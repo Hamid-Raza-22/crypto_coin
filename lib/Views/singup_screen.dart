@@ -164,7 +164,6 @@ class SignupScreenState extends State<SignupScreen> with TickerProviderStateMixi
                       gradientColors: const [Colors.blueAccent, Colors.blueAccent],
                       onTap: () {
                         Get.offNamed('/login');
-                        print("loginnnn");
                       },
                       borderRadius: 15.0,
                       boxShadow: [
@@ -193,11 +192,16 @@ class SignupScreenState extends State<SignupScreen> with TickerProviderStateMixi
                 ),
               ),
             ),
-            Positioned(
-              bottom: MediaQuery.of(context).size.height * 0.05,
-              left: MediaQuery.of(context).size.width * 0.06,
-              child: CustomButton(
+
+              // bottom: MediaQuery.of(context).size.height * 0.5,
+              // //top: MediaQuery.of(context).size.height * 0.8 ,
+              // left: MediaQuery.of(context).size.width * 0.08,
+               CustomButton(
                 width: MediaQuery.of(context).size.width * 0.9,
+                bottom: MediaQuery.of(context).size.height * 0.05,
+                left: MediaQuery.of(context).size.width * 0.08,
+                right: MediaQuery.of(context).size.width * 0.08,
+
                 height: 55,
                 buttonText: 'Sign In',
                 iconSize: 20,
@@ -213,7 +217,7 @@ class SignupScreenState extends State<SignupScreen> with TickerProviderStateMixi
                 borderRadius: 15.0,
                 borderColor: Colors.blue,
               ),
-            ),
+
           ],
         ),
       ),
