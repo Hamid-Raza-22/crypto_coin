@@ -15,13 +15,14 @@ class CustomButton extends StatelessWidget {
   final List<BoxShadow>? boxShadow;
   final EdgeInsetsGeometry? margin;
   final EdgeInsetsGeometry? padding;
-  final IconData? icon; // Parameter for icon
-  final double? iconSize; // Icon size
-  final Color? iconColor; // Icon color
-  final Color? iconBackgroundColor; // Icon background color
-  final double spacing; // Spacing between icon and text
-  final IconPosition iconPosition; // Icon position (left or right)
-  final TextAlign textAlign; // New parameter for text alignment
+  final IconData? icon;
+  final double? iconSize;
+  final Color? iconColor;
+  final Color? iconBackgroundColor;
+  final double spacing;
+  final IconPosition iconPosition;
+  final TextAlign textAlign;
+  final Color? borderColor; // New parameter for border color
 
   const CustomButton({
     super.key,
@@ -42,10 +43,11 @@ class CustomButton extends StatelessWidget {
     this.icon,
     this.iconSize = 24.0,
     this.iconColor,
-    this.iconBackgroundColor, // Optional icon background color
+    this.iconBackgroundColor,
     this.spacing = 8.0,
-    this.iconPosition = IconPosition.left, // Default position is left
-    this.textAlign = TextAlign.center, // Default text alignment is center
+    this.iconPosition = IconPosition.left,
+    this.textAlign = TextAlign.center,
+    this.borderColor, // Initialize the border color
   });
 
   @override
@@ -76,6 +78,10 @@ class CustomButton extends StatelessWidget {
                 blurRadius: 8,
               ),
             ],
+            border: Border.all(
+              color: borderColor ?? Colors.transparent, // Use the border color parameter
+              width: 2.0, // Set the border width
+            ),
           ),
           child: Center(
             child: Row(
@@ -125,7 +131,7 @@ class CustomButton extends StatelessWidget {
         Expanded(
           child: Text(
             buttonText,
-            textAlign: textAlign, // Apply the text alignment
+            textAlign: textAlign,
             style: textStyle ??
                 const TextStyle(
                   color: Colors.white,
@@ -143,7 +149,7 @@ class CustomButton extends StatelessWidget {
         Expanded(
           child: Text(
             buttonText,
-            textAlign: textAlign, // Apply the text alignment
+            textAlign: textAlign,
             style: textStyle ??
                 const TextStyle(
                   color: Colors.white,
@@ -163,7 +169,7 @@ class CustomButton extends StatelessWidget {
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(10),
                 bottomLeft: Radius.circular(10),
-                 topRight: Radius.circular(10),
+                topRight: Radius.circular(10),
                 bottomRight: Radius.circular(10),
               ),
             ),
@@ -184,4 +190,4 @@ class CustomButton extends StatelessWidget {
   }
 }
 
-enum IconPosition { left, right } // Enum for icon position
+enum IconPosition { left, right , center} // Enum for icon position

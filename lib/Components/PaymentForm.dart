@@ -123,7 +123,7 @@ class _StripePaymentFormState extends State<PaymentForm> {
                       setState(() {
                         _isProcessing = false;
                       });
-                      await launchPayFastPayment();
+                     // await launchPayFastPayment();
                     });
                   }
                 },

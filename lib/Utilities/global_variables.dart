@@ -17,6 +17,7 @@ const hamidImage = "assets/images/Hamid2.jpg";
 const grayEBike = "assets/images/grayEBike.png";
 const orangeEBike = "assets/images/orangeEBike.png";
 const markerEBike = "assets/images/markerEBike.png";
+const logo = "assets/images/logo.png";
 
 // Icons
 const googleIcon = "assets/icons/google.png";
