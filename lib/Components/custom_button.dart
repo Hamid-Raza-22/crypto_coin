@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'custom_editable_menu_option.dart';
+
 class CustomButton extends StatelessWidget {
   final double? top;
   final double? left;
@@ -52,45 +54,39 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      top: top,
-      left: left,
-      right: right,
-      bottom: bottom,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: width ?? MediaQuery.of(context).size.width * 0.9,
-          height: height ?? 60.0,
-          margin: margin,
-          padding: padding ?? const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(borderRadius),
-            gradient: LinearGradient(
-              colors: gradientColors,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            boxShadow: boxShadow ?? [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                offset: const Offset(0, 4),
-                blurRadius: 8,
-              ),
-            ],
-            border: Border.all(
-              color: borderColor ?? Colors.transparent, // Use the border color parameter
-              width: 2.0, // Set the border width
-            ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: width ?? MediaQuery.of(context).size.width * 0.9,
+        height: height ?? 60.0,
+        margin: margin,
+        padding: padding ?? const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(borderRadius),
+          gradient: LinearGradient(
+            colors: gradientColors,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          child: Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: iconPosition == IconPosition.left
-                  ? _buildIconWithTextLeft()
-                  : _buildIconWithTextRight(),
+          boxShadow: boxShadow ?? [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              offset: const Offset(0, 4),
+              blurRadius: 8,
             ),
+          ],
+          border: Border.all(
+            color: borderColor ?? Colors.transparent, // Use the border color parameter
+            width: 2.0, // Set the border width
+          ),
+        ),
+        child: Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: iconPosition == IconPosition.left
+                ? _buildIconWithTextLeft()
+                : _buildIconWithTextRight(),
           ),
         ),
       ),
@@ -190,4 +186,4 @@ class CustomButton extends StatelessWidget {
   }
 }
 
-enum IconPosition { left, right , center} // Enum for icon position
+

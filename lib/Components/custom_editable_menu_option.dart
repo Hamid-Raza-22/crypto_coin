@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'custom_button.dart';
-
-class CustomEditableMenuOption extends StatelessWidget {
+class CustomEditableMenuOption extends StatefulWidget {
   final double? top;
   final double? left;
   final double? right;
@@ -20,6 +18,7 @@ class CustomEditableMenuOption extends StatelessWidget {
   final double spacing;
   final IconPosition iconPosition;
   final TextAlign textAlign;
+  final bool obscureText; // New parameter for obscuring text
 
   const CustomEditableMenuOption({
     super.key,
@@ -40,15 +39,29 @@ class CustomEditableMenuOption extends StatelessWidget {
     this.spacing = 8.0,
     this.iconPosition = IconPosition.left,
     this.textAlign = TextAlign.center,
+    this.obscureText = false, // Default value for obscuring text
   });
 
   @override
+  _CustomEditableMenuOptionState createState() => _CustomEditableMenuOptionState();
+}
+
+class _CustomEditableMenuOptionState extends State<CustomEditableMenuOption> {
+  late bool _obscureText;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscureText = widget.obscureText;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final TextEditingController controller = TextEditingController(text: initialValue);
+    final TextEditingController controller = TextEditingController(text: widget.initialValue);
 
     final container = Container(
-      width: width ?? double.infinity,
-      height: height ?? 60.0,
+      width: widget.width ?? double.infinity,
+      height: widget.height ?? 60.0,
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
       decoration: BoxDecoration(
@@ -62,23 +75,23 @@ class CustomEditableMenuOption extends StatelessWidget {
           ),
         ],
         border: Border.all(
-          color: borderColor ?? Colors.transparent,
+          color: widget.borderColor ?? Colors.transparent,
           width: 2.0,
         ),
       ),
       child: Row(
-        children: iconPosition == IconPosition.left
+        children: widget.iconPosition == IconPosition.left
             ? _buildIconWithTextField(controller)
             : _buildTextFieldWithIcon(controller),
       ),
     );
 
-    if (top != null || left != null || right != null || bottom != null) {
+    if (widget.top != null || widget.left != null || widget.right != null || widget.bottom != null) {
       return Positioned(
-        top: top,
-        left: left,
-        right: right,
-        bottom: bottom,
+        top: widget.top,
+        left: widget.left,
+        right: widget.right,
+        bottom: widget.bottom,
         child: container,
       );
     }
@@ -88,30 +101,31 @@ class CustomEditableMenuOption extends StatelessWidget {
 
   List<Widget> _buildIconWithTextField(TextEditingController controller) {
     return [
-      if (icon != null) ...[
+      if (widget.icon != null) ...[
         Container(
           decoration: BoxDecoration(
-            color: iconBackgroundColor ?? Colors.transparent,
+            color: widget.iconBackgroundColor ?? Colors.transparent,
             borderRadius: BorderRadius.circular(10),
           ),
           padding: const EdgeInsets.all(5.0),
           child: Icon(
-            icon,
-            size: iconSize,
-            color: iconColor ?? Colors.black,
+            widget.icon,
+            size: widget.iconSize,
+            color: widget.iconColor ?? Colors.black,
           ),
         ),
-        SizedBox(width: spacing),
+        SizedBox(width: widget.spacing),
       ],
       Expanded(
         child: TextField(
           controller: controller,
+          obscureText: _obscureText,
           style: const TextStyle(
             fontSize: 16,
             color: Colors.black,
           ),
           decoration: InputDecoration(
-            labelText: label,
+            labelText: widget.label,
             labelStyle: const TextStyle(
               color: Colors.grey,
               fontSize: 16,
@@ -119,8 +133,18 @@ class CustomEditableMenuOption extends StatelessWidget {
             ),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 4),
+            suffixIcon: widget.obscureText
+                ? IconButton(
+              icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+              onPressed: () {
+                setState(() {
+                  _obscureText = !_obscureText;
+                });
+              },
+            )
+                : null,
           ),
-          onChanged: onChanged,
+          onChanged: widget.onChanged,
         ),
       ),
     ];
@@ -131,12 +155,13 @@ class CustomEditableMenuOption extends StatelessWidget {
       Expanded(
         child: TextField(
           controller: controller,
+          obscureText: _obscureText,
           style: const TextStyle(
             fontSize: 16,
             color: Colors.black,
           ),
           decoration: InputDecoration(
-            labelText: label,
+            labelText: widget.label,
             labelStyle: const TextStyle(
               color: Colors.grey,
               fontSize: 16,
@@ -144,22 +169,32 @@ class CustomEditableMenuOption extends StatelessWidget {
             ),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 5),
+            suffixIcon: widget.obscureText
+                ? IconButton(
+              icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off, color: Colors.blue,),
+              onPressed: () {
+                setState(() {
+                  _obscureText = !_obscureText;
+                });
+              },
+            )
+                : null,
           ),
-          onChanged: onChanged,
+          onChanged: widget.onChanged,
         ),
       ),
-      if (icon != null) ...[
-        SizedBox(width: spacing),
+      if (widget.icon != null) ...[
+        SizedBox(width: widget.spacing),
         Container(
           decoration: BoxDecoration(
-            color: iconBackgroundColor ?? Colors.transparent,
+            color: widget.iconBackgroundColor ?? Colors.transparent,
             borderRadius: BorderRadius.circular(10),
           ),
           padding: const EdgeInsets.all(8.0),
           child: Icon(
-            icon,
-            size: iconSize,
-            color: iconColor ?? Colors.black,
+            widget.icon,
+            size: widget.iconSize,
+            color: widget.iconColor ?? Colors.black,
           ),
         ),
       ],
@@ -167,4 +202,4 @@ class CustomEditableMenuOption extends StatelessWidget {
   }
 }
 
-// enum IconPosition { left, right }
+enum IconPosition { left, right }
