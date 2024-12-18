@@ -56,14 +56,15 @@ class _SignupScreenState extends State<SignupScreen> {
                   _buildSocialButton(
                     context: context,
                     text: 'Continue with Facebook',
-                    icon: FontAwesomeIcons.facebookF,
+                    iconImage: AssetImage(facebookIcon),
+
                     onTap: () => Get.offNamed('/facebookLogin'),
                   ),
                   const SizedBox(height: 10),
                   _buildSocialButton(
                     context: context,
                     text: 'Continue with Google',
-                    icon: FontAwesomeIcons.google,
+                    iconImage: AssetImage(googleIcon),
                     onTap: () => Get.offNamed('/googleLogin'),
                   ),
                   const SizedBox(height: 10),
@@ -77,6 +78,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   CustomButton(
                     width: screenSize.width * 0.9,
                     height: 55,
+
                     buttonText: 'Sign up with Email',
                     textStyle: const TextStyle(
                       color: Colors.white,
@@ -84,7 +86,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                     gradientColors: const [Colors.blueAccent, Colors.blueAccent],
-                    onTap: () => Get.offNamed('/emailSignup'),
+                    onTap: () => Get.offNamed('/ThreeStepLockScreen'),
                     borderRadius: 15.0,
                   ),
                   const SizedBox(height: 55),
@@ -133,7 +135,8 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget _buildSocialButton({
     required BuildContext context,
     required String text,
-    required IconData icon,
+    final IconData? icon,
+    final iconImage,
     required VoidCallback onTap,
   }) {
     final screenSize = MediaQuery.of(context).size;
@@ -142,6 +145,7 @@ class _SignupScreenState extends State<SignupScreen> {
       width: screenSize.width,
       height: screenSize.height * 0.07,
       buttonText: text,
+      iconImage: iconImage,
       icon: icon,
       iconSize: 25,
       iconColor: Colors.black,

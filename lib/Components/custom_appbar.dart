@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
-  final String imageUrl; // New dynamic parameter for the image URL
+  final String? title;
+  final String? imageUrl; // New dynamic parameter for the image URL
   final VoidCallback? onBackPressed;
 
   const CustomAppBar({
     super.key,
-    required this.title,
-    required this.imageUrl, // Initialize the image URL
+  this.title,
+     this.imageUrl, // Initialize the image URL
     this.onBackPressed,
   });
 
@@ -21,13 +21,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         Flexible(
         child:
           Image.asset(
-            imageUrl,
+            imageUrl?? "",
             height:24, // Adjust the height as needed
             fit: BoxFit.cover,
           ),),
           SizedBox(width:5), // Space between image and text
           Text(
-            title,
+            title??"",
             style: TextStyle(
               fontFamily: 'Kanit',
               fontSize: 22,

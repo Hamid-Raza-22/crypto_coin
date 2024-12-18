@@ -18,6 +18,10 @@ const grayEBike = "assets/images/grayEBike.png";
 const orangeEBike = "assets/images/orangeEBike.png";
 const markerEBike = "assets/images/markerEBike.png";
 const logo = "assets/images/logo.png";
+const lockImage = "assets/images/lock.png";
+const mobileEmail = "assets/images/mobileEmail.png";
+const verification = "assets/images/varification.png";
+
 
 // Icons
 const googleIcon = "assets/icons/google.png";
@@ -25,3 +29,4 @@ const facebookIcon = "assets/icons/facebook.png";
 const instagramIcon = "assets/icons/instagram.png";
 const twitterIcon = "assets/icons/twitter.png";
 const whatsappIcon = "assets/icons/whatsapp.png";
+

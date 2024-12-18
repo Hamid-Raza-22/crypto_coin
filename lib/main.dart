@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'Views/confirm_email_screen.dart';
 import 'Views/login_screen.dart';
 import 'Views/singup_screen.dart';
 import 'Views/splesh_screen.dart';
+import 'Views/step_one_email_screen.dart';
+import 'Views/three_step_lock_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();  // Add this line
@@ -34,6 +37,9 @@ class MyApp extends StatelessWidget {
         // GetPage(name: '/adminPanel', page: () => const AdminPanel()),
         // GetPage(name: '/getStarted', page: () =>  const GetStartedPage()),
         GetPage(name: '/signup', page: () =>  SignupScreen()),
+        GetPage(name: '/ThreeStepLockScreen', page: () =>  ThreeStepLockScreen()),
+        GetPage(name: '/StepOneEmailScreen', page: () =>  StepOneEmailScreen()),
+        GetPage(name: '/ConfirmEmailScreen', page: () =>  ConfirmEmailScreen()),
         // GetPage(name: '/transactionHistory', page: () => TransactionHistory()),
         // GetPage(name: '/rideHistory', page: () => RideHistory()),
         // GetPage(name: '/accountSetting', page: () => AccountSetting()),

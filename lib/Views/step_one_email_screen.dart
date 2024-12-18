@@ -6,14 +6,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../Components/custom_button.dart';
 import '../Components/custom_editable_menu_option.dart'; // Import CustomEditableMenuOption
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class StepOneEmailScreen extends StatefulWidget {
+  const StepOneEmailScreen({super.key});
 
   @override
-  LoginScreenState createState() => LoginScreenState();
+  StepOneEmailScreenState createState() => StepOneEmailScreenState();
 }
 
-class LoginScreenState extends State<LoginScreen> {
+class StepOneEmailScreenState extends State<StepOneEmailScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -31,7 +31,7 @@ class LoginScreenState extends State<LoginScreen> {
             children: [
               const SizedBox(height: 15),
               const Text(
-                'Login to your Account',
+                'What’s your email?',
                 style: TextStyle(
                   fontFamily: 'Readex Pro',
                   fontSize: 32,
@@ -51,37 +51,18 @@ class LoginScreenState extends State<LoginScreen> {
 
                 borderColor: Colors.blueAccent,
               ),
-              const SizedBox(height: 1),
-              CustomEditableMenuOption(
-                label: 'Password',
-                initialValue: '',
-                onChanged: (value) => _passwordController.text = value,
-                icon: Icons.lock_outline_rounded,
-                iconColor: Colors.blueAccent,
-                borderColor: Colors.blueAccent,
 
-                obscureText: true,
-              ),
+
               const SizedBox(height: 2),
-              CustomEditableMenuOption(
-                label: 'Reference Code',
-                initialValue: '',
-                onChanged: (value) => _passwordController.text = value,
-                icon: Icons.lock_outline_rounded,
-                iconColor: Colors.blueAccent,
-                borderColor: Colors.blueAccent,
-                obscureText: false,
-                keyboardType: TextInputType.phone,
-              ),
-              const SizedBox(height: 0.1),
-              Align(
-                alignment: Alignment.centerRight,
+
+              Center(
+               // alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {
                     // Handle forgot password action
                   },
                   child: const Text(
-                    'Forgot your password?',
+                    'Have an account? Log in here',
                     style: TextStyle(
                       fontFamily: 'Readex Pro',
                       fontSize: 14,
@@ -92,17 +73,31 @@ class LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 50),
               CustomButton(
+                height: 50,
                 borderRadius: 10,
-                buttonText: 'Sign in with Email',
-                icon: Icons.arrow_forward_ios_outlined,
-                iconPosition: IconPosition.right,
+                buttonText: 'Continue',
+                // icon: Icons.arrow_forward_ios_outlined,
+                // iconPosition: IconPosition.right,
                 iconColor: Colors.white,
                 gradientColors: const [Colors.blueAccent, Colors.blueAccent],
-                onTap: () => Get.offNamed('/signup'),
+                onTap: () => Get.offNamed('/ConfirmEmailScreen'),
               ),
               const SizedBox(height: 40),
+              const Text(
+                'By registering you accept our Terms & Conditions and Privacy Policy. Your data will be security encrypted with TLS',
+                style: TextStyle(
+                  fontFamily: 'Readex Pro',
+                  fontSize: 11,
+                  fontWeight: FontWeight.w300,
+                  height: 1.6,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 80),
               const Text(
                 '----------- or continue with -----------',
                 style: TextStyle(
@@ -140,7 +135,7 @@ class LoginScreenState extends State<LoginScreen> {
             height: buttonHeight,
             width: buttonWidth,
             child: CustomButton(
-               width: buttonWidth,
+              width: buttonWidth,
               height: buttonHeight,
               //iconImage: AssetImage(assetName),
               icon: FontAwesomeIcons.facebookF,
@@ -175,7 +170,7 @@ class LoginScreenState extends State<LoginScreen> {
               iconImage: AssetImage(googleIcon),
               iconImageSize: 20,
               iconColor: Colors.black,
-             // iconColor: Color(0xFFDB4437),
+              // iconColor: Color(0xFFDB4437),
               iconSize: 20,
               gradientColors: const [Colors.white, Colors.white],
               boxShadow: [
