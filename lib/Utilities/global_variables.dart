@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 late AnimationController _fadeController;
@@ -11,16 +12,14 @@ late Animation<double> _buttonAnimation;
 // Main Color
 const Color buttonColorGreen = Color(0xFF00F27E);
 // Images
-const eBikeLogo = "assets/images/e_bikeLogo.png";
-const eBike = "assets/images/e_bike.png";
+final FirebaseAuth auth = FirebaseAuth.instance;
+
 const hamidImage = "assets/images/Hamid2.jpg";
-const grayEBike = "assets/images/grayEBike.png";
-const orangeEBike = "assets/images/orangeEBike.png";
-const markerEBike = "assets/images/markerEBike.png";
 const logo = "assets/images/logo.png";
 const lockImage = "assets/images/lock.png";
+const messageImage = "assets/images/message.png";
 const mobileEmail = "assets/images/mobileEmail.png";
-const verification = "assets/images/varification.png";
+const verificationMarkImage = "assets/images/verificationMark.png";
 
 
 // Icons

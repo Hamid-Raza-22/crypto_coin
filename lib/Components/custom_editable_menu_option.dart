@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-enum IconPosition { left, right , center}
+enum IconPosition { left, right, center }
 
 class CustomEditableMenuOption extends StatefulWidget {
   final double? top;
@@ -9,15 +10,15 @@ class CustomEditableMenuOption extends StatefulWidget {
   final double? bottom;
   final double? width;
   final double? height;
-  final String label;
-  final String initialValue;
+  final String? label;
+  final String? initialValue;
   final ValueChanged<String> onChanged;
   final Color? borderColor;
   final IconData? icon;
   final double? iconSize;
   final Color? iconColor;
   final Color? iconBackgroundColor;
-  final ImageProvider? iconImage; // New parameter for iconImage
+  final ImageProvider? iconImage; // For custom images
   final double? iconImageSize; // Size for the iconImage
   final double spacing;
   final IconPosition iconPosition;
@@ -28,6 +29,9 @@ class CustomEditableMenuOption extends StatefulWidget {
   final bool useBoxShadow;
   final FormFieldValidator<String>? validator;
   final TextInputType? keyboardType;
+  final FocusNode? focusNode; // For managing focus explicitly
+  final int? maxLength; // Maximum number of characters allowed
+  final TextEditingController? controller;
 
   const CustomEditableMenuOption({
     super.key,
@@ -37,25 +41,28 @@ class CustomEditableMenuOption extends StatefulWidget {
     this.bottom,
     this.width,
     this.height,
-    required this.label,
-    required this.initialValue,
+    this.label,
+    this.initialValue,
     required this.onChanged,
     this.borderColor,
     this.icon,
     this.iconSize = 24.0,
     this.iconColor,
     this.iconBackgroundColor,
-    this.iconImage, // Initialize iconImage parameter
-    this.iconImageSize = 24.0, // Default iconImage size
+    this.iconImage,
+    this.iconImageSize = 24.0,
     this.spacing = 5.0,
     this.iconPosition = IconPosition.left,
-    this.textAlign = TextAlign.center,
+    this.textAlign = TextAlign.left,
     this.obscureText = false,
     this.inputBorder,
     this.boxShadow,
     this.useBoxShadow = true,
     this.validator,
     this.keyboardType,
+    this.focusNode,
+    this.maxLength,
+    this.controller
   });
 
   @override
@@ -139,11 +146,18 @@ class _CustomEditableMenuOptionState extends State<CustomEditableMenuOption> {
           controller: _controller,
           obscureText: _obscureText,
           keyboardType: widget.keyboardType,
+          focusNode: widget.focusNode, // Use the passed FocusNode
+          textAlign: widget.textAlign,
+          maxLength: widget.maxLength, // Enforce maxLength
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(widget.maxLength), // Dynamic limit
+          ],
           style: const TextStyle(
             fontSize: 16,
             color: Colors.black,
           ),
           decoration: InputDecoration(
+            counterText: "", // Hide counter under text field
             labelText: widget.label,
             labelStyle: const TextStyle(
               color: Colors.grey,
@@ -155,7 +169,9 @@ class _CustomEditableMenuOptionState extends State<CustomEditableMenuOption> {
             suffixIcon: widget.obscureText
                 ? IconButton(
               icon: Icon(
-                  _obscureText ? Icons.visibility : Icons.visibility_off),
+                  _obscureText
+                      ? Icons.visibility
+                      : Icons.visibility_off),
               onPressed: () {
                 setState(() {
                   _obscureText = !_obscureText;
@@ -178,11 +194,18 @@ class _CustomEditableMenuOptionState extends State<CustomEditableMenuOption> {
           controller: _controller,
           obscureText: _obscureText,
           keyboardType: widget.keyboardType,
+          focusNode: widget.focusNode,
+          textAlign: widget.textAlign,
+          maxLength: widget.maxLength,
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(widget.maxLength),
+          ],
           style: const TextStyle(
             fontSize: 16,
             color: Colors.black,
           ),
           decoration: InputDecoration(
+            counterText: "",
             labelText: widget.label,
             labelStyle: const TextStyle(
               color: Colors.grey,

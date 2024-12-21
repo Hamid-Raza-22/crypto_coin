@@ -1,9 +1,16 @@
+import 'dart:io';
+
 import 'package:crypto_coin/Utilities/global_variables.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../Components/custom_appbar.dart';
 import '../Components/custom_button.dart';
+import '../Services/FirebaseServices/sign_up_with_google.dart';
 
 class SignupScreen extends StatefulWidget {
   @override
@@ -21,15 +28,65 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
+  Future<void> _signUpWithFacebook() async {
+    try {
+      final LoginResult result = await FacebookAuth.instance.login();
+
+      if (result.status == LoginStatus.success) {
+        final AccessToken accessToken = result.accessToken!;
+        final AuthCredential credential = FacebookAuthProvider.credential(accessToken.tokenString);
+        await auth.signInWithCredential(credential);
+        Get.offNamed('/dashboard');
+      } else {
+        print('Facebook Sign-Up Failed: ${result.message}');
+      }
+    } catch (e) {
+      print('Facebook Sign-Up Error: $e');
+    }
+  }
+
+
+  Future<void> _signUpWithApple() async {
+    try {
+      final AuthorizationCredentialAppleID appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final AuthCredential credential = OAuthProvider("apple.com").credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      await auth.signInWithCredential(credential);
+      Get.offNamed('/dashboard');
+    } catch (e) {
+      print('Apple Sign-In Error: $e');
+    }
+  }
+
+  Future<void> _signUpWithEmail(String email, String password) async {
+    try {
+      await auth.createUserWithEmailAndPassword(email: email, password: password);
+      Get.offNamed('/dashboard');
+    } catch (e) {
+      print('Email Sign-Up Error: $e');
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const CustomAppBar(
+      appBar:  CustomAppBar(
         imageUrl: logo, // Adjust to the actual logo path
         title: 'Crypto Coin',
+        onBackPressed: () {exit(0);
+          // Handle back button action
+        },
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -58,21 +115,21 @@ class _SignupScreenState extends State<SignupScreen> {
                     text: 'Continue with Facebook',
                     iconImage: AssetImage(facebookIcon),
 
-                    onTap: () => Get.offNamed('/facebookLogin'),
+                    onTap: _signUpWithFacebook,
                   ),
                   const SizedBox(height: 10),
                   _buildSocialButton(
                     context: context,
                     text: 'Continue with Google',
                     iconImage: AssetImage(googleIcon),
-                    onTap: () => Get.offNamed('/googleLogin'),
+                     onTap: signUpWithGoogle,
                   ),
                   const SizedBox(height: 10),
                   _buildSocialButton(
                     context: context,
                     text: 'Continue with Apple',
                     icon: FontAwesomeIcons.apple,
-                    onTap: () => Get.offNamed('/appleLogin'),
+                    onTap: _signUpWithApple,
                   ),
                   const SizedBox(height: 10),
                   CustomButton(
@@ -117,7 +174,7 @@ class _SignupScreenState extends State<SignupScreen> {
               height: 55,
               buttonText: 'Sign In',
               textStyle: const TextStyle(
-                color: Colors.black,
+                color: Colors.blueAccent,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),

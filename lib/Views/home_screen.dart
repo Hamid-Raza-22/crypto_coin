@@ -6,12 +6,12 @@ import 'package:get/get.dart';
 import '../Components/custom_appbar.dart';
 import '../Components/custom_button.dart';
 
-class ThreeStepLockScreen extends StatefulWidget {
+class HomeScreen extends StatefulWidget {
   @override
-  State<ThreeStepLockScreen> createState() => _ThreeStepLockScreenState();
+  State<HomeScreen> createState() => _ThreeStepLockScreenState();
 }
 
-class _ThreeStepLockScreenState extends State<ThreeStepLockScreen> {
+class _ThreeStepLockScreenState extends State<HomeScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -28,7 +28,7 @@ class _ThreeStepLockScreenState extends State<ThreeStepLockScreen> {
 
     return WillPopScope(
       onWillPop: () async {
-        Get.offNamed('/signup');
+        //Get.offNamed('/signup');
         return false; // Prevents the default behavior of closing the app
       },
       child: Scaffold(
@@ -36,7 +36,7 @@ class _ThreeStepLockScreenState extends State<ThreeStepLockScreen> {
         appBar: CustomAppBar(
           imageUrl: logo,
           title: 'Crypto Coin',
-          onBackPressed: () => Get.offNamed('/signup'),
+         // onBackPressed: () => Get.offNamed('/signup'),
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -49,7 +49,7 @@ class _ThreeStepLockScreenState extends State<ThreeStepLockScreen> {
                   children: [
                     const SizedBox(height: 20),
                     const Text(
-                      'Get started in 3 easy steps',
+                      'Welcome to Home Screen',
                       style: TextStyle(
                         fontFamily: 'Readex Pro',
                         fontSize: 30,
@@ -60,23 +60,23 @@ class _ThreeStepLockScreenState extends State<ThreeStepLockScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
-                    _buildLockImage(),
+                    // _buildLockImage(),
                     const Center(
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-
-                            FontAwesomeIcons.one,
-                            size: 21,
-                            color: Colors.blueAccent,
-                          ),
-                          SizedBox(width: 8),
+                          // Icon(
+                          //
+                          //   FontAwesomeIcons.one,
+                          //   size: 21,
+                          //   color: Colors.blueAccent,
+                          // ),
+                          SizedBox(height: 500),
                           Text(
-                            'Create your account',
+                            'This Application is under Development..',
                             style: TextStyle(
                               fontFamily: 'Readex Pro',
-                              fontSize: 21,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: Colors.black,
                             ),
@@ -90,34 +90,34 @@ class _ThreeStepLockScreenState extends State<ThreeStepLockScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            FontAwesomeIcons.two,
-                            size: 21,
-                            color: Colors.blueAccent,
-                          ),
+                          // Icon(
+                          //   FontAwesomeIcons.two,
+                          //   size: 21,
+                          //   color: Colors.blueAccent,
+                          // ),
                           SizedBox(width: 8),
-                          Text(
-                            'Account verification',
-                            style: TextStyle(
-                              fontFamily: 'Readex Pro',
-                              fontSize: 21,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                          // Text(
+                          //   'Account verification',
+                          //   style: TextStyle(
+                          //     fontFamily: 'Readex Pro',
+                          //     fontSize: 21,
+                          //     fontWeight: FontWeight.w600,
+                          //     color: Colors.black,
+                          //   ),
+                          //   textAlign: TextAlign.center,
+                          // ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 70),
-                    CustomButton(
-                      height: 50,
-                      borderRadius: 10,
-                      buttonText: 'Continue',
-                      iconColor: Colors.white,
-                      gradientColors: const [Colors.blueAccent, Colors.blueAccent],
-                      onTap: () => Get.offNamed('/StepOneEmailScreen'),
-                    ),
+                    // CustomButton(
+                    //   height: 50,
+                    //   borderRadius: 10,
+                    //   buttonText: 'Continue',
+                    //   iconColor: Colors.white,
+                    //   gradientColors: const [Colors.blueAccent, Colors.blueAccent],
+                    //   onTap: () => Get.offNamed('/StepOneEmailScreen'),
+                    // ),
                   ],
                 ),
               ),

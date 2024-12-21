@@ -1,5 +1,4 @@
 import 'package:crypto_coin/Components/custom_appbar.dart';
-import 'package:crypto_coin/Services/FirebaseServices/sign_in_with_google.dart';
 import 'package:crypto_coin/Utilities/global_variables.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,43 +8,59 @@ import '../Components/custom_button.dart';
 import '../Components/custom_editable_menu_option.dart';
 import '../Components/custom_social_button.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class CreatePasswordScreen extends StatefulWidget {
+  const CreatePasswordScreen({super.key});
 
   @override
-  LoginScreenState createState() => LoginScreenState();
+  CreatePasswordScreenState createState() => CreatePasswordScreenState();
 }
 
-class LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _emailController = TextEditingController();
+class CreatePasswordScreenState extends State<CreatePasswordScreen> {
+  late String email;
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
-  Future<void> _signInUser() async {
-    final email = _emailController.text.trim();
+  @override
+  void initState() {
+    super.initState();
+    // Get the email from the arguments
+    email = Get.arguments?['email'] ?? 'your email';
+  }
+
+  Future<void> _registerUser() async {
     final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
+    if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in both email and password.')),
+        const SnackBar(content: Text('Passwords do not match.')),
+      );
+      return;
+    }
+
+    if (password.length < 8 || !RegExp(r'[A-Z]').hasMatch(password) ||
+        !RegExp(r'[0-9]').hasMatch(password) || !RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password does not meet complexity requirements.')),
       );
       return;
     }
 
     try {
-      // Firebase Authentication sign-in
-      final authResult = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      // Firebase Authentication registration
+      final authResult = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // If successful, navigate to the home screen
-      Get.offNamed('/HomeScreen'); // Replace with your home screen route
+      // Navigate to success screen
+      Get.offNamed('/SuccessfullyCreateAccount');
     } on FirebaseAuthException catch (e) {
       String errorMessage = 'An error occurred. Please try again.';
-      if (e.code == 'user-not-found') {
-        errorMessage = 'No user found with this email.';
-      } else if (e.code == 'wrong-password') {
-        errorMessage = 'Incorrect password.';
+      if (e.code == 'email-already-in-use') {
+        errorMessage = 'This email is already in use.';
+      } else if (e.code == 'weak-password') {
+        errorMessage = 'The password is too weak.';
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -62,7 +77,7 @@ class LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Get.offNamed('/signup');
+        Get.offNamed('/VerificationSuccessScreen');
         return false; // Prevents the default behavior of closing the app
       },
       child: Scaffold(
@@ -70,7 +85,7 @@ class LoginScreenState extends State<LoginScreen> {
         appBar: CustomAppBar(
           title: 'Crypto Coin',
           imageUrl: logo,
-          onBackPressed: () => Get.offNamed('/signup'),
+          onBackPressed: () => Get.offNamed('/VerificationSuccessScreen'),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -80,26 +95,28 @@ class LoginScreenState extends State<LoginScreen> {
               children: [
                 const SizedBox(height: 15),
                 const Text(
-                  'Login to your Account',
+                  'Create a password',
                   style: TextStyle(
                     fontFamily: 'Readex Pro',
                     fontSize: 32,
                     fontWeight: FontWeight.w600,
-                    height: 1.75,
+                    height: 0.5,
+                    color: Colors.black,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'The password must be 8 characters, including 1 uppercase letter, 1 number, and 1 special character.',
+                  style: TextStyle(
+                    fontFamily: 'Readex Pro',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
                     color: Colors.black,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 30),
-                CustomEditableMenuOption(
-                  label: 'Email Address',
-                  initialValue: '',
-                  onChanged: (value) => _emailController.text = value,
-                  icon: Icons.mail_outline_rounded,
-                  iconColor: Colors.blueAccent,
-                  borderColor: Colors.blueAccent,
-                ),
-                const SizedBox(height: 10),
                 CustomEditableMenuOption(
                   label: 'Password',
                   initialValue: '',
@@ -109,7 +126,32 @@ class LoginScreenState extends State<LoginScreen> {
                   borderColor: Colors.blueAccent,
                   obscureText: true,
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 1),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    ' Confirm Password$email',
+                    style: const TextStyle(
+                      fontFamily: 'Readex Pro',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w300,
+                      height: 1.6,
+                      color: Colors.black87,
+                    ),
+
+                  ),
+                ),
+                const SizedBox(height: 5),
+
+                CustomEditableMenuOption(
+                  label: 'Confirm Password',
+                  initialValue: '',
+                  onChanged: (value) => _confirmPasswordController.text = value,
+                  icon: Icons.lock_outline_rounded,
+                  iconColor: Colors.blueAccent,
+                  borderColor: Colors.blueAccent,
+                  obscureText: true,
+                ), const SizedBox(height: 10),
                 CustomEditableMenuOption(
                   label: 'Reference Code',
                   initialValue: '',
@@ -122,31 +164,25 @@ class LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 0.1),
 
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      // Navigate to forgot password screen
-                      Get.toNamed('/forgotPassword'); // Update with your forgot password route
-                    },
-                    child: const Text(
-                      'Forgot your password?',
-                      style: TextStyle(
-                        fontFamily: 'Readex Pro',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w300,
-                        height: 1.6,
-                        color: Colors.blue,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 20),
+
                 CustomButton(
+                  height: 52,
                   borderRadius: 10,
-                  buttonText: 'Sign in',
+                  buttonText: 'Continue',
                   gradientColors: const [Colors.blueAccent, Colors.blueAccent],
-                  onTap: _signInUser,
+                  onTap: _registerUser,
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'By registering you accept our Terms & Conditions and Privacy Policy. Your data will be securely encrypted with TLS.',
+                  style: TextStyle(
+                    fontFamily: 'Readex Pro',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),
                 const Text(
@@ -154,7 +190,7 @@ class LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontFamily: 'Readex Pro',
                     fontSize: 14,
-                    fontWeight: FontWeight.w300,
+                    fontWeight: FontWeight.w500,
                     height: 1.6,
                     color: Colors.black,
                   ),
@@ -183,14 +219,7 @@ class LoginScreenState extends State<LoginScreen> {
         _buildSocialButton(
           iconImage: AssetImage(googleIcon),
           color: Colors.black,
-          onTap: () async {
-            User? user = await signInWithGoogle();
-            if( user !=null){
-              Get.offNamed("/HomeScreen");
-            }else{
-
-            }
-          } ,
+          onTap: () => Get.offNamed('/reportIssues'),
         ),
         _buildSocialButton(
           icon: FontAwesomeIcons.apple,

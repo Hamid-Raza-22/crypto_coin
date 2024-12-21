@@ -52,7 +52,7 @@ class CustomButton extends StatelessWidget {
     this.iconBackgroundColor,
     this.iconImage, // Initialize iconImage
     this.iconImageSize = 24.0, // Default iconImage size
-    this.spacing = 8.0,
+    this.spacing = 1.0,
     this.iconPosition = IconPosition.left,
     this.textAlign = TextAlign.center,
     this.borderColor,
@@ -112,6 +112,7 @@ class CustomButton extends StatelessWidget {
             textAlign: textAlign,
             style: textStyle ??
                 const TextStyle(
+                  fontFamily: 'Readex Pro',
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,

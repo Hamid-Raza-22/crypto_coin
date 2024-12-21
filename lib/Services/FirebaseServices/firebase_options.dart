@@ -25,7 +25,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
+              'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.macOS:
         return macos;
@@ -34,7 +34,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
+              'you can reconfigure this by running the FlutterFire CLI again.',
         );
       default:
         throw UnsupportedError(
@@ -44,39 +44,39 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyA9tB_tOW2qxdUKU_JtfG4CfkMCHFbXFyU',
-    appId: '1:166567297331:web:0dbc57e0ba7efe617b7e46',
-    messagingSenderId: '166567297331',
-    projectId: 'oceianescooter',
-    authDomain: 'oceianescooter.firebaseapp.com',
-    storageBucket: 'oceianescooter.appspot.com',
-    measurementId: 'G-72TJN251PK',
+    apiKey: 'AIzaSyDRbs7ltz1GE6S6HO9bAaqWepgtdjxd0B8',
+    appId: '1:918087502215:web:d44aef2a687dab0669eb22',
+    messagingSenderId: '918087502215',
+    projectId: 'crypto-coin-40d81',
+    authDomain: 'crypto-coin-40d81.firebaseapp.com',
+    storageBucket: 'crypto-coin-40d81.firebasestorage.app',
+    measurementId: 'G-ZMGPQHD3K5',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAdwSdwwF5icGCTrLebmifHqZhsZTSDfJ0',
-    appId: '1:166567297331:android:518e4090fba19beb7b7e46',
-    messagingSenderId: '166567297331',
-    projectId: 'oceianescooter',
-    storageBucket: 'oceianescooter.appspot.com',
+    apiKey: 'AIzaSyBfzp3I5sFBL0MkouAt6ldVKPGuIXn15p0',
+    appId: '1:918087502215:android:b818474c38c0ba8d69eb22',
+    messagingSenderId: '918087502215',
+    projectId: 'crypto-coin-40d81',
+    storageBucket: 'crypto-coin-40d81.firebasestorage.app',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCKBcPYYUUX_IhlNkPXajGdnBdWOe3-zi0',
-    appId: '1:166567297331:ios:d0283f56fe3e29cf7b7e46',
-    messagingSenderId: '166567297331',
-    projectId: 'oceianescooter',
-    storageBucket: 'oceianescooter.appspot.com',
-    iosBundleId: 'com.example.oceanViewEScooters',
+    apiKey: 'AIzaSyDTlfpACrUU_ggsdG4xPrPyaGtxMg4qs4Q',
+    appId: '1:918087502215:ios:26f9d9f92b47cd8669eb22',
+    messagingSenderId: '918087502215',
+    projectId: 'crypto-coin-40d81',
+    storageBucket: 'crypto-coin-40d81.firebasestorage.app',
+    iosBundleId: 'com.hamid.cryptoCoin',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyA9tB_tOW2qxdUKU_JtfG4CfkMCHFbXFyU',
-    appId: '1:166567297331:web:b1fdf8e8a5b475c37b7e46',
-    messagingSenderId: '166567297331',
-    projectId: 'oceianescooter',
-    authDomain: 'oceianescooter.firebaseapp.com',
-    storageBucket: 'oceianescooter.appspot.com',
-    measurementId: 'G-ST4DCYPKX6',
+    apiKey: 'AIzaSyDRbs7ltz1GE6S6HO9bAaqWepgtdjxd0B8',
+    appId: '1:918087502215:web:194372cd6a08366c69eb22',
+    messagingSenderId: '918087502215',
+    projectId: 'crypto-coin-40d81',
+    authDomain: 'crypto-coin-40d81.firebaseapp.com',
+    storageBucket: 'crypto-coin-40d81.firebasestorage.app',
+    measurementId: 'G-987YEK4SS4',
   );
 }

@@ -1,40 +1,37 @@
-import 'package:crypto_coin/Components/custom_editable_menu_option.dart';
 import 'package:crypto_coin/Utilities/global_variables.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import '../Components/custom_appbar.dart';
 import '../Components/custom_button.dart';
 
-class ConfirmEmailScreen extends StatefulWidget {
+class VerificationSuccessScreen extends StatefulWidget {
+  const VerificationSuccessScreen({super.key});
 
   @override
-  State<ConfirmEmailScreen> createState() => _ConfirmEmailScreenState();
+  State<VerificationSuccessScreen> createState() => _ConfirmEmailScreenState();
 }
 
-class _ConfirmEmailScreenState extends State<ConfirmEmailScreen> {
-late String email;
-@override
-void initState() {
-  super.initState();
-  // Get the email from the arguments
-  email = Get.arguments?['email'] ?? 'your email';
-}
+class _ConfirmEmailScreenState extends State<VerificationSuccessScreen> {
+  late String email;
+  @override
+  void initState() {
+    super.initState();
+    // Get the email from the arguments
+    email = Get.arguments?['email'] ?? 'your email';
+  }
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-
     return WillPopScope(
       onWillPop: () async {
-        Get.offNamed('/StepOneEmailScreen');
+        Get.offNamed('/EmailCodeScreen');
         return false; // Prevents the default behavior of closing the app
       },
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: CustomAppBar(
-          imageUrl: logo, // Adjust to the actual logo path
+          imageUrl: logo,
           title: 'Crypto Coin',
-          onBackPressed: () => Get.offNamed('/StepOneEmailScreen'),
+          onBackPressed: () => Get.offNamed('/EmailCodeScreen'),
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -49,7 +46,7 @@ void initState() {
                     _buildLockImage(),
                     const SizedBox(height: 20),
                     const Text(
-                      'Confirm your email',
+                      'Verification Success',
                       style: TextStyle(
                         fontFamily: 'Readex Pro',
                         fontSize: 30,
@@ -60,9 +57,9 @@ void initState() {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 5),
-                     Text(
-                      'We just sent you an email to $email',
-                      style: const TextStyle(
+                    const Text(
+                      'Congratulations your account is ready to use, now you can start trading cryptocurrency',
+                      style: TextStyle(
                         fontFamily: 'Readex Pro',
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -72,12 +69,12 @@ void initState() {
                     ),
                     const SizedBox(height: 70),
                     CustomButton(
-                      height: 50,
+                      height: 52,
                       borderRadius: 10,
-                      buttonText: 'Continue',
+                      buttonText: 'Create Password',
                       iconColor: Colors.white,
                       gradientColors: const [Colors.blueAccent, Colors.blueAccent],
-                      onTap: () => Get.offNamed('/EmailCodeScreen', arguments: {'email': email}),
+                      onTap: () => Get.offNamed('/CreatePasswordScreen',arguments: {'email':email}),
                     ),
                   ],
                 ),
@@ -91,11 +88,11 @@ void initState() {
 
   Widget _buildLockImage() {
     return Center(
-      child: Container(
+      child: SizedBox(
         width: 375,
         height: 375,
         child: Image.asset(
-          mobileEmail,
+          verificationMarkImage,
         ),
       ),
     );

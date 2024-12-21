@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
-  final String? imageUrl; // New dynamic parameter for the image URL
-  final VoidCallback? onBackPressed;
+  final String? imageUrl; // Dynamic parameter for the image URL
+  final VoidCallback? onBackPressed; // Optional callback for back button
 
   const CustomAppBar({
     super.key,
-  this.title,
-     this.imageUrl, // Initialize the image URL
+    this.title,
+    this.imageUrl, // Initialize the image URL
     this.onBackPressed,
   });
 
@@ -16,34 +16,42 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       title: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center, // Center the entire row
+        crossAxisAlignment: CrossAxisAlignment.center, // Aligns image and text vertically centered
+       // spacing: 5,
         children: [
-        Flexible(
-        child:
-          Image.asset(
-            imageUrl?? "",
-            height:24, // Adjust the height as needed
-            fit: BoxFit.cover,
-          ),),
-          SizedBox(width:5), // Space between image and text
-          Text(
-            title??"",
+          Flexible(
+            child: Image.asset(
+                imageUrl ?? "",
+                height: 24, // Adjust the height as needed
+                fit: BoxFit.cover,
+              ),
+          ),
+         SizedBox(
+           width: 5,
+         ),
+         Padding(
+           padding: const EdgeInsets.only(right: 50.0),
+            child:  Text(
+            title ?? "",
             style: TextStyle(
-              fontFamily: 'Kanit',
+              fontFamily: 'Readex Pro',
               fontSize: 22,
               fontWeight: FontWeight.w500,
               color: Colors.indigoAccent,
             ),
-          ),
+          ),)
         ],
       ),
       centerTitle: true,
       backgroundColor: Colors.white,
-      // elevation: 0,
-      // leading: IconButton(
-      //   icon: Icon(Icons.arrow_back, color: Colors.white.withOpacity(0.8)),
-      //   onPressed: onBackPressed,
-      // ),
+      elevation: 0,
+      leading: onBackPressed != null
+          ? IconButton(
+        icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.grey.withOpacity(0.8)),
+        onPressed: onBackPressed,
+      )
+          : null, // Only show the back button if onBackPressed is provided
     );
   }
 
