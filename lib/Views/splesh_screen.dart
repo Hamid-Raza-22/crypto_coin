@@ -1,3 +1,4 @@
+import 'package:crypto_coin/Views/AppRoutes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -34,7 +35,8 @@ class SplashScreenState extends State<SplashScreen>
 
     // Navigate to home page after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
-      Get.offNamed('/signup');
+      // Get.offNamed(AppRoutes.signup);
+      Get.offNamed(AppRoutes.homeScreen);
     });
   }
 

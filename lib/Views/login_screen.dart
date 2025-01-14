@@ -1,6 +1,7 @@
 import 'package:crypto_coin/Components/custom_appbar.dart';
 import 'package:crypto_coin/Services/FirebaseServices/sign_in_with_google.dart';
 import 'package:crypto_coin/Utilities/global_variables.dart';
+import 'package:crypto_coin/Views/AppRoutes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -39,7 +40,7 @@ class LoginScreenState extends State<LoginScreen> {
       );
 
       // If successful, navigate to the home screen
-      Get.offNamed('/HomeScreen'); // Replace with your home screen route
+      Get.offNamed(AppRoutes.homeScreen); // Replace with your home screen route
     } on FirebaseAuthException catch (e) {
       String errorMessage = 'An error occurred. Please try again.';
       if (e.code == 'user-not-found') {
@@ -57,12 +58,16 @@ class LoginScreenState extends State<LoginScreen> {
       );
     }
   }
-
+// Future<void>homepage()async{
+//   // Get.offNamed('/HomeScreen'); // Replace with your home screen route
+//   Get.offNamed(AppRoutes.homepage); // Replace with your home screen route
+//
+// }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Get.offNamed('/signup');
+        Get.offNamed(AppRoutes.signup);
         return false; // Prevents the default behavior of closing the app
       },
       child: Scaffold(
@@ -70,7 +75,7 @@ class LoginScreenState extends State<LoginScreen> {
         appBar: CustomAppBar(
           title: 'Crypto Coin',
           imageUrl: logo,
-          onBackPressed: () => Get.offNamed('/signup'),
+          onBackPressed: () => Get.offNamed(AppRoutes.signup),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -147,6 +152,7 @@ class LoginScreenState extends State<LoginScreen> {
                   buttonText: 'Sign in',
                   gradientColors: const [Colors.blueAccent, Colors.blueAccent],
                   onTap: _signInUser,
+                  // onTap: _signInUser,
                 ),
                 const SizedBox(height: 40),
                 const Text(
@@ -186,7 +192,7 @@ class LoginScreenState extends State<LoginScreen> {
           onTap: () async {
             User? user = await signInWithGoogle();
             if( user !=null){
-              Get.offNamed("/HomeScreen");
+              Get.offNamed(AppRoutes.homeScreen);
             }else{
 
             }

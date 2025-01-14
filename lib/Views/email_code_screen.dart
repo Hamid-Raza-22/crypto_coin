@@ -1,8 +1,8 @@
 import 'package:crypto_coin/Components/custom_appbar.dart';
 import 'package:crypto_coin/Components/otp_inputs.dart';
 import 'package:crypto_coin/Utilities/global_variables.dart';
+import 'package:crypto_coin/Views/AppRoutes/app_routes.dart';
 import 'package:email_otp/email_otp.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -34,7 +34,7 @@ class StepOneEmailScreenState extends State<EmailCodeScreen> {
     try {
       bool isValid = await EmailOTP.verifyOTP(otp: otpController.text);
       if (isValid) {
-        Get.offNamed('/VerificationSuccessScreen', arguments: {'email':email});
+        Get.offNamed(AppRoutes.verificationSuccessScreen, arguments: {'email':email});
       } else {
         _showSnackbar('Invalid OTP. Please try again.', isError: true);
       }
@@ -70,7 +70,7 @@ class StepOneEmailScreenState extends State<EmailCodeScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Get.offNamed('/ConfirmEmailScreen');
+        Get.offNamed(AppRoutes.confirmEmailScreen);
         return false; // Prevents the default behavior of closing the app
       },
       child: Scaffold(
@@ -78,7 +78,7 @@ class StepOneEmailScreenState extends State<EmailCodeScreen> {
         appBar: CustomAppBar(
           title: 'Crypto Coin',
           imageUrl: logo,
-          onBackPressed: () => Get.offNamed('/ConfirmEmailScreen'),
+          onBackPressed: () => Get.offNamed(AppRoutes.confirmEmailScreen),
         ),
         body: SingleChildScrollView(
           child: Padding(

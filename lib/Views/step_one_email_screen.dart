@@ -1,5 +1,6 @@
 import 'package:crypto_coin/Components/custom_appbar.dart';
 import 'package:crypto_coin/Utilities/global_variables.dart';
+import 'package:crypto_coin/Views/AppRoutes/app_routes.dart';
 import 'package:email_otp/email_otp.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -47,14 +48,14 @@ class StepOneEmailScreenState extends State<StepOneEmailScreen> {
       if (isOtpSent) {
         _showSnackbar('OTP has been sent to your email');
         await Future.delayed(Duration(seconds: 2));
-        Get.offNamed('/ConfirmEmailScreen', arguments: {'email': email});
+        Get.offNamed(AppRoutes.confirmEmailScreen, arguments: {'email': email});
       } else {
         _showSnackbar('Failed to send OTP.', isError: true);
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
         _showSnackbar('Email is already registered. Log in instead.');
-        Get.offNamed('/LoginScreen');
+        Get.offNamed(AppRoutes.login);
       } else {
         _showSnackbar('Error: ${e.message}', isError: true);
       }

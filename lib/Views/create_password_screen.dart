@@ -1,5 +1,6 @@
 import 'package:crypto_coin/Components/custom_appbar.dart';
 import 'package:crypto_coin/Utilities/global_variables.dart';
+import 'package:crypto_coin/Views/AppRoutes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -54,7 +55,7 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
       );
 
       // Navigate to success screen
-      Get.offNamed('/SuccessfullyCreateAccount');
+      Get.offNamed(AppRoutes.successfullyCreateAccount);
     } on FirebaseAuthException catch (e) {
       String errorMessage = 'An error occurred. Please try again.';
       if (e.code == 'email-already-in-use') {
@@ -77,7 +78,7 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Get.offNamed('/VerificationSuccessScreen');
+        Get.offNamed(AppRoutes.verificationSuccessScreen);
         return false; // Prevents the default behavior of closing the app
       },
       child: Scaffold(
@@ -85,7 +86,7 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
         appBar: CustomAppBar(
           title: 'Crypto Coin',
           imageUrl: logo,
-          onBackPressed: () => Get.offNamed('/VerificationSuccessScreen'),
+          onBackPressed: () => Get.offNamed(AppRoutes.verificationSuccessScreen),
         ),
         body: SingleChildScrollView(
           child: Padding(

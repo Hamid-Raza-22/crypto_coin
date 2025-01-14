@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:crypto_coin/Utilities/global_variables.dart';
+import 'package:crypto_coin/Views/AppRoutes/app_routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
@@ -20,7 +21,16 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
+  static const double _horizontalPadding = 20.0;
+  static const double _verticalSpacing = 10.0;
+  static const double _buttonHeight = 55.0;
+  static const double _buttonWidthFactor = 0.9;
+  static const double _bottomPaddingFactor = 0.05;
+  static const double _sidePaddingFactor = 0.08;
+  static const double _borderRadius = 15.0;
+  static const double _socialButtonHeightFactor = 0.07;
+  static const double _iconSize = 25;
+  static const double _iconSpacing = 10;
   @override
   void dispose() {
     _emailController.dispose();
@@ -67,14 +77,7 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  Future<void> _signUpWithEmail(String email, String password) async {
-    try {
-      await auth.createUserWithEmailAndPassword(email: email, password: password);
-      Get.offNamed('/dashboard');
-    } catch (e) {
-      print('Email Sign-Up Error: $e');
-    }
-  }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -93,7 +96,7 @@ class _SignupScreenState extends State<SignupScreen> {
         children: [
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: _horizontalPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -133,7 +136,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   const SizedBox(height: 10),
                   CustomButton(
-                    width: screenSize.width * 0.9,
+                    width: screenSize.width * _buttonWidthFactor,
                     height: 55,
 
                     buttonText: 'Sign up with Email',
@@ -143,7 +146,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                     gradientColors: const [Colors.blueAccent, Colors.blueAccent],
-                    onTap: () => Get.offNamed('/ThreeStepLockScreen'),
+                    onTap: () => Get.offNamed(AppRoutes.threeStepLockScreen),
                     borderRadius: 15.0,
                   ),
                   const SizedBox(height: 55),
@@ -165,9 +168,9 @@ class _SignupScreenState extends State<SignupScreen> {
           ),
           Padding(
             padding: EdgeInsets.only(
-              bottom: screenSize.height * 0.05,
-              left: screenSize.width * 0.08,
-              right: screenSize.width * 0.08,
+              bottom: screenSize.height * _bottomPaddingFactor,
+              left: screenSize.width * _sidePaddingFactor,
+              right: screenSize.width * _sidePaddingFactor,
             ),
             child: CustomButton(
               width: screenSize.width * 0.9,
@@ -179,7 +182,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 fontWeight: FontWeight.bold,
               ),
               gradientColors: const [Colors.white, Colors.white],
-              onTap: () => Get.offNamed('/login'),
+              onTap: () => Get.offNamed(AppRoutes.login),
               borderRadius: 15.0,
               borderColor: Colors.blue,
             ),
@@ -200,7 +203,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
     return CustomButton(
       width: screenSize.width,
-      height: screenSize.height * 0.07,
+      height: screenSize.height * _socialButtonHeightFactor,
       buttonText: text,
       iconImage: iconImage,
       icon: icon,

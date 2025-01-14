@@ -1,5 +1,6 @@
 import 'package:crypto_coin/Components/custom_editable_menu_option.dart';
 import 'package:crypto_coin/Utilities/global_variables.dart';
+import 'package:crypto_coin/Views/AppRoutes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -26,7 +27,7 @@ void initState() {
 
     return WillPopScope(
       onWillPop: () async {
-        Get.offNamed('/StepOneEmailScreen');
+        Get.offNamed(AppRoutes.stepOneEmailScreen);
         return false; // Prevents the default behavior of closing the app
       },
       child: Scaffold(
@@ -34,7 +35,7 @@ void initState() {
         appBar: CustomAppBar(
           imageUrl: logo, // Adjust to the actual logo path
           title: 'Crypto Coin',
-          onBackPressed: () => Get.offNamed('/StepOneEmailScreen'),
+          onBackPressed: () => Get.offNamed(AppRoutes.stepOneEmailScreen),
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -77,7 +78,7 @@ void initState() {
                       buttonText: 'Continue',
                       iconColor: Colors.white,
                       gradientColors: const [Colors.blueAccent, Colors.blueAccent],
-                      onTap: () => Get.offNamed('/EmailCodeScreen', arguments: {'email': email}),
+                      onTap: () => Get.offNamed(AppRoutes.emailCodeScreen, arguments: {'email': email}),
                     ),
                   ],
                 ),

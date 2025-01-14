@@ -1,5 +1,6 @@
 import 'package:crypto_coin/Components/custom_editable_menu_option.dart';
 import 'package:crypto_coin/Utilities/global_variables.dart';
+import 'package:crypto_coin/Views/AppRoutes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -36,7 +37,7 @@ class _ThreeStepLockScreenState extends State<ThreeStepLockScreen> {
         appBar: CustomAppBar(
           imageUrl: logo,
           title: 'Crypto Coin',
-          onBackPressed: () => Get.offNamed('/signup'),
+          onBackPressed: () => Get.offNamed(AppRoutes.signup),
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -116,7 +117,7 @@ class _ThreeStepLockScreenState extends State<ThreeStepLockScreen> {
                       buttonText: 'Continue',
                       iconColor: Colors.white,
                       gradientColors: const [Colors.blueAccent, Colors.blueAccent],
-                      onTap: () => Get.offNamed('/StepOneEmailScreen'),
+                      onTap: () => Get.offNamed(AppRoutes.stepOneEmailScreen),
                     ),
                   ],
                 ),

@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-
 import 'custom_editable_menu_option.dart';
-
-
-
 class CustomButton extends StatelessWidget {
   final double? top;
   final double? left;

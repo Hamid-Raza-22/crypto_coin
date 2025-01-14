@@ -1,4 +1,5 @@
 import 'package:crypto_coin/Utilities/global_variables.dart';
+import 'package:crypto_coin/Views/AppRoutes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Components/custom_appbar.dart';
@@ -16,7 +17,7 @@ class _ConfirmEmailScreenState extends State<SuccessfullyCreateAccount> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Get.offNamed('/CreatePasswordScreen');
+        Get.offNamed(AppRoutes.createPasswordScreen);
         return false; // Prevents the default behavior of closing the app
       },
       child: Scaffold(
@@ -24,7 +25,7 @@ class _ConfirmEmailScreenState extends State<SuccessfullyCreateAccount> {
         appBar: CustomAppBar(
           imageUrl: logo,
           title: 'Crypto Coin',
-          onBackPressed: () => Get.offNamed('/CreatePasswordScreen'),
+          onBackPressed: () => Get.offNamed(AppRoutes.createPasswordScreen),
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -67,7 +68,7 @@ class _ConfirmEmailScreenState extends State<SuccessfullyCreateAccount> {
                       buttonText: 'Login',
                       iconColor: Colors.white,
                       gradientColors: const [Colors.blueAccent, Colors.blueAccent],
-                      onTap: () => Get.offNamed('/login'),
+                      onTap: () => Get.offNamed(AppRoutes.login),
                     ),
                   ],
                 ),
