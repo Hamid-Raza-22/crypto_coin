@@ -1,0 +1,40 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "crypto-coin-f8437",
+          "appId": "1:824849125773:android:c1c82a7c6b279e862a6dc4",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "crypto-coin-f8437",
+          "configurations": {
+            "android": "1:824849125773:android:c1c82a7c6b279e862a6dc4",
+            "macos": "1:824849125773:ios:6db669ed921388cf2a6dc4",
+            "web": "1:824849125773:web:40b1202b2f8837f22a6dc4",
+            "windows": "1:824849125773:web:0482e8fc2db816512a6dc4"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint"
+      ]
+    }
+  ]
+}
