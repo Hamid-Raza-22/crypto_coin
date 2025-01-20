@@ -1,8 +1,10 @@
 import 'package:crypto_coin/Views/home/wallet_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../Components/custom_appbar.dart';
 import '../../Utilities/global_variables.dart';
 import '../app_colors.dart';
+import '../setting_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -141,12 +143,17 @@ class AssetContainerHeader extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.search),
                 onPressed: () {
+
                   // Handle search action
                 },
               ),
               IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SettingsPage()),
+                  );
                   // Handle settings action
                 },
               ),

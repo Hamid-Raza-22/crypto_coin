@@ -20,6 +20,7 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
   late String email;
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -39,6 +40,7 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
       return;
     }
 
+
     if (password.length < 8 || !RegExp(r'[A-Z]').hasMatch(password) ||
         !RegExp(r'[0-9]').hasMatch(password) || !RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -46,7 +48,9 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
       );
       return;
     }
-
+    setState(() {
+      isLoading = true;
+    });
     try {
       // Firebase Authentication registration
       final authResult = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -71,6 +75,11 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('An unexpected error occurred.')),
       );
+    }
+    finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -131,7 +140,7 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    ' Confirm Password$email',
+                    email,
                     style: const TextStyle(
                       fontFamily: 'Readex Pro',
                       fontSize: 14,
@@ -170,9 +179,9 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
                 CustomButton(
                   height: 52,
                   borderRadius: 10,
-                  buttonText: 'Continue',
+                  buttonText: isLoading ? 'Please wait...': 'Continue',
                   gradientColors: const [Colors.blueAccent, Colors.blueAccent],
-                  onTap: _registerUser,
+                  onTap: isLoading ? null : _registerUser,
                 ),
                 const SizedBox(height: 10),
                 const Text(

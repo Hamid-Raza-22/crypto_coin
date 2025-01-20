@@ -2,12 +2,15 @@ import 'package:crypto_coin/Components/custom_appbar.dart';
 import 'package:crypto_coin/Components/otp_inputs.dart';
 import 'package:crypto_coin/Utilities/global_variables.dart';
 import 'package:crypto_coin/Views/AppRoutes/app_routes.dart';
-import 'package:email_otp/email_otp.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:email_otp/email_otp.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../Components/custom_button.dart';
 import '../Components/custom_social_button.dart';
+import '../Services/FirebaseServices/send_otp_email.dart';
+import '../Services/FirebaseServices/sign_in_with_google.dart';
 
 class EmailCodeScreen extends StatefulWidget {
   const EmailCodeScreen({super.key});
@@ -32,7 +35,8 @@ class StepOneEmailScreenState extends State<EmailCodeScreen> {
       isLoading = true;
     });
     try {
-      bool isValid = await EmailOTP.verifyOTP(otp: otpController.text);
+      bool isValid = await verifyOtpEmailHttp(email, otpController.text);
+      // bool isValid = await EmailOTP.verifyOTP(otp: otpController.text);
       if (isValid) {
         Get.offNamed(AppRoutes.verificationSuccessScreen, arguments: {'email':email});
       } else {
@@ -137,10 +141,10 @@ class StepOneEmailScreenState extends State<EmailCodeScreen> {
                 CustomButton(
                   height: 50,
                   borderRadius: 10,
-                  buttonText: 'Entered',
+                  buttonText: isLoading ? 'Please wait...': 'Entered',
                   iconColor: Colors.white,
                   gradientColors: const [Colors.blueAccent, Colors.blueAccent],
-                  onTap: _verifyOTP,
+                  onTap: isLoading ? null : _verifyOTP,
                 ),
 
                 const SizedBox(height: 40),
@@ -191,7 +195,14 @@ class StepOneEmailScreenState extends State<EmailCodeScreen> {
         _buildSocialButton(
           iconImage: AssetImage(googleIcon),
           color: Colors.black,
-          onTap: () => Get.offNamed('/reportIssues'),
+          onTap: () async {
+            User? user = await signInWithGoogle();
+            if( user !=null){
+              Get.offNamed(AppRoutes.homeScreen);
+            }else{
+
+            }
+          } ,
         ),
         _buildSocialButton(
           icon: FontAwesomeIcons.apple,

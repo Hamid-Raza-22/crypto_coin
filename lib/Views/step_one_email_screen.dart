@@ -1,13 +1,16 @@
 import 'package:crypto_coin/Components/custom_appbar.dart';
 import 'package:crypto_coin/Utilities/global_variables.dart';
 import 'package:crypto_coin/Views/AppRoutes/app_routes.dart';
-import 'package:email_otp/email_otp.dart';
+// import 'package:email_otp/email_otp.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import '../Components/custom_button.dart';
 import '../Components/custom_editable_menu_option.dart';
+import '../Components/custom_social_button.dart';
+import '../Services/FirebaseServices/send_otp_email.dart';
+import '../Services/FirebaseServices/sign_in_with_google.dart';
 
 class StepOneEmailScreen extends StatefulWidget {
   const StepOneEmailScreen({super.key});
@@ -43,7 +46,7 @@ class StepOneEmailScreenState extends State<StepOneEmailScreen> {
       );
 
       await result.user!.delete();
-      final bool isOtpSent = await EmailOTP.sendOTP(email: email);
+     final bool isOtpSent = await sendOtpEmailHttp(email);
 
       if (isOtpSent) {
         _showSnackbar('OTP has been sent to your email');
@@ -169,7 +172,7 @@ class StepOneEmailScreenState extends State<StepOneEmailScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 50),
-            _buildSocialButtons(),
+            _buildSocialButtons(context),
             const SizedBox(height: 40),
           ],
         ),
@@ -177,70 +180,49 @@ class StepOneEmailScreenState extends State<StepOneEmailScreen> {
     );
   }
 
-  Widget _buildSocialButtons() {
-    const double buttonHeight = 55.0;
-    const double buttonWidth = 50.0;
-    return
-    Padding(padding: EdgeInsets.symmetric(horizontal: 35),
-      child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      // crossAxisAlignment: CrossAxisAlignment,
-      spacing: 20,
 
+
+  Widget _buildSocialButtons(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-
         _buildSocialButton(
           icon: FontAwesomeIcons.facebookF,
-          iconColor: Colors.blueAccent,
+          color: Colors.blue,
           onTap: () => Get.offNamed('/reportIssues'),
         ),
         _buildSocialButton(
-          iconImage: const AssetImage(googleIcon),
-          onTap: () => Get.offNamed('/reportIssues'),
+          iconImage: AssetImage(googleIcon),
+          color: Colors.black,
+          onTap: () async {
+            User? user = await signInWithGoogle();
+            if( user !=null){
+              Get.offNamed(AppRoutes.homeScreen);
+            }else{
+
+            }
+          } ,
         ),
         _buildSocialButton(
           icon: FontAwesomeIcons.apple,
-          iconColor: Colors.black,
+          color: Colors.black,
           onTap: () => Get.offNamed('/reportIssues'),
         ),
-      ],)
+      ],
     );
   }
 
   Widget _buildSocialButton({
     IconData? icon,
     AssetImage? iconImage,
-    Color iconColor = Colors.grey,
+    required Color color,
     required VoidCallback onTap,
   }) {
-    return Flexible(
-      flex: 1,
-      fit: FlexFit.tight,
-      child: SizedBox(
-        height: 55.0,
-
-        child: CustomButton(
-          width: 50.0,
-          height: 55.0,
-          icon: icon,
-          iconSize: 20,
-          iconImageSize: 20,
-          iconImage: iconImage,
-          iconColor: iconColor,
-          gradientColors: const [Colors.white, Colors.white],
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 1,
-              blurRadius: 0,
-              offset: const Offset(0, 0),
-            ),
-          ],
-          borderRadius: 6,
-          borderColor: Colors.grey.withOpacity(0.5),
-          onTap: onTap,
-        ),
-      ),
+    return SocialButton(
+      icon: icon,
+      iconImage: iconImage,
+      color: color,
+      onTap: onTap,
     );
   }
 }

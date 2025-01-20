@@ -20,6 +20,7 @@ class LoginScreen extends StatefulWidget {
 class LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool isLoading = false;
 
   Future<void> _signInUser() async {
     final email = _emailController.text.trim();
@@ -32,6 +33,10 @@ class LoginScreenState extends State<LoginScreen> {
       return;
     }
 
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       // Firebase Authentication sign-in
       final authResult = await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -42,11 +47,13 @@ class LoginScreenState extends State<LoginScreen> {
       // If successful, navigate to the home screen
       Get.offNamed(AppRoutes.homeScreen); // Replace with your home screen route
     } on FirebaseAuthException catch (e) {
-      String errorMessage = 'An error occurred. Please try again.';
+      String errorMessage;
       if (e.code == 'user-not-found') {
         errorMessage = 'No user found with this email.';
       } else if (e.code == 'wrong-password') {
         errorMessage = 'Incorrect password.';
+      } else {
+        errorMessage = 'An error occurred. Please try again.';
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -56,6 +63,10 @@ class LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('An unexpected error occurred.')),
       );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 // Future<void>homepage()async{
@@ -149,9 +160,9 @@ class LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 5),
                 CustomButton(
                   borderRadius: 10,
-                  buttonText: 'Sign in',
+                  buttonText: isLoading ? 'Please wait...':'Sign in',
                   gradientColors: const [Colors.blueAccent, Colors.blueAccent],
-                  onTap: _signInUser,
+                  onTap: isLoading ? null :_signInUser,
                   // onTap: _signInUser,
                 ),
                 const SizedBox(height: 40),
