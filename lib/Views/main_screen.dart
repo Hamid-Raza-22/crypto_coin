@@ -1,10 +1,12 @@
+import 'package:crypto_coin/Views/home/WalletComponents/wallet_main_page.dart';
 import 'package:flutter/material.dart';
-import 'package:crypto_coin/Views/home/wallet_screen.dart';
+// import 'package:crypto_coin/Views/home/wallet_screen.dart';
 
 import 'home/channel_screen.dart';
 import 'home/home_screen.dart';
 import 'home/service_screen.dart';
 import 'home/team_screen.dart';
+import 'home/WalletComponents/wallet_screen_two.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -18,7 +20,7 @@ class _MainScreenState extends State<MainScreen> {
     ServiceScreen(),
     TeamScreen(),
     ChannelScreen(),
-    const WalletScreen(),
+     WalletMainPage(),
   ];
 
   void _onItemTapped(int index) {

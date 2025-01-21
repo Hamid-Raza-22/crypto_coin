@@ -1,4 +1,5 @@
 // settings_page.dart
+import 'package:crypto_coin/Views/edit_profile_screen.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -60,7 +61,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
           // Privacy Section
           buildSectionTitle('Privacy'),
-          buildListTile(Icons.person, 'Profile', () {}),
+          buildListTile(Icons.person, 'Profile', () {    Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => EditProfilePage()),
+          );}),
           buildListTile(Icons.lock, 'Security', () {}),
 
           Divider(),
@@ -131,7 +135,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget buildSectionTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.only(bottom: 8.0, top: 16.0),
       child: Text(
         title,
         style: TextStyle(
@@ -144,10 +148,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget buildListTile(IconData icon, String title, VoidCallback onTap) {
     return ListTile(
-        leading: Icon(icon),
-        title: Text(title),
-        trailing: Icon(Icons.chevron_right),
-        onTap: onTap,
-        );
-    }
+      leading: Icon(icon),
+      title: Text(title),
+      trailing: Icon(Icons.chevron_right),
+      onTap: onTap,
+    );
+  }
 }
