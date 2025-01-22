@@ -1,4 +1,7 @@
+import 'package:crypto_coin/Views/home/WalletComponents/wallet_transaction_success.dart';
+import 'package:crypto_coin/Views/home/WalletComponents/wallet_withdraw_confirm_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class WithdrawScreen extends StatelessWidget {
   final double withdrawalAmount;
@@ -20,7 +23,7 @@ class WithdrawScreen extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context);
+            Get.to(() => WithdrawPage());
           },
         ),
         title: Text(
@@ -104,6 +107,7 @@ class WithdrawScreen extends StatelessWidget {
             Divider(),
             ElevatedButton(
               onPressed: () {
+                Get.to(WalletTransactionSuccess());
                 // Confirm withdrawal action
               },
               style: ElevatedButton.styleFrom(

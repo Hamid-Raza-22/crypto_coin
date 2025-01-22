@@ -37,38 +37,75 @@ class LoginScreenState extends State<LoginScreen> {
       isLoading = true;
     });
 
-    try {
-      // Firebase Authentication sign-in
-      final authResult = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+    int retryCount = 0;
+    const maxRetries = 3;
+    const retryDelay = Duration(seconds: 2);
 
-      // If successful, navigate to the home screen
-      Get.offNamed(AppRoutes.homeScreen); // Replace with your home screen route
-    } on FirebaseAuthException catch (e) {
-      String errorMessage;
-      if (e.code == 'user-not-found') {
-        errorMessage = 'No user found with this email.';
-      } else if (e.code == 'wrong-password') {
-        errorMessage = 'Incorrect password.';
-      } else {
-        errorMessage = 'An error occurred. Please try again.';
+    while (retryCount < maxRetries) {
+      try {
+        // Firebase Authentication sign-in
+        final authResult = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+
+        // If successful, navigate to the home screen
+        Get.offNamed(AppRoutes.homeScreen); // Replace with your home screen route
+        return;
+      } on FirebaseAuthException catch (e) {
+        print('FirebaseAuthException code: ${e.code}');
+        if (e.code != 'network-request-failed' || retryCount == maxRetries - 1) {
+          String errorMessage;
+
+          switch (e.code) {
+            case 'invalid-email':
+              errorMessage = 'The email address is badly formatted.';
+              break;
+            case 'user-disabled':
+              errorMessage = 'This user account has been disabled.';
+              break;
+            case 'user-not-found':
+              errorMessage = 'No user found with this email.';
+              break;
+            case 'wrong-password':
+              errorMessage = 'Incorrect password.';
+              break;
+            case 'invalid-credential':
+              errorMessage = 'The email or password is incorrect.';
+              break;
+            case 'network-request-failed':
+              errorMessage = 'No internet connection. Please check your network and try again.';
+              break;
+            case 'too-many-requests':
+              errorMessage = 'Too many unsuccessful attempts. Please try again later.';
+              break;
+            default:
+              errorMessage = 'An error occurred. Please try again.';
+          }
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMessage)),
+          );
+          break;
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('An unexpected error occurred.')),
+        );
+        print('Error: $e');
+        break;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('An unexpected error occurred.')),
-      );
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
+      // Wait before retrying
+      await Future.delayed(retryDelay);
+      retryCount++;
     }
+
+    setState(() {
+      isLoading = false;
+    });
   }
+
 // Future<void>homepage()async{
 //   // Get.offNamed('/HomeScreen'); // Replace with your home screen route
 //   Get.offNamed(AppRoutes.homepage); // Replace with your home screen route

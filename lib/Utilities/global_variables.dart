@@ -20,6 +20,7 @@ const lockImage = "assets/images/lock.png";
 const messageImage = "assets/images/message.png";
 const mobileEmail = "assets/images/mobileEmail.png";
 const verificationMarkImage = "assets/images/verificationMark.png";
+const transactionMarkImage = "assets/images/TransactionSuccess.png";
 
 
 // Icons

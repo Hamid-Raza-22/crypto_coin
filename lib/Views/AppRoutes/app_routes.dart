@@ -5,13 +5,13 @@ import 'package:crypto_coin/Views/splesh_screen.dart';
 import 'package:crypto_coin/Views/step_one_email_screen.dart';
 import 'package:crypto_coin/Views/successfully_create_accont.dart';
 import 'package:crypto_coin/Views/three_step_lock_screen.dart';
-import 'package:crypto_coin/Views/verification_success_screen.dart';
 import 'package:get/get.dart';
 import '../confirm_email_screen.dart';
 import '../create_password_screen.dart';
 import '../email_code_screen.dart';
 import '../main_screen.dart';
 import '../login_screen.dart';
+import '../verification_success_screen.dart';
 
 class AppRoutes {
   static const String splashScreen = '/splashScreen';

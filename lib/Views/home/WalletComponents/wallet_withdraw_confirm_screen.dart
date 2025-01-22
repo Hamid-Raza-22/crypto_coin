@@ -1,5 +1,7 @@
 import 'package:crypto_coin/Views/home/WalletComponents/wallet_withdrwa_screen.dart';
+import 'package:crypto_coin/Views/main_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class WithdrawPage extends StatefulWidget {
   @override
@@ -43,23 +45,40 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
   void _confirmWithdraw() {
     double withdrawalAmount = double.tryParse(_amountController.text) ?? 0.0;
+
+    if (withdrawalAmount <= 0) {
+      // Notify user to enter a valid amount
+      Get.snackbar(
+        'Invalid Amount',
+        'Please enter an amount greater than zero.',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.orangeAccent,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
     double transactionFee = withdrawalAmount * 0.02;
     double totalWithdrawalAmount = withdrawalAmount + transactionFee;
 
     if (totalWithdrawalAmount <= availableBalance) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => WithdrawScreen(
-            withdrawalAmount: withdrawalAmount,
-            availableBalance: availableBalance - totalWithdrawalAmount,
-          ),
-        ),
+      Get.to(() => WithdrawScreen(
+        withdrawalAmount: withdrawalAmount,
+        availableBalance: availableBalance - totalWithdrawalAmount,
+      ),
       );
     } else {
-      // Handle insufficient funds
+      // Display snackbar about insufficient balance
+      Get.snackbar(
+        'Insufficient Balance',
+        'Please enter an amount less than your available balance.',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +94,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context);
+            Get.to(()=> MainScreen());
           },
         ),
         actions: [
