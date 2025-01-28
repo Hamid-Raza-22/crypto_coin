@@ -1,19 +1,35 @@
+import 'dart:convert';
+
 import 'package:crypto_coin/Views/home/wallet_screen.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import '../../Components/custom_appbar.dart';
 import '../../Utilities/global_variables.dart';
 import '../app_colors.dart';
 import '../setting_screen.dart';
+import 'package:http/http.dart' as http;
+
+import 'dart:math'as math;
+
+
+import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  Future<void> _refreshData() async {
+    // Simulate a network call or any data fetching logic
+    PortfolioBalanceHeader();
+    await Future.delayed(const Duration(seconds: 2));
+    print('Data refreshed!');
+  }
 
   @override
   Widget build(BuildContext context) {
     final RateItem rateItem = RateItem(
       flagImage: 'assets/images/flags/united-states.png',
-      name: 'America',
+      name: 'USTD',
       currency: 'USD',
       difference: 2,
       rateInCents: 597500,
@@ -27,31 +43,186 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
-        imageUrl: logo, // Adjust to the actual logo path
+        imageUrl: logo,
         title: 'Crypto Coin',
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const PortfolioBalanceHeader(),
-          const SizedBox(height: 70),
-          Expanded(
-            child: AssetContainer(rateItem: rateItem),
-          ),
-        ],
+      body:
+      CustomMaterialIndicator(
+        onRefresh: _refreshData, // Your refresh logic
+        backgroundColor: Colors.white,
+
+        indicatorBuilder: (context, controller) {
+          return Padding(
+            padding: const EdgeInsets.all(6.0),
+            child: CircularProgressIndicator(
+              color: Colors.redAccent,
+              value: controller.state.isLoading ? null : math.min(controller.value, 1.0),
+            ),
+          );
+        },
+        child: ListView(
+          padding: const EdgeInsets.all(16.0),
+          children: [
+            PortfolioBalanceHeader(),
+            const SizedBox(height: 70),
+            AssetContainer(rateItem: rateItem),
+          ],
+        ),
       ),
     );
   }
 }
 
-class PortfolioBalanceHeader extends StatelessWidget {
+
+
+
+class PortfolioBalanceHeader extends StatefulWidget {
   const PortfolioBalanceHeader({Key? key}) : super(key: key);
+
+  @override
+  _PortfolioBalanceHeaderState createState() =>
+      _PortfolioBalanceHeaderState();
+}
+
+class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
+  String usdtBalance = 'Loading...';
+  String trxbalance = 'Loading...';
+  double totalAssetsInUSDT = 0.0;
+  double trxToUsdtRate = 0.0; // Example: 1 TRX = 0.07 USDT
+  double totalAssets = 0.0; // Add this line
+
+  @override
+  void initState() {
+    super.initState();
+    fetchTRXtoUSDTConversionRate();
+    fetchUSDTBalance();
+
+  }
+
+  Future<void> fetchTRXtoUSDTConversionRate() async {
+    const String apiUrl = 'https://min-api.cryptocompare.com/data/pricemulti?fsyms=TRX&tsyms=USDT';
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final rateData = json.decode(response.body);
+        print('Rate API Response: $rateData'); // Log the entire response
+
+        if (rateData['TRX'] != null && rateData['TRX']['USDT'] != null) {
+          final trxToUsdtRate = rateData['TRX']['USDT'] as double;
+          print('TRX to USDT Rate: $trxToUsdtRate');
+
+          setState(() {
+            this.trxToUsdtRate = trxToUsdtRate; // Save the rate here
+          });
+         await fetchTRXBalance();
+        } else {
+          print('TRX to USDT rate is not available in the response');
+        }
+      } else {
+        print('Failed to fetch TRX to USDT rate: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Exception: $e');
+    }
+  }
+
+
+  // Fetch TRX balance
+  Future<void> fetchTRXBalance() async {
+    const String tronAddress = 'TEGAcjUoR9W8mdKqXEWd7KNaWH8sTs8S1s';
+    const String apiUrl =
+        'https://apilist.tronscan.org/api/account?address=$tronAddress';
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        final tokenBalances = data['tokenBalances'] as List<dynamic>;
+        final trxToken = tokenBalances.firstWhere(
+              (token) => token['tokenName'].toLowerCase() == 'trx',
+          orElse: () => null,
+        );
+
+        if (trxToken != null) {
+          final trxBalanceString = trxToken['balance'];
+          final trxBalance = int.tryParse(trxBalanceString) ?? 0;
+
+          setState(() {
+            final trxInTRX = trxBalance / 1000000; // Convert to TRX
+            final trxInUSDT = trxInTRX * trxToUsdtRate; // Convert TRX to USDT
+            totalAssetsInUSDT += trxInUSDT; // Add to total portfolio balance
+
+            trxbalance = '${trxInTRX.toStringAsFixed(2)} TRX (\$${trxInUSDT.toStringAsFixed(2)} USDT)';
+          });
+        } else {
+          setState(() {
+            trxbalance = '0.00 TRX (\$0.00 USDT)';
+          });
+        }
+      } else {
+        setState(() {
+          trxbalance = 'Error fetching balance';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        trxbalance = 'Failed to load balance';
+      });
+    }
+  }
+
+  // Fetch USDT balance
+  Future<void> fetchUSDTBalance() async {
+    const String tronAddress = 'TEGAcjUoR9W8mdKqXEWd7KNaWH8sTs8S1s';
+    const String apiUrl =
+        'https://apilist.tronscan.org/api/account?address=$tronAddress';
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        final tokens = data['tokens'] as List<dynamic>;
+        final usdtToken = tokens.firstWhere(
+              (token) => token['tokenName'] == 'Tether USD',
+          orElse: () => null,
+        );
+
+        if (usdtToken != null) {
+          setState(() {
+            final usdtBalanceInUSDT =
+                double.parse(usdtToken['balance']) / 1000000;
+            totalAssetsInUSDT += usdtBalanceInUSDT; // Add to total portfolio balance
+
+            usdtBalance = '${usdtBalanceInUSDT.toStringAsFixed(2)} USDT';
+          });
+        } else {
+          setState(() {
+            usdtBalance = '0.00 USDT';
+          });
+        }
+      } else {
+        setState(() {
+          usdtBalance = 'Error fetching balance';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        usdtBalance = 'Failed to load balance';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: const [
-        Text(
+      children: [
+        const Text(
           'Portfolio Balance',
           style: TextStyle(
             fontFamily: 'Readex Pro',
@@ -62,10 +233,10 @@ class PortfolioBalanceHeader extends StatelessWidget {
           ),
           textAlign: TextAlign.center,
         ),
-        SizedBox(height: 5),
+        const SizedBox(height: 5),
         Text(
-          '\$2,760.23',
-          style: TextStyle(
+          '\$${totalAssetsInUSDT.toStringAsFixed(2)}', // Total in USDT
+          style: const TextStyle(
             fontFamily: 'Readex Pro',
             fontSize: 30,
             fontWeight: FontWeight.w600,
@@ -74,9 +245,9 @@ class PortfolioBalanceHeader extends StatelessWidget {
           ),
           textAlign: TextAlign.center,
         ),
-        SizedBox(height: 5),
-        Text(
-          '+2.60%',
+        const SizedBox(height: 5),
+        const Text(
+          '+2.60%', // Placeholder for dynamic growth percentage
           style: TextStyle(
             fontFamily: 'Readex Pro',
             fontSize: 12,
@@ -85,10 +256,69 @@ class PortfolioBalanceHeader extends StatelessWidget {
           ),
           textAlign: TextAlign.center,
         ),
+        const SizedBox(height: 15),
+        const Text(
+          'Assets Breakdown',
+          style: TextStyle(
+            fontFamily: 'Readex Pro',
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AssetDetailRow(label: 'USDT', value: usdtBalance),
+              AssetDetailRow(label: 'TRX', value: trxbalance),
+              AssetDetailRow(label: 'ETH', value: '\$0.00'),
+            ],
+          ),
+        ),
       ],
     );
   }
 }
+
+class AssetDetailRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const AssetDetailRow({Key? key, required this.label, required this.value})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Colors.black,
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.black,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 
 class AssetContainer extends StatelessWidget {
   const AssetContainer({Key? key, required this.rateItem}) : super(key: key);
@@ -112,7 +342,7 @@ class AssetContainer extends StatelessWidget {
           const SizedBox(height: 20),
           const CenterText(),
           const SizedBox(height: 30),
-          const HistoryDetails(),
+         const HistoryDetails(),
         ],
       ),
     );
@@ -286,10 +516,12 @@ class HistoryDetails extends StatelessWidget {
         const HistoryHeader(),
         const HistoryItem(price: '500000', amount: '50', time: '12:00'),
         const HistoryItem(price: '517500', amount: '75', time: '12:30'),
-        const HistoryItem(price: '507500', amount: '60', time: '13:00'),       const HistoryItem(price: '500000', amount: '50', time: '12:00'),
-        const HistoryItem(price: '517500', amount: '75', time: '12:30'),
-        const HistoryItem(price: '507500', amount: '60', time: '13:00'),       const HistoryItem(price: '500000', amount: '50', time: '12:00'),
         const HistoryItem(price: '507500', amount: '60', time: '13:00'),
+        // const HistoryItem(price: '500000', amount: '50', time: '12:00'),
+        // const HistoryItem(price: '517500', amount: '75', time: '12:30'),
+        // const HistoryItem(price: '507500', amount: '60', time: '13:00'),
+        // const HistoryItem(price: '500000', amount: '50', time: '12:00'),
+        // const HistoryItem(price: '507500', amount: '60', time: '13:00'),
       ],
     );
   }
