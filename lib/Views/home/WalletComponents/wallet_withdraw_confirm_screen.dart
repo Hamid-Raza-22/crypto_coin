@@ -143,7 +143,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
     }
 
     // Addresses
-    const ownerAddress = 'TEGAcjUoR9W8mdKqXEWd7KNaWH8sTs8S1s';
+    const ownerAddress = 'TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw';
     const toAddress = 'TKSRbKd1K8v62FLLeKeMd19joP1oxCPTjP';
     //const contractAddress = 'TLaGf5Cp9nbD5ednxz66oZfvZAX3as5eFf';
     const contractAddress = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
@@ -244,7 +244,12 @@ class _WithdrawPageState extends State<WithdrawPage> {
       print('Error creating transaction: ${createResponse.body}');
     }
   }
-
+  // void main() async {
+  //   const privateKey = 'c66578a4aac443073050601295b970af2d9fa4643b39baa617f8afa8169e1bf7'; // Replace with your private key
+  //   const amount = 6; // Amount in USDT
+  //
+  //   await sendUSDT(privateKey,amount);
+  //   }
   // void main() async {
   //   const privateKey = 'c66578a4aac443073050601295b970af2d9fa4643b39baa617f8afa8169e1bf7'; // Replace with your private key
   //   const amount = 7; // Amount in USDT
@@ -253,11 +258,12 @@ class _WithdrawPageState extends State<WithdrawPage> {
   // }
   //   void main() async {
   //     final TronService tronService = TronService();
-  //     bool success = await tronService.sendTrc20(
-  //       "TEGAcjUoR9W8mdKqXEWd7KNaWH8sTs8S1s",
+  //     bool success = await tronService.sendTrx(
+  //       "TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw",
+  //
   //       "TKSRbKd1K8v62FLLeKeMd19joP1oxCPTjP",
-  //       "1",  // Smallest unit test
-  //       "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t", // USDT Contract Address
+  //       7.0,  // Smallest unit test
+  //      // "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t", // USDT Contract Address
   //     );
   //     if (success) {
   //       print("USDT sent successfully!");
@@ -265,7 +271,21 @@ class _WithdrawPageState extends State<WithdrawPage> {
   //       print("Failed to send USDT.");
   //     }
   //
-  // }
+  // }\
+  void main() async {
+    final TronService tronService = TronService();
+    bool success = await tronService.swapTrxToUsdt(
+      "TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw", // Your TRX wallet
+      "TKSRbKd1K8v62FLLeKeMd19joP1oxCPTjP", // USDT receiver
+      1, // Amount of TRX to swap
+    );
+
+    if (success) {
+      print("TRX swapped to USDT successfully!");
+    } else {
+      print("Swap failed.");
+    }
+  }
   // void main() async {
   //   String address = "TEGAcjUoR9W8mdKqXEWd7KNaWH8sTs8S1s"; // Replace with your TRON address
   //   final TronService tronService = TronService();
@@ -277,16 +297,16 @@ class _WithdrawPageState extends State<WithdrawPage> {
   //     print("Failed to fetch balance.");
   //   }
   // }
-  void main() async {
-    final TronService tronService = TronService();
-    double? balance = await tronService.generateWallet();
-
-    if (balance != null) {
-      print("TRX Balance: $balance");
-    } else {
-      print("Failed to fetch balance.");
-    }
-  }
+  // void main() async {
+  //   final TronService tronService = TronService();
+  //   double? balance = await tronService.generateWallet();
+  //
+  //   if (balance != null) {
+  //     print("TRX Balance: $balance");
+  //   } else {
+  //     print("Failed to fetch balance.");
+  //   }
+  // }
 
 
   void _confirmWithdraw() {

@@ -131,7 +131,7 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
 
   // Fetch TRX balance
   Future<void> fetchTRXBalance() async {
-    const String tronAddress = 'TEGAcjUoR9W8mdKqXEWd7KNaWH8sTs8S1s';
+    const String tronAddress = 'TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw';
     const String apiUrl =
         'https://apilist.tronscan.org/api/account?address=$tronAddress';
 
@@ -177,7 +177,7 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
 
   // Fetch USDT balance
   Future<void> fetchUSDTBalance() async {
-    const String tronAddress = 'TEGAcjUoR9W8mdKqXEWd7KNaWH8sTs8S1s';
+    const String tronAddress = 'TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw';
     const String apiUrl =
         'https://apilist.tronscan.org/api/account?address=$tronAddress';
 

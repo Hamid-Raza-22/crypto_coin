@@ -34,15 +34,17 @@ class TronService {
 
 
   // 2. Send TRX
-  Future<bool> sendTrx(String toAddress, double amount) async {
+  Future<bool> sendTrx(String fromAddress, String toAddress, double amount) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/sendTronTransaction'),
         body: {
+          'fromAddress': fromAddress, // Add fromAddress
           'toAddress': toAddress,
           'amount': amount.toString(),
         },
       );
+      // ... rest of the code
 
       if (response.statusCode == 200) {
         print("Transaction successful: ${response.body}");
@@ -58,12 +60,12 @@ class TronService {
   }
 
   // 3. Send TRC-20 Tokens
-  Future<bool> sendTrc20(String ownerAddress,String toAddress, String amount, String contractAddress) async {
+  Future<bool> sendTrc20(String toAddress, String amount, String contractAddress) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/sendTrc20Transaction'),
         body: {
-          'fromAddress': ownerAddress,
+
           'toAddress': toAddress,
           'amount': amount,
           'contractAddress': contractAddress,
@@ -103,6 +105,58 @@ class TronService {
       }
     } catch (e) {
       print("Error generating wallet: $e");
+    }
+  }
+  Future<bool> swapTrxToUsdt(String fromAddress, String receiverAddress, int trxAmount) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/swapTrxToUsdt'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          "fromAddress": fromAddress.toString(), // Ensure it's a string
+          "receiverAddress": receiverAddress.toString(), // Ensure it's a string
+          "trxAmount": trxAmount.toInt() // Ensure it's a double
+
+        }),
+      );
+      print("From Address Type: ${fromAddress.runtimeType}");
+      print("Receiver Address Type: ${receiverAddress.runtimeType}");
+      print("TRX Amount Type: ${trxAmount.runtimeType}");
+
+
+      if (response.statusCode == 200) {
+        print("Swap successful: ${response.body}");
+        return true;
+      } else {
+        print("Error: ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      print("Error swapping TRX to USDT: $e");
+      return false;
+    }
+  }
+  Future<bool> withdraw( String receiverAddress, double trxAmount) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/withdraw'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'recipientAddress': receiverAddress,
+          'trxAmount': trxAmount,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print("Swap successful: ${response.body}");
+        return true;
+      } else {
+        print("Error: ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      print("Error swapping wit TRX to USDT: $e");
+      return false;
     }
   }
 }
