@@ -239,7 +239,7 @@ class LoginScreenState extends State<LoginScreen> {
           color: Colors.black,
           onTap: () async {
             User? user = await signInWithGoogle();
-            if( user !=null){
+            if( user != null){
               Get.offNamed(AppRoutes.homeScreen);
             }else{
 

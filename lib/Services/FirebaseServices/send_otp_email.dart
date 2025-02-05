@@ -1,11 +1,7 @@
 import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-
 import 'firebase_remote_config.dart';
-
-
 
 Future<bool> sendOtpEmailHttp(String email) async {
   await Config.fetchLatestConfig();
@@ -22,7 +18,9 @@ Future<bool> sendOtpEmailHttp(String email) async {
 
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
-      print('OTP sent successfully: ${responseData['message']}');
+      if (kDebugMode) {
+        print('OTP sent successfully: ${responseData['message']}');
+      }
       return true;
     } else {
       if (kDebugMode) {
@@ -31,11 +29,12 @@ Future<bool> sendOtpEmailHttp(String email) async {
       return false;
     }
   } catch (e) {
-    print('Error sending OTP: $e');
+    if (kDebugMode) {
+      print('Error sending OTP: $e');
+    }
     return false;
   }
 }
-
 
 Future<bool> verifyOtpEmailHttp(String email, String otp) async {
   await Config.fetchLatestConfig();
@@ -66,3 +65,5 @@ Future<bool> verifyOtpEmailHttp(String email, String otp) async {
     return false; // Return false if there is an exception
   }
 }
+
+

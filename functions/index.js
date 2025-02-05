@@ -7,108 +7,88 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-const {onRequest} = require("firebase-functions/v2/https");
+const { onRequest } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const logger = require("firebase-functions/logger");
 const nodemailer = require("nodemailer");
-const {TronWeb} = require("tronweb"); // TronWeb blockchain transactions
+const { TronWeb } = require("tronweb");
+const net = require("net");
+
 
 admin.initializeApp();
 const db = admin.firestore();
 
-// TRON Configuration
+// Initialize TronWeb globally
 const tronWeb = new TronWeb({
-  fullHost: "https://api.trongrid.io", // MainNet URL
-   privateKey: "c66578a4aac443073050601295b970af2d9fa4643b39baa617f8afa8169e1bf7",
-//  privateKey: "c37bcb093e7a9b53a7c478602ff4510313a21d2e20c8034d0010d6e920520c848",
-  // privateKey: "36E14FE949DCE28AF7A7D061DE164018F0E4CDEAFC99ACE724065C95DC4042A4",
+  fullHost: "https://api.trongrid.io",
 });
 
-// Generate the address from the private key
-const publicAddress = tronWeb.defaultAddress.base58;
-const address1 = '0x67dedf8cc958dbe573d4c9b5669d2943812bfa99';
-const address2 = '0xa614f803b6fd780986a42c78ec9c7f77e6ded13c';
+const client = new net.Socket();
+client.connect(465, "smtp.hostinger.com", () => {
+  console.log("Connected to SMTP server");
+  client.destroy();
+});
 
-const tronAddress1 = TronWeb.address.fromHex(address1);
-const tronAddress2 = TronWeb.address.fromHex(address2);
-
-console.log(`TRON base58 Address 1: ${tronAddress1}`);
-console.log(`TRON base58 Address 2: ${tronAddress2}`);
-// Compare the generated address with the address you're trying to verify
-console.log("Generated Public Address: ", publicAddress);
-
-// Function to generate a 6-digit OTP
+client.on("error", (err) => {
+  console.error("Connection failed:", err);
+});
 /**
- * Generates a 6-digit OTP
- * @return {string} - The generated 6-digit OTP
+ * Initializes TronWeb with a private key
+ * @param {string} privateKey - The private key to initialize TronWeb
+ * @return {TronWeb} - Initialized TronWeb instance
  */
-function generateOtp() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+function initializeTronWeb(privateKey) {
+  return new TronWeb({
+    fullHost: "https://api.trongrid.io",
+    privateKey: privateKey,
+  });
 }
 
-const SUNSWAP_ROUTER = "TXF1xDbVGdxFGbovmmmXvBGu8ZiE3Lq4mR"; // SunSwap Router V2
-const WTRX = "TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR"; // Wrapped TRX Address
-const USDT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"; // USDT Contract
-
-const errorMessages = [];
-
-
-if (!tronWeb.isAddress(WTRX)) {
-  console.error("WTRX address is invalid:", WTRX);
-  errorMessages.push("WTRX address is invalid.");
-}
-if (!tronWeb.isAddress(USDT)) {
-  console.error("USDT address is invalid:", USDT);
-  errorMessages.push("USDT address is invalid.");
-}
-if (!tronWeb.isAddress(SUNSWAP_ROUTER)) {
-  console.error("SUNSWAP_ROUTER address is invalid:", SUNSWAP_ROUTER);
-  errorMessages.push("SUNSWAP_ROUTER address is invalid.");
-}
-if (errorMessages.length > 0) {
-  throw new Error(errorMessages.join(" "));
+/**
+ * Validates TRON addresses
+ * @param {TronWeb} tronWeb - TronWeb instance
+ * @param {string[]} addresses - Array of TRON addresses to validate
+ * @throws {Error} - Throws an error if any address is invalid
+ */
+function validateAddresses(tronWeb, addresses) {
+  addresses.forEach((addr) => {
+    if (!tronWeb.isAddress(addr)) throw new Error(`Invalid address: ${addr}`);
+  });
 }
 
-
-console.log("Generated SunSwap Address: ", SUNSWAP_ROUTER);
-
-
+/**
+ * Swap TRX to USDT
+ */
 exports.swapTrxToUsdt = onRequest(async (request, response) => {
-  const { fromAddress, receiverAddress, trxAmount } = request.body;
+  const { fromAddress, receiverAddress, trxAmount, privateKey, wtrx, usdt, sunswapRouter } = request.body;
 
-  // Validate input
-  if (!fromAddress || !receiverAddress || !trxAmount) {
+  if (!fromAddress || !receiverAddress || !trxAmount || !privateKey || !wtrx || !usdt || !sunswapRouter) {
     return response.status(400).json({ error: "Missing parameters" });
   }
 
-  try {
-    // Validate addresses
-    [fromAddress, receiverAddress, WTRX, USDT, SUNSWAP_ROUTER].forEach((addr) => {
-      if (!tronWeb.isAddress(addr)) throw new Error(`Invalid address: ${addr}`);
-    });
+  const tronWeb = initializeTronWeb(privateKey);
 
-    // Convert TRX to SUN
+  try {
+    validateAddresses(tronWeb, [fromAddress, receiverAddress, wtrx, usdt, sunswapRouter]);
+
     const amountInSun = tronWeb.toSun(trxAmount);
     if (!amountInSun || isNaN(amountInSun)) {
       throw new Error("Invalid TRX amount provided.");
     }
 
-    // Use base58 addresses for the path
-    const path = [WTRX, USDT];
+    const path = [wtrx, usdt];
 
-    // Get amounts out using correct path formatting
     const amountsOutResult = await tronWeb.transactionBuilder.triggerConstantContract(
-      SUNSWAP_ROUTER,
+      sunswapRouter,
       "getAmountsOut(uint256,address[])",
       { feeLimit: 10000000 },
       [
         { type: "uint256", value: amountInSun.toString() },
         { type: "address[]", value: path },
       ],
-      tronWeb.address.toHex(fromAddress), // fromAddress in hex for simulation
+      tronWeb.address.toHex(fromAddress),
     );
 
-    // Extract expected USDT amount
     const hexData = amountsOutResult.constant_result[0];
     if (!hexData || hexData.length < 128) {
       throw new Error("Invalid response from getAmountsOut");
@@ -116,27 +96,24 @@ exports.swapTrxToUsdt = onRequest(async (request, response) => {
     const expectedUsdt = tronWeb.toBigNumber(`0x${hexData.substring(64, 128)}`);
     const amountOutMin = expectedUsdt.multipliedBy(0.98).integerValue();
 
-    // Prepare swap parameters with correct address types
     const swapParams = [
       { type: "uint256", value: amountOutMin.toString() },
       { type: "address[]", value: path },
-      { type: "address", value: receiverAddress }, // Pass base58 directly
+      { type: "address", value: receiverAddress },
       { type: "uint256", value: (Math.floor(Date.now() / 1000) + 300).toString() },
     ];
 
-    // Execute the swap
     const transaction = await tronWeb.transactionBuilder.triggerSmartContract(
-      SUNSWAP_ROUTER,
+      sunswapRouter,
       "swapExactETHForTokens(uint256,address[],address,uint256)",
       {
         feeLimit: 10000000,
         callValue: amountInSun,
       },
       swapParams,
-      fromAddress, // base58 fromAddress
+      fromAddress,
     );
 
-    // Sign and broadcast transaction
     const signedTx = await tronWeb.trx.sign(transaction.transaction);
     const receipt = await tronWeb.trx.sendRawTransaction(signedTx);
 
@@ -154,229 +131,145 @@ exports.swapTrxToUsdt = onRequest(async (request, response) => {
     });
   }
 });
-exports.withdraw = onRequest(async (req, res) => {
-  const { recipientAddress, trxAmount } = req.body;
+/**
+ * Swap USDT to TRX
+ */
+exports.swapAllUsdtToTrx = onRequest(async (request, response) => {
+  const { fromAddress, receiverAddress, privateKey, wtrx, usdt, sunswapRouter } = request.body;
 
-  if (!recipientAddress || !trxAmount) {
-    return res.status(400).json({ error: "Missing parameters" });
+  // Validate required parameters
+  if (!fromAddress || !receiverAddress || !privateKey || !wtrx || !usdt || !sunswapRouter) {
+    return response.status(400).json({ error: "Missing parameters" });
   }
 
-  // Validate recipient address
-  if (!tronWeb.isAddress(recipientAddress)) {
-    return res.status(400).json({ error: "Invalid recipient address" });
-  }
+  // Initialize TronWeb with the provided private key
+  const tronWeb = initializeTronWeb(privateKey);
 
   try {
-    // TRX balance check
-    const senderAddress = await tronWeb.defaultAddress.base58;
-    const balance = await tronWeb.trx.getBalance(senderAddress);
-    if (balance < trxAmount * 1e6) {
-      return res.status(400).json({ error: "Insufficient TRX balance" });
+    // Validate all addresses
+    validateAddresses(tronWeb, [fromAddress, receiverAddress, wtrx, usdt, sunswapRouter]);
+
+    // Fetch the USDT balance of the wallet
+    const usdtContract = await tronWeb.contract().at(usdt);
+    const usdtBalanceHex = await usdtContract.balanceOf(fromAddress).call();
+    const usdtBalance = tronWeb.toBigNumber(usdtBalanceHex).dividedBy(10 ** 6); // Convert to human-readable format
+
+    if (usdtBalance.isZero()) {
+      return response.status(400).json({ error: "No USDT balance available in the wallet" });
     }
 
-    // Swap TRX to USDT using SunSwap Router
-    const path = [WTRX, USDT].map((addr) =>
-      tronWeb.address.toHex(addr).replace(/^41/, "0x"),
+    // Define the swap path (USDT -> WTRX -> TRX)
+    const path = [usdt, wtrx];
+
+    // Get the expected amount of TRX to receive
+    const adjustedAmount = tronWeb.toBigNumber(usdtBalance).multipliedBy(10 ** 6); // Convert back to smallest unit
+    const amountsOutResult = await tronWeb.transactionBuilder.triggerConstantContract(
+      sunswapRouter,
+      "getAmountsOut(uint256,address[])",
+      { feeLimit: 10000000 },
+      [
+        { type: "uint256", value: adjustedAmount.toString() },
+        { type: "address[]", value: path },
+      ],
+      tronWeb.address.toHex(fromAddress),
     );
 
-    const deadline = Math.floor(Date.now() / 1000) + 600; // 10-minute deadline
+    const hexData = amountsOutResult.constant_result[0];
+    if (!hexData || hexData.length < 128) {
+      throw new Error("Invalid response from getAmountsOut");
+    }
 
-    const swapTx = await tronWeb.transactionBuilder.triggerSmartContract(
-      SUNSWAP_ROUTER,
-      "swapExactTRXForTokens(uint256,address[],address,uint256)",
+    const expectedTrx = tronWeb.toBigNumber(`0x${hexData.substring(64, 128)}`);
+    const amountOutMin = expectedTrx.multipliedBy(0.98).integerValue(); // Allow 2% slippage
+
+    // Prepare the swap parameters
+    const swapParams = [
+      { type: "uint256", value: adjustedAmount.toString() },
+      { type: "uint256", value: amountOutMin.toString() },
+      { type: "address[]", value: path },
+      { type: "address", value: receiverAddress },
+      { type: "uint256", value: (Math.floor(Date.now() / 1000) + 300).toString() }, // Deadline: 5 minutes
+    ];
+
+    // Build the transaction to swap USDT for TRX
+    const transaction = await tronWeb.transactionBuilder.triggerSmartContract(
+      sunswapRouter,
+      "swapExactTokensForETH(uint256,uint256,address[],address,uint256)",
       {
         feeLimit: 10000000,
-        callValue: tronWeb.toSun(trxAmount),
       },
-      [
-        "0", // Minimum amount out (you can adjust slippage handling here)
-        path,
-        tronWeb.address.toHex(recipientAddress),
-        deadline,
-      ],
-      senderAddress,
+      swapParams,
+      fromAddress,
     );
 
-    // Sign & broadcast transaction
-    const signedTx = await tronWeb.trx.sign(swapTx.transaction);
+    // Sign and broadcast the transaction
+    const signedTx = await tronWeb.trx.sign(transaction.transaction);
     const receipt = await tronWeb.trx.sendRawTransaction(signedTx);
 
-    res.json({ success: true, receipt });
-
+    // Return the transaction details
+    response.json({
+      success: true,
+      txId: receipt.transaction.txID,
+      swappedUsdtAmount: usdtBalance.toString(),
+      amountOutMin: amountOutMin.toString(),
+    });
   } catch (error) {
-    console.error("Withdraw Error:", error);
-    res.status(500).json({ error: "Withdrawal failed", details: error.message });
+    console.error("Swap Failed:", error);
+    response.status(500).json({
+      error: "Swap execution failed",
+      reason: error.message.includes("revert") ? "Insufficient liquidity or invalid path" : error.message,
+    });
   }
 });
-
-// Email transporter configuration
-const transporter = nodemailer.createTransport({
-  service: "gmail", // Replace with your email service (e.g., SendGrid, Gmail)
-  auth: {
-    user: "hamidraza.engr@gmail.com", // Replace with your email
-    pass: "imyy swks mieh bhwy", // Replace with your email password
-  },
-});
-
-/**
- * HTTP function that logs a message and sends a response
- * @param {object} request - The HTTP request object
- * @param {object} response - The HTTP response object
- */
-exports.helloWorld = onRequest((request, response) => {
-  logger.info("Hello logs!", {structuredData: true});
-  response.json("Hello from Firebase!");
-});
-
-/**
- * HTTP function that generates and sends OTP via email
- * @param {object} request - The HTTP request object
- * @param {object} response - The HTTP response object
- */
-exports.sendOtp = onRequest(async (request, response) => {
-  logger.info("Request body:", request.body);
-
-  const email = request.body.email; // Extract email from request body
-  if (!email) {
-    logger.error("No email address provided.");
-    return response.status(400).json({error: "No email address provided."});
-  }
-
-  const otp = generateOtp(); // Generate a 6-digit OTP
-
-  // Store the OTP in Firestore with a TTL (Time-to-Live)
-  const otpDoc = db.collection("otps").doc(email);
-  await otpDoc.set({
-    otp: otp,
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-  });
-
-  logger.info(`Stored OTP for ${email}: ${otp}`);
-
-  const mailOptions = {
-    from: "hamidraza.engr@gmail.com", // Replace with your email
-    to: email, // Use the extracted email
-    subject: "Your OTP Code",
-    text: `Your OTP code is: ${otp}`,
-  };
-
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      logger.error("Error sending OTP email:", error);
-      return response.status(500)
-          .json({error: `Error sending OTP email: ${error.toString()}`});
-    }
-    logger.info("OTP email sent successfully:", info.response);
-    response.json({message: "OTP email sent successfully"});
-  });
-});
-
-/**
- * HTTP function that verifies the OTP
- * @param {object} request - The HTTP request object
- * @param {object} response - The HTTP response object
- */
-exports.verifyOtp = onRequest(async (request, response) => {
-  logger.info("Request body:", request.body);
-
-  const {email, otp} = request.body; // Extract email and OTP from request body
-  if (!email || !otp) {
-    logger.error("Email or OTP not provided.");
-    return response.status(400).json({error: "Email or OTP not provided."});
-  }
-
-  // Retrieve the OTP from Firestore
-  const otpDoc = db.collection("otps").doc(email);
-  const doc = await otpDoc.get();
-
-  if (!doc.exists) {
-    logger.error("No OTP found for the provided email.");
-    return response.status(400)
-        .json({error: "No OTP found for the provided email."});
-  }
-
-  const storedOtp = doc.data().otp;
-
-  if (storedOtp === otp) {
-    logger.info("OTP verification successful for email:", email);
-    response.json({message: "OTP verification successful"});
-    // Optionally, delete the OTP from Firestore after successful verification
-    await otpDoc.delete();
-  } else {
-    logger.error("OTP verification failed for email:", email);
-    response.status(400).json({error: "Invalid OTP"});
-  }
-});
-
-/**
- * Get TRON Wallet Balance
- */
-exports.getTronBalance = onRequest(async (request, response) => {
-  const address = request.query.address;
-  if (!address) {
-    return response.status(400).json({error: "Address is required"});
-  }
-
-  try {
-    const balance = await tronWeb.trx.getBalance(address);
-    response.json({balance});
-  } catch (error) {
-    logger.error("Error fetching balance:", error);
-    response.status(500).json({error: "Failed to get balance"});
-  }
-});
-
 /**
  * Send TRON Transaction
  */
 exports.sendTronTransaction = onRequest(async (request, response) => {
-  const {fromAddress, toAddress, amount} = request.body;
+  const { fromAddress, toAddress, amount, privateKey } = request.body;
 
-  if (!fromAddress || !toAddress || !amount) {
-    return response.status(400).json({error: "Missing required fields"});
+  if (!fromAddress || !toAddress || !amount || !privateKey) {
+    return response.status(400).json({ error: "Missing parameters" });
   }
+
+  const tronWeb = initializeTronWeb(privateKey);
 
   try {
     const trade = await tronWeb.transactionBuilder.sendTrx(
-        toAddress,
-        tronWeb.toSun(amount), // Convert to SUN
-        fromAddress,
+      toAddress,
+      tronWeb.toSun(amount),
+      fromAddress,
     );
 
     const signedTransaction = await tronWeb.trx.sign(trade);
     const receipt = await tronWeb.trx.sendRawTransaction(signedTransaction);
 
-    response.json({receipt});
+    response.json({ receipt });
   } catch (error) {
-    logger.error("Transaction error:", error);
-    response.status(500).json({error: "Failed to send transaction"});
+    console.error("Transaction error:", error);
+    response.status(500).json({ error: "Failed to send transaction" });
   }
 });
 
-// Adjusted Backend Code (Node.js)
+/**
+ * Send TRC-20 Tokens
+ */
 exports.sendTrc20Transaction = onRequest(async (request, response) => {
-  const { contractAddress, toAddress, amount } = request.body;
+  const { contractAddress, toAddress, amount, privateKey } = request.body;
 
-  if (!contractAddress || !toAddress || !amount) {
-    return response.status(400).json({ error: "Missing required fields" });
+  if (!contractAddress || !toAddress || !amount || !privateKey) {
+    return response.status(400).json({ error: "Missing parameters" });
   }
 
-  try {
-    // Validate addresses
-    if (!tronWeb.isAddress(contractAddress) || !tronWeb.isAddress(toAddress)) {
-      return response.status(400).json({ error: "Invalid address" });
-    }
+  const tronWeb = initializeTronWeb(privateKey);
 
-    // Convert amount to smallest unit
-    const decimals = 6; // Adjust for token's decimals
+  try {
+    const decimals = 6;
     const adjustedAmount = tronWeb.toBigNumber(parseFloat(amount)).multipliedBy(10 ** decimals);
 
-    // Load contract
     const contract = await tronWeb.contract().at(contractAddress);
 
-    // Send transaction
     const transaction = await contract.transfer(toAddress, adjustedAmount.toString()).send({
-      feeLimit: 1000000, // 20 TRX
+      feeLimit: 1000000,
     });
 
     response.json({ success: true, transaction });
@@ -390,7 +283,103 @@ exports.sendTrc20Transaction = onRequest(async (request, response) => {
 });
 
 /**
- * Generate a new TRON Wallet
+ * Withdraw TRX
+ */
+exports.withdraw = onRequest(async (request, response) => {
+  const { recipientAddress, trxAmount, privateKey, wtrx, usdt, sunswapRouter } = request.body;
+
+  if (!recipientAddress || !trxAmount || !privateKey || !wtrx || !usdt || !sunswapRouter) {
+    return response.status(400).json({ error: "Missing parameters" });
+  }
+
+  const tronWeb = initializeTronWeb(privateKey);
+
+  try {
+    const senderAddress = await tronWeb.defaultAddress.base58;
+    const balance = await tronWeb.trx.getBalance(senderAddress);
+    if (balance < trxAmount * 1e6) {
+      return response.status(400).json({ error: "Insufficient TRX balance" });
+    }
+
+    const path = [wtrx, usdt].map((addr) =>
+      tronWeb.address.toHex(addr).replace(/^41/, "0x"),
+    );
+
+    const deadline = Math.floor(Date.now() / 1000) + 600;
+
+    const swapTx = await tronWeb.transactionBuilder.triggerSmartContract(
+      sunswapRouter,
+      "swapExactTRXForTokens(uint256,address[],address,uint256)",
+      {
+        feeLimit: 10000000,
+        callValue: tronWeb.toSun(trxAmount),
+      },
+      [
+        "0",
+        path,
+        tronWeb.address.toHex(recipientAddress),
+        deadline,
+      ],
+      senderAddress,
+    );
+
+    const signedTx = await tronWeb.trx.sign(swapTx.transaction);
+    const receipt = await tronWeb.trx.sendRawTransaction(signedTx);
+
+    response.json({ success: true, receipt });
+
+  } catch (error) {
+    console.error("Withdraw Error:", error);
+    response.status(500).json({ error: "Withdrawal failed", details: error.message });
+  }
+});
+
+/**
+ * Verify OTP
+ */
+exports.verifyOtp = onRequest(async (request, response) => {
+  const { email, otp } = request.body;
+  if (!email || !otp) {
+    return response.status(400).json({ error: "Email or OTP not provided." });
+  }
+
+  const otpDoc = db.collection("otps").doc(email);
+  const doc = await otpDoc.get();
+
+  if (!doc.exists) {
+    return response.status(400).json({ error: "No OTP found for the provided email." });
+  }
+
+  const storedOtp = doc.data().otp;
+
+  if (storedOtp === otp) {
+    await otpDoc.delete();
+    response.json({ message: "OTP verification successful" });
+  } else {
+    response.status(400).json({ error: "Invalid OTP" });
+  }
+});
+
+/**
+ * Get TRON Wallet Balance
+ */
+exports.getTronBalance = onRequest(async (request, response) => {
+  const { address } = request.query;
+  if (!address) {
+    return response.status(400).json({ error: "Address is required" });
+  }
+
+  try {
+    const balance = await tronWeb.trx.getBalance(address);
+    response.json({ balance });
+  } catch (error) {
+    response.status(500).json({ error: "Failed to get balance" });
+  }
+});
+
+/**
+ * Generates a new TRON wallet
+ * @returns {Promise<Object>} - A promise that resolves to an object containing the wallet address and private key
  */
 exports.generateWallet = onRequest(async (request, response) => {
   try {
@@ -401,7 +390,7 @@ exports.generateWallet = onRequest(async (request, response) => {
     });
   } catch (error) {
     logger.error("Error generating wallet:", error);
-    response.status(500).json({error: "Failed to generate wallet"});
+    response.status(500).json({ error: "Failed to generate wallet" });
   }
 });
 
@@ -409,16 +398,82 @@ exports.generateWallet = onRequest(async (request, response) => {
  * Broadcast a Raw Transaction
  */
 exports.broadcastRawTransaction = onRequest(async (request, response) => {
-  const {signedTransaction} = request.body;
+  const { signedTransaction } = request.body;
   if (!signedTransaction) {
-    return response.status(400).json({error: "Signed transaction is required"});
+    return response.status(400).json({ error: "Signed transaction is required" });
   }
 
   try {
     const result = await tronWeb.trx.sendRawTransaction(signedTransaction);
-    response.json({result});
+    response.json({ result });
   } catch (error) {
     logger.error("Error broadcasting transaction:", error);
-    response.status(500).json({error: "Failed to broadcast transaction"});
+    response.status(500).json({ error: "Failed to broadcast transaction" });
   }
 });
+
+/**
+ * Send OTP
+ */
+exports.sendOtp = onRequest(async (request, response) => {
+  const { email } = request.body;
+  if (!email) {
+    return response.status(400).json({ error: "No email address provided." });
+  }
+
+  const otp = generateOtp();
+
+  const otpDoc = db.collection("otps").doc(email);
+  await otpDoc.set({
+    otp: otp,
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+
+  const mailOptions = {
+    from: "info@cryptocoinworld.net",
+    to: email,
+    subject: "Crypto Coin OTP Code",
+    text: `Your Crypto Coin OTP code is: ${otp}`,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      logger.error("Error sending OTP email:", error);
+      return response.status(500).json({ error: `Error sending OTP email: ${error.toString()}` });
+    }
+    response.json({ message: "OTP email sent successfully" });
+  });
+});
+
+// Email transporter configuration
+const transporter = nodemailer.createTransport({
+  host: "smtp.hostinger.com",
+  port: 465,
+  secure: true, // Use SSL/TLS for port 465
+  auth: {
+    user: "info@cryptocoinworld.net",
+    pass: "Sialkot123@123",
+  },
+  tls: {
+    rejectUnauthorized: false, // Disable certificate validation (temporary)
+  },
+  connectionTimeout: 60000, // Increase timeout
+  debug: true, // Enable debug mode
+});
+
+// Verify transporter connection
+transporter.verify((error, success) => {
+  if (error) {
+    console.error("SMTP verification failed:", error);
+  } else {
+    console.log("SMTP server is ready to take messages");
+  }
+});
+
+/**
+ * Function to generate OTP
+ */
+function generateOtp() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+

@@ -64,7 +64,7 @@ class WalletService {
 
 
   /// Save Wallet Data to Firebase
-  Future<void> saveToFirebase(String email, Map<String, dynamic> walletData) async {
+  Future<void> _saveToFirebase(String email, Map<String, dynamic> walletData) async {
     final userDoc = FirebaseFirestore.instance.collection('wallets').doc(email);
     await userDoc.set(walletData, SetOptions(merge: true));
   }

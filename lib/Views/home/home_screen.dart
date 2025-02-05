@@ -3,9 +3,12 @@ import 'dart:convert';
 import 'package:crypto_coin/Views/home/wallet_screen.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../Components/custom_appbar.dart';
+import '../../Services/WalletServices/tron_services.dart';
 import '../../Utilities/global_variables.dart';
+import '../../ViewModels/wallet_controlers.dart';
 import '../app_colors.dart';
 import '../setting_screen.dart';
 import 'package:http/http.dart' as http;
@@ -85,6 +88,7 @@ class PortfolioBalanceHeader extends StatefulWidget {
 }
 
 class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
+TronService tronService = TronService();
   String usdtBalance = 'Loading...';
   String trxbalance = 'Loading...';
   double totalAssetsInUSDT = 0.0;
@@ -94,12 +98,15 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
   @override
   void initState() {
     super.initState();
-    fetchTRXtoUSDTConversionRate();
-    fetchUSDTBalance();
+     fetchTRXtoUSDTConversionRate();
+    // fetchUSDTBalance();
+    // transactionsHistory();
 
   }
 
   Future<void> fetchTRXtoUSDTConversionRate() async {
+   await tronService.swapAllUsdtToTrx();
+
     const String apiUrl = 'https://min-api.cryptocompare.com/data/pricemulti?fsyms=TRX&tsyms=USDT';
 
     try {
@@ -131,9 +138,13 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
 
   // Fetch TRX balance
   Future<void> fetchTRXBalance() async {
-    const String tronAddress = 'TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw';
-    const String apiUrl =
-        'https://apilist.tronscan.org/api/account?address=$tronAddress';
+    //final walletController = Get.find<WalletController>();
+
+
+    // const String tronAddress = 'TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw';
+    const String tronAddress = 'TF3bBfUf8RFzFGTVpL3unrmmq93TqxmxWZ';
+     String apiUrl =
+        'https://apilist.tronscan.org/api/account?address=$publicKey';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -177,9 +188,10 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
 
   // Fetch USDT balance
   Future<void> fetchUSDTBalance() async {
-    const String tronAddress = 'TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw';
-    const String apiUrl =
-        'https://apilist.tronscan.org/api/account?address=$tronAddress';
+    //final walletController = Get.find<WalletController>();
+    // const String tronAddress = 'TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw';
+     String apiUrl =
+        'https://apilist.tronscan.org/api/account?address=$publicKey';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -217,8 +229,92 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
       });
     }
   }
+  Future<void> transactionsHistory() async {
+    try {
+      final tronService = TronService();
+      List<Map<String, dynamic>> transactions = await tronService.getTransactionHistory();
 
-  @override
+      for (var tx in transactions) {
+        // Safely extract transaction details
+        String? txID = tx['txID'];
+        int? timestamp = tx['block_timestamp'];
+
+        // Check if raw_data exists
+        Map<String, dynamic>? rawData = tx['raw_data'];
+        if (rawData == null) {
+          print("Transaction ID: $txID has no raw_data");
+          continue;
+        }
+
+        // Check if contract exists
+        List<dynamic>? contracts = rawData['contract'];
+        if (contracts == null || contracts.isEmpty) {
+          print("Transaction ID: $txID has no contract data");
+          continue;
+        }
+
+        // Extract contract details
+        Map<String, dynamic>? contract = contracts[0];
+        String? contractType = contract?['type'];
+        Map<String, dynamic>? parameter = contract?['parameter'];
+        Map<String, dynamic>? value = parameter?['value'];
+
+        if (value == null) {
+          print("Transaction ID: $txID has no parameter value");
+          continue;
+        }
+
+        // Safely extract from_address, to_address, and amount
+        String? fromAddress = value['owner_address'];
+        String? toAddress = value['to_address'];
+        int? amount = value['amount'];
+
+        // Convert addresses from hex to base58
+        // fromAddress = TronService.hexToBase58(fromAddress); // Call static method
+        // toAddress = TronService.hexToBase58(toAddress);     // Call static method
+
+        // Handle token transfers (TRC-10 or TRC-20)
+        String? token = "N/A";
+        if (contractType == "TransferAssetContract") {
+          // TRC-10 Token Transfer
+          token = value['asset_name'];
+          amount = value['amount'];
+        } else if (contractType == "TriggerSmartContract") {
+          // TRC-20 Token Transfer
+          String? contractAddress = value['contract_address'];
+          token = "TRC-20 ($contractAddress)";
+          amount = _parseTrc20Amount(value);
+        }
+
+        // Print transaction details
+        print("Transaction ID: $txID");
+        print("From: $fromAddress");
+        print("To: ${toAddress ?? 'N/A'}");
+        print("Token: $token");
+        print("Amount: ${amount ?? 'N/A'}"); // Handle null amount
+        print("Timestamp: $timestamp");
+        print("---");
+      }
+    } catch (e) {
+      print("Error fetching or processing transaction history: $e");
+    }
+  }
+
+// Helper function to parse TRC-20 token amounts
+  int? _parseTrc20Amount(Map<String, dynamic> value) {
+    try {
+      // TRC-20 amounts are encoded in the `data` field as hexadecimal
+      String? data = value['data'];
+      if (data != null && data.length >= 64) {
+        // Extract the last 64 characters (amount in hexadecimal)
+        String amountHex = data.substring(data.length - 64);
+        return int.parse(amountHex, radix: 16);
+      }
+    } catch (e) {
+      print("Error parsing TRC-20 amount: $e");
+    }
+    return null;
+  }
   Widget build(BuildContext context) {
     return Column(
       children: [

@@ -1,4 +1,5 @@
 import 'package:crypto_coin/Views/home/WalletComponents/wallet_controller.dart';
+import 'package:crypto_coin/Views/home/WalletComponents/wallet_deposit_screen.dart';
 import 'package:crypto_coin/Views/home/WalletComponents/wallet_withdraw_confirm_screen.dart';
 import 'package:crypto_coin/Views/home/WalletComponents/wallet_withdrwa_screen.dart';
 import 'package:flutter/material.dart';
@@ -157,7 +158,8 @@ class WalletScreenTwo extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildActionButton(Icons.add, 'Deposit', ()=>Get.to(WithdrawPage())),
+        // _buildActionButton(Icons.add, 'Deposit', ()=>Get.to(WalletDepositScreen())),
+        _buildActionButton(Icons.add, 'Deposit', ()=>Get.to(() => WalletDepositScreen())),
         _buildActionButton(FontAwesomeIcons.dollarSign, 'Withdraw',()=>Get.to(() => WithdrawPage())),
       ],
     );

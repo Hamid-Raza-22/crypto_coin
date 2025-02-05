@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:convert/convert.dart';
+import 'package:crypto_coin/Views/home/WalletComponents/wallet_deposit_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:crypto/crypto.dart' as crypto; // We'll use this to sign the transaction
 import 'package:crypto_coin/Views/home/WalletComponents/wallet_withdrwa_screen.dart';
@@ -275,9 +276,9 @@ class _WithdrawPageState extends State<WithdrawPage> {
   void main() async {
     final TronService tronService = TronService();
     bool success = await tronService.swapTrxToUsdt(
-      "TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw", // Your TRX wallet
-      "TKSRbKd1K8v62FLLeKeMd19joP1oxCPTjP", // USDT receiver
-      1, // Amount of TRX to swap
+      "TKSRbKd1K8v62FLLeKeMd19joP1oxCPTjP", // Your TRX wallet
+      // "TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw", // Your TRX wallet
+      70,
     );
 
     if (success) {
@@ -384,6 +385,10 @@ SingleChildScrollView( child:       Padding(
                 Expanded(
                   child: TextButton(
                     onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const WalletDepositScreen()),
+                      );
                       // Add deposit functionality
                     },
                     style: TextButton.styleFrom(

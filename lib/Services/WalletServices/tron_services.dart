@@ -1,19 +1,31 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../../Utilities/global_variables.dart';
+
+const WTRX = "TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR"; // Wrapped TRX Address
+const USDT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"; // USDT Contract
+const SUNSWAP_ROUTER =
+    "TXF1xDbVGdxFGbovmmmXvBGu8ZiE3Lq4mR"; // SunSwap Router V2
+
 class TronService {
   final String baseUrl =
       "https://us-central1-crypto-coin-f8437.cloudfunctions.net";
-
   // 1. Get Balance
-  Future<double?> getTronBalance(String address) async {
+
+  Future<double?> getTronBalance() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/getTronBalance?address=$address'));
+      final response =
+          await http.get(Uri.parse('$baseUrl/getTronBalance?address=$publicKey'));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
-        // Handle balance as an int or a double
+        if (data['balance'] == null) {
+          print("Balance not found in response");
+          return null;
+        }
+
         if (data['balance'] is int) {
           return (data['balance'] as int) / 1e6; // Convert Sun to TRX
         } else if (data['balance'] is String) {
@@ -23,7 +35,7 @@ class TronService {
           return null;
         }
       } else {
-        print("Error: ${response.body}");
+        print("Error: ${response.statusCode} - ${response.body}");
         return null;
       }
     } catch (e) {
@@ -32,25 +44,27 @@ class TronService {
     }
   }
 
-
   // 2. Send TRX
-  Future<bool> sendTrx(String fromAddress, String toAddress, double amount) async {
+
+  Future<bool> sendTrx(  String toAddress, double amount,
+       ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/sendTronTransaction'),
-        body: {
-          'fromAddress': fromAddress, // Add fromAddress
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'fromAddress':  publicKey!,
           'toAddress': toAddress,
           'amount': amount.toString(),
-        },
+          'privateKey': privateKey,
+        }),
       );
-      // ... rest of the code
 
       if (response.statusCode == 200) {
         print("Transaction successful: ${response.body}");
         return true;
       } else {
-        print("Error: ${response.body}");
+        print("Error: ${response.statusCode} - ${response.body}");
         return false;
       }
     } catch (e) {
@@ -60,23 +74,26 @@ class TronService {
   }
 
   // 3. Send TRC-20 Tokens
-  Future<bool> sendTrc20(String toAddress, String amount, String contractAddress) async {
+
+  Future<bool> sendTrc20(String toAddress, String amount,
+      String contractAddress ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/sendTrc20Transaction'),
-        body: {
-
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
           'toAddress': toAddress,
           'amount': amount,
           'contractAddress': contractAddress,
-        },
+          'privateKey': privateKey,
+        }),
       );
 
       if (response.statusCode == 200) {
         print("TRC-20 Transaction successful: ${response.body}");
         return true;
       } else {
-        print("Error: ${response.body}");
+        print("Error: ${response.statusCode} - ${response.body}");
         return false;
       }
     } catch (e) {
@@ -86,49 +103,52 @@ class TronService {
   }
 
   // 4. Generate Wallet
-   generateWallet() async {
+
+  Future<Map<String, String>> generateWallet() async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/generateWallet'));
 
       if (response.statusCode == 200) {
-        // Successfully got a wallet response
         Map<String, dynamic> walletData = jsonDecode(response.body);
 
         String address = walletData['address'];
         String privateKey = walletData['privateKey'];
 
-        // Print the generated wallet data
-        print("Generated Wallet Address: $address");
-        print("Generated Wallet Private Key: $privateKey");
+        return {'address': address, 'privateKey': privateKey};
       } else {
-        print("Error: ${response.body}");
+        print("Error: ${response.statusCode} - ${response.body}");
+        return {};
       }
     } catch (e) {
       print("Error generating wallet: $e");
+      return {};
     }
   }
-  Future<bool> swapTrxToUsdt(String fromAddress, String receiverAddress, int trxAmount) async {
+
+  // 5. Swap TRX to USDT
+
+  Future<bool> swapTrxToUsdt(  String receiverAddress,
+      int trxAmount ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/swapTrxToUsdt'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          "fromAddress": fromAddress.toString(), // Ensure it's a string
-          "receiverAddress": receiverAddress.toString(), // Ensure it's a string
-          "trxAmount": trxAmount.toInt() // Ensure it's a double
-
+          'fromAddress':  publicKey,
+          'receiverAddress': receiverAddress,
+          'trxAmount': trxAmount,
+          'privateKey': privateKey,
+          'wtrx': WTRX,
+          'usdt': USDT,
+          'sunswapRouter': SUNSWAP_ROUTER,
         }),
       );
-      print("From Address Type: ${fromAddress.runtimeType}");
-      print("Receiver Address Type: ${receiverAddress.runtimeType}");
-      print("TRX Amount Type: ${trxAmount.runtimeType}");
-
 
       if (response.statusCode == 200) {
         print("Swap successful: ${response.body}");
         return true;
       } else {
-        print("Error: ${response.body}");
+        print("Error: ${response.statusCode} - ${response.body}");
         return false;
       }
     } catch (e) {
@@ -136,7 +156,11 @@ class TronService {
       return false;
     }
   }
-  Future<bool> withdraw( String receiverAddress, double trxAmount) async {
+
+  // 6. Withdraw
+
+  Future<bool> withdraw(
+      String receiverAddress, double trxAmount ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/withdraw'),
@@ -144,18 +168,113 @@ class TronService {
         body: jsonEncode({
           'recipientAddress': receiverAddress,
           'trxAmount': trxAmount,
+          'privateKey': privateKey,
+          'wtrx': WTRX,
+          'usdt': USDT,
+          'sunswapRouter': SUNSWAP_ROUTER,
         }),
       );
 
       if (response.statusCode == 200) {
-        print("Swap successful: ${response.body}");
+        print("Withdrawal successful: ${response.body}");
         return true;
       } else {
-        print("Error: ${response.body}");
+        print("Error: ${response.statusCode} - ${response.body}");
         return false;
       }
     } catch (e) {
-      print("Error swapping wit TRX to USDT: $e");
+      print("Error withdrawing TRX: $e");
+      return false;
+    }
+  }
+  // 7. Get Transaction History
+
+  Future<List<Map<String, dynamic>>> getTransactionHistory() async {
+    try {
+      // Use TronGrid API to fetch transaction history
+      final String tronGridUrl =
+          "https://api.trongrid.io/v1/accounts/$publicKey/transactions";
+      final response = await http.get(Uri.parse(tronGridUrl));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['data'] != null && data['data'] is List) {
+          // Parse and return the list of transactions
+          List<dynamic> transactions = data['data'];
+          return transactions.map((tx) => tx as Map<String, dynamic>).toList();
+        } else {
+          print("No transaction data found in response");
+          return [];
+        }
+      } else {
+        print("Error: ${response.statusCode} - ${response.body}");
+        return [];
+      }
+    } catch (e) {
+      print("Error fetching transaction history: $e");
+      return [];
+    }
+  }
+
+
+
+// 8. Swap All USDT to TRX
+  Future<bool> swapAllUsdtToTrx() async {
+    try {
+      // Fetch the USDT balance of the wallet
+      final response = await http.post(
+        Uri.parse('https://apilist.tronscan.org/api/account?address=$publicKey'),
+        //Uri.parse('$baseUrl/getUsdtBalance'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'address':  publicKey!,
+          'contractAddress': USDT,
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        print("Error fetching USDT balance: ${response.body}");
+        return false;
+      }
+
+      final data = jsonDecode(response.body);
+      if (data['balance'] == null ||
+          double.tryParse(data['balance'].toString()) == null) {
+        print("No USDT balance found or invalid balance format");
+        return false;
+      }
+
+      double usdtBalance = double.parse(data['balance'].toString());
+      if (usdtBalance <= 0) {
+        print("No USDT balance available in the wallet");
+        return false;
+      }
+
+      // Perform the swap
+      final swapResponse = await http.post(
+        Uri.parse('$baseUrl/swapAllUsdtToTrx'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'fromAddress':  publicKey!,
+          'receiverAddress': publicKey,
+          'usdtAmount': usdtBalance.toString(),
+          'privateKey': privateKey,
+          'wtrx': WTRX,
+          'usdt': USDT,
+          'sunswapRouter': SUNSWAP_ROUTER,
+        }),
+      );
+
+      if (swapResponse.statusCode == 200) {
+        print("Swap successful: ${swapResponse.body}");
+        return true;
+      } else {
+        print(
+            "Error swapping USDT to TRX: ${swapResponse.statusCode} - ${swapResponse.body}");
+        return false;
+      }
+    } catch (e) {
+      print("Error during swapAllUsdtToTrx: $e");
       return false;
     }
   }

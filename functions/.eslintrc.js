@@ -12,6 +12,7 @@ module.exports = {
     "google",
   ],
   rules: {
+   "valid-jsdoc": "off",
     "object-curly-spacing": "off",  // Ignore spaces after or before `{` and `}`
     "indent": "off",                // Ignore indentation errors
     "no-multi-spaces": "off",        // Allow multiple spaces in code

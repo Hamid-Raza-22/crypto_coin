@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:crypto_coin/Utilities/global_variables.dart';
+import 'package:crypto_coin/ViewModels/wallet_controlers.dart';
 import 'package:crypto_coin/Views/AppRoutes/app_routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  //final WalletController walletController =Get.put(WalletController());
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   static const double _horizontalPadding = 20.0;
@@ -124,7 +126,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   _buildSocialButton(
                     context: context,
                     text: 'Continue with Google',
-                    iconImage: AssetImage(googleIcon),
+                    iconImage: const AssetImage(googleIcon),
                      onTap: signUpWithGoogle,
                   ),
                   const SizedBox(height: 10),

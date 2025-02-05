@@ -30,3 +30,5 @@ const instagramIcon = "assets/icons/instagram.png";
 const twitterIcon = "assets/icons/twitter.png";
 const whatsappIcon = "assets/icons/whatsapp.png";
 
+String? privateKey = "";
+String? publicKey = "";

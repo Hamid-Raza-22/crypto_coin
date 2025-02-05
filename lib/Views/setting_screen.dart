@@ -1,6 +1,8 @@
 // settings_page.dart
 import 'package:crypto_coin/Views/edit_profile_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -10,10 +12,27 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool isDarkMode = false;
 
-  void logout() {
-    // Navigate to the login screen or clear user session
-    Navigator.of(context).pushReplacementNamed('/login');
-  }
+
+final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+
+void logout() async {
+  // Clear user session data from SharedPreferences
+  // SharedPreferences prefs = await SharedPreferences.getInstance();
+  // await prefs.clear(); // This will clear all stored preferences
+  final GoogleSignIn googleSignIn = GoogleSignIn();
+
+  // Sign out from the previous account
+  await googleSignIn.signOut();
+  // Clear user session data from Secure Storage
+  await secureStorage.deleteAll(); // This will clear all stored secure data
+
+  // If you have any global variables, reset them here
+  // Example: Global.user = null;
+
+  // Navigate to the login screen
+  Navigator.of(context).pushReplacementNamed('/login');
+}
+
 
   @override
   Widget build(BuildContext context) {
