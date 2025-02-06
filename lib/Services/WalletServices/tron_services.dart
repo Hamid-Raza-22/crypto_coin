@@ -1,6 +1,6 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-
 import '../../Utilities/global_variables.dart';
 
 const WTRX = "TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR"; // Wrapped TRX Address
@@ -15,14 +15,16 @@ class TronService {
 
   Future<double?> getTronBalance() async {
     try {
-      final response =
-          await http.get(Uri.parse('$baseUrl/getTronBalance?address=$publicKey'));
+      final response = await http
+          .get(Uri.parse('$baseUrl/getTronBalance?address=$publicKey'));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
         if (data['balance'] == null) {
-          print("Balance not found in response");
+          if (kDebugMode) {
+            print("Balance not found in response");
+          }
           return null;
         }
 
@@ -46,14 +48,16 @@ class TronService {
 
   // 2. Send TRX
 
-  Future<bool> sendTrx(  String toAddress, double amount,
-       ) async {
+  Future<bool> sendTrx(
+    String toAddress,
+    double amount,
+  ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/sendTronTransaction'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'fromAddress':  publicKey!,
+          'fromAddress': publicKey!,
           'toAddress': toAddress,
           'amount': amount.toString(),
           'privateKey': privateKey,
@@ -75,8 +79,8 @@ class TronService {
 
   // 3. Send TRC-20 Tokens
 
-  Future<bool> sendTrc20(String toAddress, String amount,
-      String contractAddress ) async {
+  Future<bool> sendTrc20(
+      String toAddress, String amount, String contractAddress) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/sendTrc20Transaction'),
@@ -127,14 +131,13 @@ class TronService {
 
   // 5. Swap TRX to USDT
 
-  Future<bool> swapTrxToUsdt(  String receiverAddress,
-      int trxAmount ) async {
+  Future<bool> swapTrxToUsdt(String receiverAddress, int trxAmount) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/swapTrxToUsdt'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'fromAddress':  publicKey,
+          'fromAddress': publicKey,
           'receiverAddress': receiverAddress,
           'trxAmount': trxAmount,
           'privateKey': privateKey,
@@ -159,8 +162,7 @@ class TronService {
 
   // 6. Withdraw
 
-  Future<bool> withdraw(
-      String receiverAddress, double trxAmount ) async {
+  Future<bool> withdraw(String receiverAddress, double trxAmount) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/withdraw'),
@@ -216,18 +218,17 @@ class TronService {
     }
   }
 
-
-
 // 8. Swap All USDT to TRX
   Future<bool> swapAllUsdtToTrx() async {
     try {
       // Fetch the USDT balance of the wallet
       final response = await http.post(
-        Uri.parse('https://apilist.tronscan.org/api/account?address=$publicKey'),
+        Uri.parse(
+            'https://apilist.tronscan.org/api/account?address=$publicKey'),
         //Uri.parse('$baseUrl/getUsdtBalance'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'address':  publicKey!,
+          'address': publicKey!,
           'contractAddress': USDT,
         }),
       );
@@ -255,7 +256,7 @@ class TronService {
         Uri.parse('$baseUrl/swapAllUsdtToTrx'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'fromAddress':  publicKey!,
+          'fromAddress': publicKey!,
           'receiverAddress': publicKey,
           'usdtAmount': usdtBalance.toString(),
           'privateKey': privateKey,
@@ -275,6 +276,39 @@ class TronService {
       }
     } catch (e) {
       print("Error during swapAllUsdtToTrx: $e");
+      return false;
+    }
+  }
+  // 9. Stake TRX for Energy or Bandwidth
+  Future<bool> stakeTrx(String resourceType, double amount) async {
+    try {
+      // Validate resource type
+      if (resourceType != 'ENERGY' && resourceType != 'BANDWIDTH') {
+        print("Invalid resource type: $resourceType");
+        return false;
+      }
+      // Call the backend API to stake TRX
+      final response = await http.post(
+        Uri.parse('$baseUrl/stakeTrx'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'fromAddress': publicKey,
+          'privateKey': privateKey,
+          'resourceType': resourceType,
+          'amount': amount.toInt(), // Amount in TRX
+        }),
+      );
+
+      // Handle the response
+      if (response.statusCode == 200) {
+        print("Staking successful: ${response.body}");
+        return true;
+      } else {
+        print("Error staking TRX: ${response.statusCode} - ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      print("Error during staking TRX: $e");
       return false;
     }
   }

@@ -1,14 +1,15 @@
 import 'dart:convert';
 
 import 'package:crypto_coin/Views/home/wallet_screen.dart';
+import 'package:crypto_coin/Views/home/widgets/resource_row.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 import '../../Components/custom_appbar.dart';
 import '../../Services/WalletServices/tron_services.dart';
 import '../../Utilities/global_variables.dart';
-import '../../ViewModels/wallet_controlers.dart';
+
 import '../app_colors.dart';
 import '../setting_screen.dart';
 import 'package:http/http.dart' as http;
@@ -91,9 +92,12 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
 TronService tronService = TronService();
   String usdtBalance = 'Loading...';
   String trxbalance = 'Loading...';
-  double totalAssetsInUSDT = 0.0;
   double trxToUsdtRate = 0.0; // Example: 1 TRX = 0.07 USDT
   double totalAssets = 0.0; // Add this line
+
+// Add energy and bandwidth variables
+int energy = 0;
+int bandwidth = 0;
 
   @override
   void initState() {
@@ -101,11 +105,12 @@ TronService tronService = TronService();
      fetchTRXtoUSDTConversionRate();
     // fetchUSDTBalance();
     // transactionsHistory();
-
+    fetchResources();
   }
 
   Future<void> fetchTRXtoUSDTConversionRate() async {
-   await tronService.swapAllUsdtToTrx();
+    totalAssetsInUSDT = 0.0; // Reset total assets
+    await tronService.swapAllUsdtToTrx();// Swap all USDT to TRX
 
     const String apiUrl = 'https://min-api.cryptocompare.com/data/pricemulti?fsyms=TRX&tsyms=USDT';
 
@@ -229,6 +234,65 @@ TronService tronService = TronService();
       });
     }
   }
+Future<void> fetchResources() async {
+  // const String tronAddress = 'TF3bBfUf8RFzFGTVpL3unrmmq93TqxmxWZ';
+  final String apiUrl = 'https://api.trongrid.io/wallet/getaccountresource?address=$publicKey';
+
+  try {
+    final response = await http.get(Uri.parse(apiUrl));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        energy = data['EnergyLimit'] ?? 0;
+        bandwidth = data['freeNetLimit'] ?? 0;
+      });
+    } else {
+      print('Failed to fetch resources: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Exception while fetching resources: $e');
+  }
+}
+// Future<void> stakeTRXForResources({required String resourceType}) async {
+//   const int amountToStake = 1000000; // 1 TRX in SUN
+//   final String apiUrl = 'https://api.trongrid.io/wallet/freezebalance';
+//
+//   final Map<String, dynamic> requestBody = {
+//     "owner_address": publicKey,
+//     "frozen_balance": amountToStake,
+//     "resource": resourceType, // "ENERGY" or "BANDWIDTH"
+//     "visible": true,
+//   };
+//
+//   try {
+//     final response = await http.post(
+//       Uri.parse(apiUrl),
+//       headers: {'Content-Type': 'application/json'},
+//       body: json.encode(requestBody),
+//     );
+//
+//     if (response.statusCode == 200) {
+//       print('Staking successful for $resourceType');
+//       fetchResources(); // Refresh resources after staking
+//     } else {
+//       print('Staking failed: ${response.statusCode}');
+//     }
+//   } catch (e) {
+//     print('Exception while staking: $e');
+//   }
+// }
+
+  void stakeTrxExample() async {
+    TronService tronService = TronService();
+
+    // Stake 10 TRX for ENERGY
+    bool success = await tronService.stakeTrx("ENERGY", 100);
+    if (success) {
+      print("TRX staked successfully!");
+    } else {
+      print("Failed to stake TRX.");
+    }
+  }
   Future<void> transactionsHistory() async {
     try {
       final tronService = TronService();
@@ -318,43 +382,33 @@ TronService tronService = TronService();
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Existing Portfolio Balance Section
         const Text(
           'Portfolio Balance',
           style: TextStyle(
             fontFamily: 'Readex Pro',
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            height: 1.2,
             color: Colors.black,
           ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 5),
         Text(
-          '\$${totalAssetsInUSDT.toStringAsFixed(2)}', // Total in USDT
+          '\$${totalAssetsInUSDT.toStringAsFixed(1)}', // Total in USDT
           style: const TextStyle(
             fontFamily: 'Readex Pro',
             fontSize: 30,
             fontWeight: FontWeight.w600,
-            height: 1.2,
             color: Colors.black,
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 5),
+
+        // New Resources Section
+        const SizedBox(height: 20),
         const Text(
-          '+2.60%', // Placeholder for dynamic growth percentage
-          style: TextStyle(
-            fontFamily: 'Readex Pro',
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 15),
-        const Text(
-          'Assets Breakdown',
+          'Resources',
           style: TextStyle(
             fontFamily: 'Readex Pro',
             fontSize: 16,
@@ -368,16 +422,14 @@ TronService tronService = TronService();
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AssetDetailRow(label: 'USDT', value: usdtBalance),
-              AssetDetailRow(label: 'TRX', value: trxbalance),
-              AssetDetailRow(label: 'ETH', value: '\$0.00'),
+              ResourceRow(label: 'Energy', value: '$energy', onTap: () => stakeTrxExample()),
+              // ResourceRow(label: 'Bandwidth', value: '$bandwidth', onTap: () => stakeTRXForResources(resourceType: 'BANDWIDTH')),
             ],
           ),
         ),
       ],
     );
-  }
-}
+  }}
 
 class AssetDetailRow extends StatelessWidget {
   final String label;

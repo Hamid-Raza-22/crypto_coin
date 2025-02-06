@@ -1,32 +1,82 @@
+import 'dart:convert';
+
 import 'package:crypto_coin/Views/home/WalletComponents/wallet_transaction_success.dart';
 import 'package:crypto_coin/Views/home/WalletComponents/wallet_withdraw_confirm_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../../../Services/WalletServices/tron_services.dart';
 
 class WithdrawScreen extends StatelessWidget {
   final double withdrawalAmount;
   final double availableBalance;
+  final String publicKeyAddress;
 
   WithdrawScreen({
     required this.withdrawalAmount,
     required this.availableBalance,
+    required this.publicKeyAddress,
   });
+  // void main() async {
+  //   bool success = await tronService.swapTrxToUsdt(
+  //     publicKeyAddress, // Your TRX wallet
+  //     // "TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw", // Your TRX wallet
+  //     totalWithdrawalAmount,
+  //   );
+  //
+  //   if (success) {
+  //     print("TRX swapped to USDT successfully!");
+  //   } else {
+  //     print("Swap failed.");
+  //   }
+  // }
 
+
+  Future<double> fetchTRXtoUSDTConversionRate() async {
+    const String apiUrl = 'https://min-api.cryptocompare.com/data/pricemulti?fsyms=TRX&tsyms=USDT';
+
+    try {
+      // Make the HTTP GET request to the API
+      final response = await http.get(Uri.parse(apiUrl));
+
+      // Check if the response is successful
+      if (response.statusCode == 200) {
+        // Parse the JSON response
+        Map<String, dynamic> data = json.decode(response.body);
+
+        // Extract the TRX to USDT rate
+        double trxToUsdtRate = data['TRX']['USDT'].toDouble();
+
+        // Return the rate
+        return trxToUsdtRate;
+      } else {
+        // Handle API errors
+        throw Exception('Failed to fetch TRX to USDT rate. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle exceptions (e.g., network errors)
+      throw Exception('Error fetching TRX to USDT rate: $e');
+    }
+  }
   @override
   Widget build(BuildContext context) {
-    double transactionFee = withdrawalAmount * 0.02;
-    double totalWithdrawalAmount = withdrawalAmount + transactionFee;
+    final TronService tronService = TronService();
+
+  // Fixed transaction fee of $1
+    double transactionFee = 1.0;
+    double totalWithdrawalAmount = withdrawalAmount - transactionFee;
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Get.to(() => WithdrawPage());
           },
         ),
-        title: Text(
+        title: const Text(
           'Withdraw',
           style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600),
         ),
@@ -35,7 +85,7 @@ class WithdrawScreen extends StatelessWidget {
         elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(Icons.help_outline, color: Colors.black),
+            icon: const Icon(Icons.help_outline, color: Colors.black),
             onPressed: () {
               // Help action
             },
@@ -50,7 +100,7 @@ class WithdrawScreen extends StatelessWidget {
             Center(
               child: Column(
                 children: [
-                  Text(
+                  const Text(
                     'Total Amount',
                     style: TextStyle(
                       fontSize: 16,
@@ -58,10 +108,10 @@ class WithdrawScreen extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
-                    '\$${totalWithdrawalAmount.toStringAsFixed(2)}',
-                    style: TextStyle(
+                    '\$${withdrawalAmount.toStringAsFixed(2)}',
+                    style: const TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,
                       color: Colors.blue,
@@ -70,8 +120,8 @@ class WithdrawScreen extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 24),
-            Text(
+            const SizedBox(height: 24),
+            const Text(
               'Available Balance',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
@@ -79,36 +129,103 @@ class WithdrawScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   _buildRowQuantity('Quantity', '${availableBalance.toStringAsFixed(2)} USD'),
                 ],
               ),
             ),
-            SizedBox(height: 24),
-            Text(
-              'Order',
+            const SizedBox(height: 24),
+            const Text(
+              'Withdrawal Details',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             _buildCard(
               child: Column(
                 children: [
-                  _buildRow('Bank Account', 'monobank XXXX5555'),
-                  Divider(),
+                  _buildRowLabelValue('Address', publicKeyAddress),
+                  const Divider(),
                   _buildRow('Withdrawal Amount', '\$${withdrawalAmount.toStringAsFixed(2)}'),
-                  Divider(),
-                  _buildRow('Transaction Fee (2%)', '\$${transactionFee.toStringAsFixed(2)}'),
-                  Divider(),
+                  const Divider(),
+                  _buildRow('Transaction Fee', '\$${transactionFee.toStringAsFixed(2)}'), // Fixed fee
+                  const Divider(),
                   _buildRow('Total Withdrawal Amount', '\$${totalWithdrawalAmount.toStringAsFixed(2)}'),
+
                 ],
               ),
             ),
-            Spacer(),
-            Divider(),
+            const Spacer(),
+            const Divider(),
             ElevatedButton(
-              onPressed: () {
-                Get.to(WalletTransactionSuccess());
-                // Confirm withdrawal action
+              onPressed: () async {
+                // Show loading dialog
+                Get.dialog(
+                  WillPopScope(
+                    onWillPop: () async => false,
+                    child: AlertDialog(
+                      content: Row(
+                        children: [
+                          CircularProgressIndicator(),
+                          SizedBox(width: 16),
+                          Text("Please wait..."),
+                        ],
+                      ),
+                    ),
+                  ),
+                  barrierDismissible: false,
+                );
+
+                try {
+                  // Fetch the TRX to USDT conversion rate
+                  double trxToUsdtRate = await fetchTRXtoUSDTConversionRate();
+
+                  // Convert the withdrawal amount (in USD) to TRX
+                  double withdrawalAmountInTrx = withdrawalAmount / trxToUsdtRate;
+
+                  // Perform the transaction with the converted TRX amount
+                  bool success = await tronService.swapTrxToUsdt(
+                    publicKeyAddress,
+                    withdrawalAmountInTrx.toInt(), // Pass the TRX amount
+                  );
+
+                  // Close the loading dialog
+                  Get.back();
+
+                  if (success) {
+                    // Show success SnackBar
+                    Get.snackbar(
+                      "Success",
+                      "Transaction successful!",
+                      backgroundColor: Colors.green,
+                      colorText: Colors.white,
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
+
+                    // Navigate to the success screen
+                    Get.to(const WalletTransactionSuccess());
+                  } else {
+                    // Show failure SnackBar
+                    Get.snackbar(
+                      "Error",
+                      "Transaction failed. Please try again.",
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
+                  }
+                } catch (e) {
+                  // Close the loading dialog in case of an error
+                  Get.back();
+
+                  // Show error SnackBar
+                  Get.snackbar(
+                    "Error",
+                    "An unexpected error occurred: ${e.toString()}",
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
+                    snackPosition: SnackPosition.BOTTOM,
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
@@ -116,14 +233,13 @@ class WithdrawScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
-                minimumSize: Size(double.infinity, 50),
+                minimumSize: const Size(double.infinity, 50),
               ),
-              child: Text(
+              child: const Text(
                 'Confirm',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            ),
-            SizedBox(height: 16),
+            ),            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -132,7 +248,7 @@ class WithdrawScreen extends StatelessWidget {
 
   Widget _buildCard({required Widget child}) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
@@ -140,18 +256,35 @@ class WithdrawScreen extends StatelessWidget {
       child: child,
     );
   }
+  _buildRowLabelValue(String label, String value) {
+    return Row(
+      //crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontSize: 16, color: Colors.black54),
+        ),
+         //SizedBox(width: 2), // Add some spacing between label and value
+        Text(
+          value,
+          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+        ),
+      ],
+    );
+  }
   Widget _buildRow(String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 16, color: Colors.black54),
+          style: const TextStyle(fontSize: 16, color: Colors.black54),
         ),
         Text(
           value,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -161,25 +294,24 @@ class WithdrawScreen extends StatelessWidget {
     List<String> valueParts = value.split(' '); // Amount aur currency alag karne ke liye
     String amount = valueParts[0]; // Amount part
     String currency = valueParts.length > 1 ? valueParts.sublist(1).join(' ') : ''; // Currency part
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 16, color: Colors.black54),
+          style: const TextStyle(fontSize: 16, color: Colors.black54),
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              amount,  // Sirf amount bold hoga
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              amount, // Sirf amount bold hoga
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Text(
               currency, // Currency ko alag rakha gya hai
-              style: TextStyle(fontSize: 16, color: Colors.black54),
+              style: const TextStyle(fontSize: 16, color: Colors.black54),
             ),
           ],
         ),

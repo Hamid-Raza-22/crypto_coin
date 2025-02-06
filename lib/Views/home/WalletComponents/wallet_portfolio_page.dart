@@ -1,8 +1,8 @@
 import 'package:crypto_coin/Views/home/WalletComponents/wallet_controller.dart';
-import 'package:crypto_coin/Views/home/WalletComponents/wallet_screen_two.dart';
-import 'package:crypto_coin/Views/home/WalletComponents/wallet_segmented_controlled.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../../../Utilities/global_variables.dart';
 
 class WalletPortfolioPage extends StatelessWidget {
   WalletPortfolioPage({super.key});
@@ -58,15 +58,15 @@ class WalletPortfolioPage extends StatelessWidget {
               ),
             ),
             Column(
-              children: const [
-                Icon(Icons.visibility, color: Colors.grey),
-                Text('My Balance',
+              children: [
+                const Icon(Icons.visibility, color: Colors.grey),
+                const Text('My Balance',
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                Text('\$2,760.23',
+                Text('\$${totalAssetsInUSDT.toStringAsFixed(2)}',
                     style:
-                        TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                Text('+2.60%',
+                        const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                const Text('+2.60%',
                     style: TextStyle(color: Colors.green, fontSize: 16)),
               ],
             ),

@@ -32,3 +32,4 @@ const whatsappIcon = "assets/icons/whatsapp.png";
 
 String? privateKey = "";
 String? publicKey = "";
+double totalAssetsInUSDT = 0.0;
