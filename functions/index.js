@@ -132,6 +132,70 @@ exports.swapTrxToUsdt = onRequest(async (request, response) => {
   }
 });
 /**
+ * Stake TRX for Energy or Bandwidth
+ */
+exports.stakeTrx = onRequest(async (request, response) => {
+  const { fromAddress, privateKey, resourceType, amount } = request.body;
+
+  // Validate required parameters
+  if (!fromAddress || !privateKey || !resourceType || !amount) {
+    return response.status(400).json({ error: "Missing parameters" });
+  }
+
+  // Validate resource type
+  if (!["ENERGY", "BANDWIDTH"].includes(resourceType)) {
+    return response.status(400).json({ error: "Invalid resource type. Use 'ENERGY' or 'BANDWIDTH'" });
+  }
+
+  // Initialize TronWeb with the provided private key
+  const tronWeb = initializeTronWeb(privateKey);
+
+  try {
+    // Validate the wallet address
+    validateAddresses(tronWeb, [fromAddress]);
+
+    // Convert amount to SUN (smallest unit of TRX)
+    const amountInSun = tronWeb.toSun(amount);
+    if (!amountInSun || isNaN(amountInSun)) {
+      throw new Error("Invalid TRX amount provided.");
+    }
+
+    console.log(`Staking ${amount} TRX (${amountInSun} SUN) for ${resourceType}`);
+
+   // Build the freeze transaction
+    const transaction = await tronWeb.transactionBuilder.freezeBalanceV2(
+      amountInSun, // Amount in SUN
+      resourceType, // "ENERGY" or "BANDWIDTH"
+      fromAddress, // Receiver address (can be the same as owner address)
+    );
+
+    console.log("Transaction built successfully:", transaction);
+
+    // Sign the transaction
+    const signedTx = await tronWeb.trx.sign(transaction);
+    console.log("Transaction signed successfully:", signedTx);
+
+    // Broadcast the transaction
+    const receipt = await tronWeb.trx.sendRawTransaction(signedTx);
+    console.log("Transaction broadcasted successfully:", receipt);
+
+    // Return the transaction details
+    response.json({
+      success: true,
+      txId: receipt.txID,
+      stakedAmount: amount,
+      resourceType: resourceType,
+    });
+  } catch (error) {
+    console.error("Staking Failed:", error);
+    response.status(500).json({
+      error: "Staking execution failed",
+      reason: error.message,
+    });
+  }
+});
+
+/**
  * Swap USDT to TRX
  */
 exports.swapAllUsdtToTrx = onRequest(async (request, response) => {
@@ -281,7 +345,55 @@ exports.sendTrc20Transaction = onRequest(async (request, response) => {
     });
   }
 });
+/**
+ * Get Energy and Bandwidth Resources for a TRON Wallet Address
+ */
+exports.getResources = onRequest(async (request, response) => {
+  const { address } = request.query;
 
+  // Validate required parameters
+  if (!address) {
+    return response.status(400).json({ error: "Address is required" });
+  }
+
+  try {
+    // Validate the wallet address
+    validateAddresses(tronWeb, [address]);
+
+    // Fetch account resource information
+    const accountResource = await tronWeb.trx.getAccountResources(address);
+
+    // Extract Energy and Bandwidth details
+    const energyLimit = accountResource.EnergyLimit || 0;
+    const energyUsed = accountResource.EnergyUsed || 0;
+    const bandwidthLimit = accountResource.freeNetLimit || 0;
+    const bandwidthUsed = accountResource.NetUsed || 0;
+
+    // Return the resource details
+    response.json({
+      success: true,
+      address,
+      resources: {
+        energy: {
+          limit: energyLimit,
+          used: energyUsed,
+          available: energyLimit - energyUsed,
+        },
+        bandwidth: {
+          limit: bandwidthLimit,
+          used: bandwidthUsed,
+          available: bandwidthLimit - bandwidthUsed,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Failed to fetch resources:", error);
+    response.status(500).json({
+      error: "Failed to fetch resources",
+      reason: error.message,
+    });
+  }
+});
 /**
  * Withdraw TRX
  */
