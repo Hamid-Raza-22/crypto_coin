@@ -1,4 +1,5 @@
 import 'package:crypto_coin/Views/home/WalletComponents/wallet_main_page.dart';
+import 'package:crypto_coin/Views/setting_screen.dart';
 import 'package:flutter/material.dart';
 // import 'package:crypto_coin/Views/home/wallet_screen.dart';
 
@@ -17,10 +18,11 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   final List<Widget> _pages = [
     HomeScreen(),
-    ServiceScreen(),
     TeamScreen(),
     ChannelScreen(),
      WalletMainPage(),
+    SettingsPage(),
+
   ];
 
   void _onItemTapped(int index) {
@@ -47,13 +49,14 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Icons.group),
             label: 'Team',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'Channel',
-          ),
+
           BottomNavigationBarItem(
             icon: Icon(Icons.account_balance_wallet),
             label: 'Wallet',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat),
+            label: 'Settings',
           ),
         ],
         currentIndex: _selectedIndex,

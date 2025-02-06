@@ -6,9 +6,11 @@ import 'package:crypto_coin/Views/step_one_email_screen.dart';
 import 'package:crypto_coin/Views/successfully_create_accont.dart';
 import 'package:crypto_coin/Views/three_step_lock_screen.dart';
 import 'package:get/get.dart';
+import '../account_activation_screen.dart';
 import '../confirm_email_screen.dart';
 import '../create_password_screen.dart';
 import '../email_code_screen.dart';
+import '../home/WalletComponents/wallet_screen_two.dart';
 import '../main_screen.dart';
 import '../login_screen.dart';
 import '../verification_success_screen.dart';
@@ -27,7 +29,24 @@ class AppRoutes {
    static const String homeScreen = '/HomeScreen';
   //static const String homepage = '/MyHomePage';
   static const String walletScreen = '/WalletScreen';
+  static const String walletScreenTwo = '/WalletScreenTwo';
 
+  static const String walletDepositScreen = '/WalletDepositScreen';
+  static const String walletWithdrawConfirmScreen = '/WalletWithdrawConfirmScreen';
+  static const String walletWithdrawScreen = '/WalletWithdrawScreen';
+  static const String walletMainPage = '/WalletMainPage';
+  static const String walletPortfolioPage = '/WalletPortfolioPage';
+  static const String walletTransactionHistoryPage = '/WalletTransactionHistoryPage';
+  static const String walletTransactionPage = '/WalletTransactionPage';
+  static const String walletTransactionSuccessPage = '/WalletTransactionSuccessPage';
+  static const String walletTransactionDetailPage = '/WalletTransactionDetailPage';
+
+  static const String channelScreen = '/ChannelScreen';
+  // static const String homeScreen = '/HomeScreen';
+  static const String serviceScreen = '/ServiceScreen';
+  static const String teamScreen = '/TeamScreen';
+
+  static const String accountActivationScreen = '/AccountActivationScreen';
   static final routes = [
     GetPage(name: splashScreen, page: () => const SplashScreen()),
     GetPage(name: login, page: () => const LoginScreen()),
@@ -42,5 +61,9 @@ class AppRoutes {
      GetPage(name: homeScreen, page: () =>  MainScreen()),
     // GetPage(name: homepage, page: () =>  const WalletScreen()),
     GetPage(name: walletScreen, page: () =>   WalletScreen()),
+    GetPage(name: walletScreenTwo, page: () =>   WalletScreenTwo()),
+    GetPage(name: accountActivationScreen, page: () =>  AccountActivationScreen()),
+
+
   ];
 }

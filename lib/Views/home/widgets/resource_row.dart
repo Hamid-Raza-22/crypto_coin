@@ -3,44 +3,52 @@ import 'package:flutter/material.dart';
 class ResourceRow extends StatelessWidget {
   final String label;
   final String value;
+  final IconData icon;
+  final Color valueColor;
   final VoidCallback onTap;
 
   const ResourceRow({
     Key? key,
     required this.label,
     required this.value,
+    required this.icon,
+    required this.valueColor,
     required this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Container(
+        padding: EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(8),
+        ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
-            ),
-            Row(
+            Icon(icon, color: Colors.blue), // Icon
+            SizedBox(width: 10), // Spacing between icon and text
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black,
+                  label,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
                   ),
                 ),
-                const SizedBox(width: 10),
-                const Icon(Icons.add_circle_outline, color: Colors.blue),
+                SizedBox(height: 4), // Spacing between label and value
+                Text(
+                  value,
+                  style: TextStyle(
+                    color: valueColor,
+                    fontSize: 14,
+                  ),
+                ),
               ],
             ),
           ],

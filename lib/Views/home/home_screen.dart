@@ -1,23 +1,17 @@
+import 'dart:async';
 import 'dart:convert';
-
 import 'package:crypto_coin/Views/home/wallet_screen.dart';
 import 'package:crypto_coin/Views/home/widgets/resource_row.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
-
-
 import '../../Components/custom_appbar.dart';
 import '../../Services/WalletServices/tron_services.dart';
 import '../../Utilities/global_variables.dart';
-
 import '../app_colors.dart';
 import '../setting_screen.dart';
 import 'package:http/http.dart' as http;
-
 import 'dart:math'as math;
-
-
-import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -94,19 +88,105 @@ TronService tronService = TronService();
   String trxbalance = 'Loading...';
   double trxToUsdtRate = 0.0; // Example: 1 TRX = 0.07 USDT
   double totalAssets = 0.0; // Add this line
-
+Map<String, dynamic>? resources;
 // Add energy and bandwidth variables
 int energy = 0;
 int bandwidth = 0;
-
+  bool isLoading = true;
+  bool _isDialogShown = false; // Flag to track if the dialog has been shown
   @override
   void initState() {
     super.initState();
+
      fetchTRXtoUSDTConversionRate();
     // fetchUSDTBalance();
     // transactionsHistory();
-    fetchResources();
+    fetchResources().then((_) {
+      _checkIfDialogShown(); // Ensure this is called after resources are fetched
+    });
   }
+  Future _checkIfDialogShown() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _isDialogShown = prefs.getBool('isDialogShown') ?? false;
+      });
+
+      // Show the dialog only if it hasn't been shown before
+      if (!_isDialogShown) {
+        _showActivationDialog(context);
+      }
+    } catch (e) {
+      print("Error checking dialog state: $e");
+    }
+  }
+  void _showActivationDialog(BuildContext context) {
+    int countdownDuration = 120; // 2 minutes in seconds
+    bool isCloseButtonEnabled = false;
+
+    print("Attempting to show activation dialog..."); // Debug log
+
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent closing by tapping outside
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            Timer.periodic(Duration(seconds: 1), (timer) {
+              if (countdownDuration > 0) {
+                setState(() {
+                  countdownDuration--;
+                });
+              } else {
+                timer.cancel(); // Stop the timer when countdown reaches 0
+                setState(() {
+                  isCloseButtonEnabled = true;
+                });
+              }
+            });
+
+            String formatTime(int seconds) {
+              int minutes = seconds ~/ 60;
+              int remainingSeconds = seconds % 60;
+              return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+            }
+
+            return AlertDialog(
+              title: Text('Account Activation Required'),
+              content: Text(
+                'Your account is not activated yet. To activate your account, transfer 100 TRX to your current TRON address. After receiving 100 TRX, immediately click on Energy and stake your 100 TRX to avoid network fees. Otherwise, you will incur a cost of 5 to 10 USDT per transaction.',
+                style: TextStyle(fontSize: 14),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isCloseButtonEnabled
+                      ? () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  }
+                      : null, // Disable the button until the countdown finishes
+                  child: Text(
+                    isCloseButtonEnabled ? 'Close' : 'Close (${formatTime(countdownDuration)})',
+                    style: TextStyle(
+                      color: isCloseButtonEnabled ? Colors.blue : Colors.grey,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    ).then((_) {
+      print("Dialog closed. Saving dialog state..."); // Debug log
+      _saveDialogState(true);
+    });
+  }
+
+  Future<void> _saveDialogState(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isDialogShown', value); // Save the state to persistent storage
+  }
+
 
   Future<void> fetchTRXtoUSDTConversionRate() async {
     totalAssetsInUSDT = 0.0; // Reset total assets
@@ -234,25 +314,17 @@ int bandwidth = 0;
       });
     }
   }
-Future<void> fetchResources() async {
-  // const String tronAddress = 'TF3bBfUf8RFzFGTVpL3unrmmq93TqxmxWZ';
-  final String apiUrl = 'https://api.trongrid.io/wallet/getaccountresource?address=$publicKey';
+  Future<void> fetchResources() async {
+    TronService tronService = TronService();
+    Map<String, dynamic>? fetchedResources = await tronService.getResources();
+   await _checkIfDialogShown();
+    setState(() {
 
-  try {
-    final response = await http.get(Uri.parse(apiUrl));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      setState(() {
-        energy = data['EnergyLimit'] ?? 0;
-        bandwidth = data['freeNetLimit'] ?? 0;
-      });
-    } else {
-      print('Failed to fetch resources: ${response.statusCode}');
-    }
-  } catch (e) {
-    print('Exception while fetching resources: $e');
+      resources = fetchedResources;
+      isLoading = false;
+    });
   }
-}
+
 // Future<void> stakeTRXForResources({required String resourceType}) async {
 //   const int amountToStake = 1000000; // 1 TRX in SUN
 //   final String apiUrl = 'https://api.trongrid.io/wallet/freezebalance';
@@ -282,11 +354,11 @@ Future<void> fetchResources() async {
 //   }
 // }
 
-  void stakeTrxExample() async {
+  void stakeTrxExample(String resourceName) async {
     TronService tronService = TronService();
 
     // Stake 10 TRX for ENERGY
-    bool success = await tronService.stakeTrx("ENERGY", 100);
+    bool success = await tronService.stakeTrx(resourceName, 100);
     if (success) {
       print("TRX staked successfully!");
     } else {
@@ -419,13 +491,34 @@ Future<void> fetchResources() async {
         const SizedBox(height: 10),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ResourceRow(label: 'Energy', value: '$energy', onTap: () => stakeTrxExample()),
-              // ResourceRow(label: 'Bandwidth', value: '$bandwidth', onTap: () => stakeTRXForResources(resourceType: 'BANDWIDTH')),
-            ],
-          ),
+          child:Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              spacing: 5,
+              children: [
+                ResourceRow(
+                  label: 'Energy',
+                  value: '${resources?['energy']['available'] ?? "0"}',
+                  icon: Icons.flash_on, // Lightning bolt icon
+                  valueColor: resources?['energy']['available'] == 0
+                      ? Colors.red
+                      : Colors.green, // Red if no energy available
+                  onTap: () => stakeTrxExample("ENERGY"),
+                ),
+                SizedBox(height: 10),
+                ResourceRow(
+                  label: 'Bandwidth',
+                  value: '${resources?['bandwidth']['available'] ?? "0"}',
+                  icon: Icons.network_wifi, // Network icon
+                  valueColor: resources?['bandwidth']['available'] == 0
+                      ? Colors.red
+                      : Colors.green, // Red if no bandwidth available
+                  onTap: () => stakeTrxExample("BANDWIDTH"),
+                ),
+              ],
+            ),
+          )
         ),
       ],
     );
@@ -485,9 +578,9 @@ class AssetContainer extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const AssetContainerHeader(),
-          AssetDetails(rateItem: rateItem),
-          const SizedBox(height: 20),
+          // const AssetContainerHeader(),
+          // AssetDetails(rateItem: rateItem),
+          const SizedBox(height: 10),
           const CenterText(),
           const SizedBox(height: 30),
          const HistoryDetails(),
@@ -497,137 +590,137 @@ class AssetContainer extends StatelessWidget {
   }
 }
 
-class AssetContainerHeader extends StatelessWidget {
-  const AssetContainerHeader({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'My Assets',
-            style: TextStyle(
-              fontFamily: 'Readex Pro',
-              fontSize: 12,
-              fontWeight: FontWeight.w200,
-              color: Colors.black,
-            ),
-          ),
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.search),
-                onPressed: () {
-
-                  // Handle search action
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.settings),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SettingsPage()),
-                  );
-                  // Handle settings action
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class AssetDetails extends StatelessWidget {
-  const AssetDetails({Key? key, required this.rateItem}) : super(key: key);
-
-  final RateItem rateItem;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5),
-          child: Image.asset(
-            rateItem.flagImage!,
-            width: 46,
-            height: 46,
-          ),
-        ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                rateItem.name,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                rateItem.currency,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 10,
-                  color: AppColors.currencyColor,
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          width: 80,
-          height: 40,
-          child: MiniChart(
-            ratesHistory: rateItem.rateHistory,
-            rateColor: rateItem.rateColor,
-          ),
-        ),
-        const SizedBox(width: 40),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              rateItem.difference > 0
-                  ? '+${rateItem.difference}'
-                  : '${rateItem.difference}',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: rateItem.difference > 0
-                    ? AppColors.positiveRate
-                    : AppColors.negativeRate,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '${rateItem.rateInCents / 100}',
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
-                color: Colors.black,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(width: 20),
-      ],
-
-
-    );
-
-
-  }
-}
+// class AssetContainerHeader extends StatelessWidget {
+//   const AssetContainerHeader({Key? key}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//         children: [
+//           const Text(
+//             'My Assets',
+//             style: TextStyle(
+//               fontFamily: 'Readex Pro',
+//               fontSize: 12,
+//               fontWeight: FontWeight.w200,
+//               color: Colors.black,
+//             ),
+//           ),
+//           Row(
+//             children: [
+//               IconButton(
+//                 icon: const Icon(Icons.search),
+//                 onPressed: () {
+//
+//                   // Handle search action
+//                 },
+//               ),
+//               IconButton(
+//                 icon: const Icon(Icons.settings),
+//                 onPressed: () {
+//                   Navigator.push(
+//                     context,
+//                     MaterialPageRoute(builder: (context) => SettingsPage()),
+//                   );
+//                   // Handle settings action
+//                 },
+//               ),
+//             ],
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+//
+// class AssetDetails extends StatelessWidget {
+//   const AssetDetails({Key? key, required this.rateItem}) : super(key: key);
+//
+//   final RateItem rateItem;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children: [
+//         Padding(
+//           padding: const EdgeInsets.symmetric(horizontal: 5),
+//           child: Image.asset(
+//             rateItem.flagImage!,
+//             width: 46,
+//             height: 46,
+//           ),
+//         ),
+//         Expanded(
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               Text(
+//                 rateItem.name,
+//                 style: const TextStyle(
+//                   fontSize: 14,
+//                   color: Colors.black,
+//                   fontWeight: FontWeight.w500,
+//                 ),
+//               ),
+//               const SizedBox(height: 4),
+//               Text(
+//                 rateItem.currency,
+//                 style: const TextStyle(
+//                   fontWeight: FontWeight.bold,
+//                   fontSize: 10,
+//                   color: AppColors.currencyColor,
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//         SizedBox(
+//           width: 80,
+//           height: 40,
+//           child: MiniChart(
+//             ratesHistory: rateItem.rateHistory,
+//             rateColor: rateItem.rateColor,
+//           ),
+//         ),
+//         const SizedBox(width: 40),
+//         Column(
+//           mainAxisAlignment: MainAxisAlignment.start,
+//           children: [
+//             Text(
+//               rateItem.difference > 0
+//                   ? '+${rateItem.difference}'
+//                   : '${rateItem.difference}',
+//               style: TextStyle(
+//                 fontWeight: FontWeight.bold,
+//                 color: rateItem.difference > 0
+//                     ? AppColors.positiveRate
+//                     : AppColors.negativeRate,
+//               ),
+//             ),
+//             const SizedBox(height: 4),
+//             Text(
+//               '${rateItem.rateInCents / 100}',
+//               style: const TextStyle(
+//                 fontWeight: FontWeight.w500,
+//                 fontSize: 16,
+//                 color: Colors.black,
+//               ),
+//             ),
+//           ],
+//         ),
+//         const SizedBox(width: 20),
+//       ],
+//
+//
+//     );
+//
+//
+//   }
+// }
 
 class CenterText extends StatelessWidget {
   const CenterText({Key? key}) : super(key: key);
@@ -654,23 +747,52 @@ class CenterText extends StatelessWidget {
   }
 }
 
-class HistoryDetails extends StatelessWidget {
+
+
+class HistoryDetails extends StatefulWidget {
   const HistoryDetails({Key? key}) : super(key: key);
 
   @override
+  State<HistoryDetails> createState() => _HistoryDetailsState();
+}
+
+class _HistoryDetailsState extends State<HistoryDetails> {
+  late Future<List<Transaction>> _transactionsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _transactionsFuture = TronApiService.fetchTransactions();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const HistoryHeader(),
-        const HistoryItem(price: '500000', amount: '50', time: '12:00'),
-        const HistoryItem(price: '517500', amount: '75', time: '12:30'),
-        const HistoryItem(price: '507500', amount: '60', time: '13:00'),
-        // const HistoryItem(price: '500000', amount: '50', time: '12:00'),
-        // const HistoryItem(price: '517500', amount: '75', time: '12:30'),
-        // const HistoryItem(price: '507500', amount: '60', time: '13:00'),
-        // const HistoryItem(price: '500000', amount: '50', time: '12:00'),
-        // const HistoryItem(price: '507500', amount: '60', time: '13:00'),
-      ],
+    return FutureBuilder<List<Transaction>>(
+      future: _transactionsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No transactions found.'));
+        } else {
+          final transactions = snapshot.data!;
+          const tronPriceInUSD = 0.12; // Example price: 1 TRX = $0.12
+
+          return Column(
+            children: [
+              const HistoryHeader(),
+              ...transactions.map((tx) => HistoryItem(
+                ownerAddress: tx.ownerAddress,
+                amount: tx.getAmountInUSD(tronPriceInUSD).toStringAsFixed(2),
+                time: '${tx.timestamp.hour}:${tx.timestamp.minute}',
+                status: tx.status,
+              )),
+            ],
+          );
+        }
+      },
     );
   }
 }
@@ -684,31 +806,22 @@ class HistoryHeader extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-
         children: const [
           Text(
-            'Price',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Readex Pro',
-              fontSize: 12,
-            ),
+            'Owner Address',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
           ),
           Text(
-            'Amount',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Readex Pro',
-              fontSize: 12,
-            ),
+            'Amount (USD)',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
           ),
           Text(
             'Time',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Readex Pro',
-              fontSize: 12,
-            ),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+          ),
+          Text(
+            'Status',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
           ),
         ],
       ),
@@ -719,29 +832,97 @@ class HistoryHeader extends StatelessWidget {
 class HistoryItem extends StatelessWidget {
   const HistoryItem({
     Key? key,
-    required this.price,
+    required this.ownerAddress,
     required this.amount,
     required this.time,
+    required this.status,
   }) : super(key: key);
 
-  final String price;
+  final String ownerAddress;
   final String amount;
   final String time;
+  final String status;
 
   @override
   Widget build(BuildContext context) {
-    return
-      Padding(
+    return Padding(
       padding: const EdgeInsets.only(top: 4.0),
-      child:
-      Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Text(price,style: TextStyle(fontSize: 12),),
-          Text(amount,style: TextStyle(fontSize: 12)),
-          Text(time,style: TextStyle(fontSize: 12)),
+          Expanded(
+            child: Text(
+              ownerAddress,
+              style: const TextStyle(fontSize: 8),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Text(amount, style: const TextStyle(fontSize: 12)),
+          // Text(time, style: const TextStyle(fontSize: 12)),
+          SizedBox(width: 25,),
+          Text(status, style: const TextStyle(fontSize: 12)),
         ],
       ),
     );
+  }
+}
+
+
+class TronApiService {
+  static const String baseUrl = "https://api.trongrid.io/v1/accounts";
+  static const String ownerAddress = "TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw";
+
+  static Future<List<Transaction>> fetchTransactions() async {
+    final response = await http.get(Uri.parse('$baseUrl/$ownerAddress/transactions'));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonData = json.decode(response.body);
+      print(jsonData); // Log the full JSON response
+      final List<dynamic> transactionsData = jsonData['data'];
+
+      return transactionsData.map((json) => Transaction.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load transactions');
+    }
+  }}
+class Transaction {
+  final String ownerAddress;
+  final int frozenBalance; // in SUN
+  final String status;
+  final DateTime timestamp;
+
+  Transaction({
+    required this.ownerAddress,
+    required this.frozenBalance,
+    required this.status,
+    required this.timestamp,
+  });
+
+  factory Transaction.fromJson(Map<String, dynamic> json) {
+    try {
+      final rawContract = json['raw_data']['contract'][0]['parameter']['value'];
+      final ret = json['ret'][0];
+
+      return Transaction(
+        ownerAddress: rawContract['owner_address'] ?? 'Unknown Address',
+        frozenBalance: rawContract['frozen_balance'] ?? 0,
+        status: ret['contractRet'] ?? 'UNKNOWN',
+        timestamp: DateTime.fromMillisecondsSinceEpoch(json['block_timestamp']),
+      );
+    } catch (e) {
+      print('Error parsing transaction: $e');
+      return Transaction(
+        ownerAddress: 'Unknown Address',
+        frozenBalance: 0,
+        status: 'UNKNOWN',
+        timestamp: DateTime.now(),
+      );
+    }
+  }
+
+  // Convert frozen balance (SUN) to USD
+  double getAmountInUSD(double tronPriceInUSD) {
+    final trxAmount = frozenBalance / 1e6;
+    return trxAmount * tronPriceInUSD;
   }
 }

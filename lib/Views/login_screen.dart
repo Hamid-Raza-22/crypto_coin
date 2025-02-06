@@ -240,6 +240,7 @@ class LoginScreenState extends State<LoginScreen> {
           onTap: () async {
             User? user = await signInWithGoogle();
             if( user != null){
+              //Get.offNamed(AppRoutes.accountActivationScreen);
               Get.offNamed(AppRoutes.homeScreen);
             }else{
 

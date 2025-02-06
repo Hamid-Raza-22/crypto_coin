@@ -9,7 +9,8 @@ import 'package:get/get.dart';
 import '../../../Components/custom_button.dart';
 import '../../../Components/custom_editable_menu_option.dart';
 import '../../../Utilities/global_variables.dart';
-
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 class WalletScreenTwo extends StatelessWidget {
   final WalletController controller = Get.put(WalletController());
 
@@ -209,37 +210,228 @@ class WalletScreenTwo extends StatelessWidget {
   }
 
   Widget _buildTransactionList(BuildContext context) {
-    return ListView(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      children: [
-        _buildTransactionTile('Apple', 'Payment for subscription', '-\$8.99', FontAwesomeIcons.iceCream),
-        _buildTransactionTile(
-            'Netflix', 'Payment for subscription', '-\$12.99', FontAwesomeIcons.f),
-        _buildTransactionTile('Deposit', 'Cryptocurrency', '+\$2000.00', FontAwesomeIcons.faceAngry),
-      ],
+    return FutureBuilder<List<Transaction>>(
+      future: TronApiService.fetchTransactions(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No transactions found.'));
+        } else {
+          final transactions = snapshot.data!;
+          const tronPriceInUSD = 0.12; // Example price: 1 TRX = $0.12
+
+          return ListView(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            children: transactions.map((tx) {
+              return _buildTransactionTile(
+                title: tx.status, // Status in the title
+                subtitle: tx.ownerAddress, // Owner address in the subtitle
+                amount: '${tx.getAmountInUSD(tronPriceInUSD).toStringAsFixed(2)} USD', // Amount in USD
+                icon: _getStatusIcon(tx.status), // Icon based on status
+              );
+            }).toList(),
+          );
+        }
+      },
     );
   }
 
-  Widget _buildTransactionTile(String title, String subtitle, String amount, IconData icons) {
+// Helper method to determine the icon based on the transaction status
+  IconData _getStatusIcon(String status) {
+    switch (status) {
+      case 'SUCCESS':
+        return FontAwesomeIcons.checkCircle;
+      case 'FAILED':
+        return FontAwesomeIcons.timesCircle;
+      case 'UNKNOWN':
+      default:
+        return FontAwesomeIcons.clock;
+    }
+  }
+
+// Method to build individual transaction tiles
+  Widget _buildTransactionTile({
+    required String title,
+    required String subtitle,
+    required String amount,
+    required IconData icon,
+  }) {
     return ListTile(
       leading: CircleAvatar(
         radius: 20,
         backgroundColor: Colors.grey.shade200,
-        child: const Icon(Icons.account_balance_wallet, color: Colors.grey),
+        child: Icon(icon, color: Colors.grey),
       ),
-      title: Text(title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-      subtitle:
-          Text(subtitle, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+      title: Text(
+        title, // Status
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+      subtitle: Text(
+        subtitle, // Owner Address
+        style: const TextStyle(fontSize: 14, color: Colors.grey),
+      ),
       trailing: Text(
-        amount,
+        amount, // Amount in USD
         style: TextStyle(
-          color: amount.startsWith('+') ? Colors.green : Colors.red,
+          color: amount.startsWith('-') ? Colors.red : Colors.green,
           fontWeight: FontWeight.bold,
           fontSize: 16,
         ),
       ),
     );
+  }}
+class TransactionList extends StatefulWidget {
+  const TransactionList({Key? key}) : super(key: key);
+
+  @override
+  State<TransactionList> createState() => _TransactionListState();
+}
+
+class _TransactionListState extends State<TransactionList> {
+  late Future<List<Transaction>> _transactionsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _transactionsFuture = TronApiService.fetchTransactions();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Transaction>>(
+      future: _transactionsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No transactions found.'));
+        } else {
+          final transactions = snapshot.data!;
+          const tronPriceInUSD = 0.12; // Example price: 1 TRX = $0.12
+
+          return ListView(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            children: transactions.map((tx) {
+              return _buildTransactionTile(
+                title: tx.status, // Status
+                subtitle: tx.ownerAddress, // Owner Address
+                amount: '${tx.getAmountInUSD(tronPriceInUSD).toStringAsFixed(2)} USD', // Amount in USD
+                icon: _getStatusIcon(tx.status), // Icon based on status
+              );
+            }).toList(),
+          );
+        }
+      },
+    );
+  }
+
+  IconData _getStatusIcon(String status) {
+    switch (status) {
+      case 'SUCCESS':
+        return FontAwesomeIcons.checkCircle;
+      case 'FAILED':
+        return FontAwesomeIcons.timesCircle;
+      case 'UNKNOWN':
+      default:
+        return FontAwesomeIcons.clock;
+    }
+  }
+
+  Widget _buildTransactionTile({
+    required String title,
+    required String subtitle,
+    required String amount,
+    required IconData icon,
+  }) {
+    return ListTile(
+      leading: CircleAvatar(
+        radius: 20,
+        backgroundColor: Colors.grey.shade200,
+        child: Icon(icon, color: Colors.grey),
+      ),
+      title: Text(
+        title, // Status
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+      subtitle: Text(
+        subtitle, // Owner Address
+        style: const TextStyle(fontSize: 14, color: Colors.grey),
+      ),
+      trailing: Text(
+        amount, // Amount in USD
+        style: TextStyle(
+          color: amount.startsWith('-') ? Colors.red : Colors.green,
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+        ),
+      ),
+    );
+  }
+}
+class TronApiService {
+  static const String baseUrl = "https://api.trongrid.io/v1/accounts";
+  static const String ownerAddress = "TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw";
+
+  static Future<List<Transaction>> fetchTransactions() async {
+    final response = await http.get(Uri.parse('$baseUrl/$publicKey/transactions'));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonData = json.decode(response.body);
+      final List<dynamic> transactionsData = jsonData['data'];
+
+      // Parse each transaction into a Transaction object
+      return transactionsData.map((json) => Transaction.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load transactions');
+    }
+  }
+}
+
+class Transaction {
+  final String ownerAddress;
+  final int frozenBalance; // in SUN
+  final String status;
+  final DateTime timestamp;
+
+  Transaction({
+    required this.ownerAddress,
+    required this.frozenBalance,
+    required this.status,
+    required this.timestamp,
+  });
+
+  factory Transaction.fromJson(Map<String, dynamic> json) {
+    try {
+      final rawContract = json['raw_data']['contract'][0]['parameter']['value'];
+      final ret = json['ret'][0];
+
+      return Transaction(
+        ownerAddress: rawContract['owner_address'] ?? 'Unknown Address',
+        frozenBalance: rawContract['frozen_balance'] ?? 0,
+        status: ret['contractRet'] ?? 'UNKNOWN',
+        timestamp: DateTime.fromMillisecondsSinceEpoch(json['block_timestamp']),
+      );
+    } catch (e) {
+      print('Error parsing transaction: $e');
+      return Transaction(
+        ownerAddress: 'Unknown Address',
+        frozenBalance: 0,
+        status: 'UNKNOWN',
+        timestamp: DateTime.now(),
+      );
+    }
+  }
+
+  // Convert frozen balance (SUN) to USD
+  double getAmountInUSD(double tronPriceInUSD) {
+    final trxAmount = frozenBalance / 1e6; // Convert SUN to TRX
+    return trxAmount * tronPriceInUSD;
   }
 }
