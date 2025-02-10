@@ -42,7 +42,7 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
         imageUrl: logo,
-        title: 'Crypto Coin',
+        title: 'C Coin',
       ),
       body:
       CustomMaterialIndicator(

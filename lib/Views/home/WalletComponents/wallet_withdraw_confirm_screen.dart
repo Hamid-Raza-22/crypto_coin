@@ -13,33 +13,41 @@ class WithdrawPage extends StatefulWidget {
 
 class _WithdrawPageState extends State<WithdrawPage> {
   TextEditingController _amountController = TextEditingController();
-  //double availableBalance =  33.66;
-  double availableBalance =  totalAssetsInUSDT;
-
+  double availableBalance = totalAssetsInUSDT;
   String selectedBank = 'Enter Public Address'; // Default bank
+  double withdrawalAmount = 0.0; // Add this line
 
   void _updateAmount(String value) {
     setState(() {
       _amountController.text = _amountController.text + value;
+      withdrawalAmount = double.tryParse(_amountController.text) ?? 0.0; // Update withdrawalAmount here
     });
   }
 
   void _backspace() {
     setState(() {
       if (_amountController.text.isNotEmpty) {
-        _amountController.text = _amountController.text
-            .substring(0, _amountController.text.length - 1);
+        _amountController.text = _amountController.text.substring(0, _amountController.text.length - 1);
+        withdrawalAmount = double.tryParse(_amountController.text) ?? 0.0; // Update withdrawalAmount here
       }
     });
   }
 
-
-
   void _confirmWithdraw() {
-    double withdrawalAmount = double.tryParse(_amountController.text) ?? 0.0;
+    withdrawalAmount = double.tryParse(_amountController.text) ?? 0.0; // Reuse the class-level variable
+
+    if (withdrawalAmount < 20) {
+      Get.snackbar(
+        'Invalid Amount',
+        'Please enter an amount greater than or equal to 20.',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.orangeAccent,
+        colorText: Colors.white,
+      );
+      return;
+    }
 
     if (withdrawalAmount <= 0) {
-      // Notify user to enter a valid amount
       Get.snackbar(
         'Invalid Amount',
         'Please enter an amount greater than zero.',
@@ -49,11 +57,11 @@ class _WithdrawPageState extends State<WithdrawPage> {
       );
       return;
     }
+
     if (publicAddressController.text.isEmpty) {
-      // Notify user to enter a valid amount
       Get.snackbar(
         'Enter Tron Address',
-        'Please enter an valid Address.',
+        'Please enter a valid Address.',
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.orangeAccent,
         colorText: Colors.white,
@@ -66,15 +74,13 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
     if (totalWithdrawalAmount <= availableBalance) {
       Get.to(
-        () => WithdrawScreen(
+            () => WithdrawScreen(
           withdrawalAmount: withdrawalAmount,
           availableBalance: availableBalance - totalWithdrawalAmount,
           publicKeyAddress: publicAddressController.text,
-
         ),
       );
     } else {
-      // Display snackbar about insufficient balance
       Get.snackbar(
         'Insufficient Balance',
         'Please enter an amount less than your available balance.',
@@ -173,7 +179,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   child: Column(
                     children: [
                       const Text(
-                        "You Pay",
+                        "Amount must be greater than 20",
                         style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                       TextField(
@@ -183,9 +189,14 @@ class _WithdrawPageState extends State<WithdrawPage> {
                           fontWeight: FontWeight.bold,
                           color: Colors.blue,
                         ),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           border: InputBorder.none,
-                          hintText: "\$0",
+                          hintText: "\$20",
+                          hintStyle: TextStyle(
+                            fontSize: 32, // Chhota font size
+                            fontWeight: FontWeight.normal, // Normal font weight
+                            color: Colors.grey.withOpacity(0.8), // Halka grey color
+                          ),
                         ),
                         textAlign: TextAlign.center,
                         readOnly: true,

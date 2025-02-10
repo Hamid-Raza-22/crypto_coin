@@ -78,7 +78,7 @@ class SplashScreenState extends State<SplashScreen>
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: 'Crypto Coin', // First part of the text
+                      text: 'C Coin', // First part of the text
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontSize: mainTextSize, // Dynamic font size for main text

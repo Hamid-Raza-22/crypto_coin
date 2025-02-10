@@ -88,7 +88,7 @@ class _SignupScreenState extends State<SignupScreen> {
       backgroundColor: Colors.white,
       appBar:  CustomAppBar(
         imageUrl: logo, // Adjust to the actual logo path
-        title: 'Crypto Coin',
+        title: 'C Coin',
         onBackPressed: () {exit(0);
           // Handle back button action
         },

@@ -30,7 +30,7 @@ class TopBar extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-          Text("Crypto Coin",
+          Text("C Coin",
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w500,

@@ -36,7 +36,7 @@ class _ThreeStepLockScreenState extends State<ThreeStepLockScreen> {
         backgroundColor: Colors.white,
         appBar: CustomAppBar(
           imageUrl: logo,
-          title: 'Crypto Coin',
+          title: 'C Coin',
           onBackPressed: () => Get.offNamed(AppRoutes.signup),
         ),
         body: Column(

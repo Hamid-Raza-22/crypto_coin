@@ -35,7 +35,7 @@ class _ConfirmEmailScreenState extends State<WalletTransactionSuccess> {
         backgroundColor: Colors.white,
         appBar: CustomAppBar(
           imageUrl: logo,
-          title: 'Crypto Coin',
+          title: 'C Coin',
           //onBackPressed: () => Get.offNamed(AppRoutes.emailCodeScreen),
         ),
         body: Column(

@@ -34,7 +34,7 @@ void initState() {
         backgroundColor: Colors.white,
         appBar: CustomAppBar(
           imageUrl: logo, // Adjust to the actual logo path
-          title: 'Crypto Coin',
+          title: 'C Coin',
           onBackPressed: () => Get.offNamed(AppRoutes.stepOneEmailScreen),
         ),
         body: Column(

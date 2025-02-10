@@ -1,22 +1,48 @@
-import 'package:crypto_coin/Components/custom_appbar.dart';
-import 'package:crypto_coin/Components/custom_editable_menu_option.dart';
-import 'package:crypto_coin/Utilities/global_variables.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../Components/custom_appbar.dart';
+import '../../Utilities/global_variables.dart';
 import '../../Components/custom_button.dart';
+import 'dart:io' show Platform;
 
 class ChannelScreen extends StatelessWidget {
+  // Function to launch the Telegram channel link
+
+  Future<void> _launchTelegramChannel() async {
+    const String telegramLink = "https://t.me/+1lAv9emLNsM3NWE9";
+
+    try {
+      // Check if the URL can be launched
+      if (await canLaunch(telegramLink)) {
+        await launch(telegramLink);
+      } else {
+        // Fallback to opening in a browser
+        throw 'Could not launch $telegramLink';
+      }
+    } catch (e) {
+      // Show an error message or fallback behavior
+      print("Error launching URL: $e");
+
+      // Fallback to opening in a browser
+      if (Platform.isAndroid) {
+        await launch(telegramLink, forceSafariVC: false);
+      } else if (Platform.isIOS) {
+        await launch(telegramLink, forceSafariVC: false);
+      }
+    }
+  }
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
-        title: "Crypto Coin",
+        title: "C Coin",
         imageUrl: logo,
-        //onBackPressed: ,
+        // onBackPressed: ,
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -25,9 +51,8 @@ class ChannelScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // SizedBox(height: 20),
                     Text(
-                      'Channel link for the WhatsApp',
+                      'Channel link for the Telegram',
                       style: TextStyle(
                         fontFamily: 'Readex Pro',
                         fontSize: 12,
@@ -37,10 +62,10 @@ class ChannelScreen extends StatelessWidget {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 200),
+                    const SizedBox(height: 200),
                     Center(
                       child: Text(
-                        'Here we put the channel link for the whatsapp',
+                        'Here we put the channel link for the Telegram',
                         style: TextStyle(
                           fontFamily: 'Readex Pro',
                           fontSize: 12,
@@ -50,25 +75,25 @@ class ChannelScreen extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    SizedBox(height: 20), // Added space between text and button
+                    const SizedBox(height: 20), // Added space between text and button
                     CustomButton(
                       width: 150,
                       height: 50,
                       spacing: 0,
-                      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
                       icon: Icons.open_in_new,
-                      iconPosition: IconPosition.right,
+                      // iconPosition: IconPosition.right,
                       iconColor: Colors.white,
                       iconSize: 20,
                       buttonText: 'Join Channel',
-                      textStyle: TextStyle(
+                      textStyle: const TextStyle(
                         color: Colors.white,
                         fontSize: 15,
                         fontFamily: 'Readex Pro',
                         fontWeight: FontWeight.bold,
                       ),
                       gradientColors: [Colors.blueAccent, Colors.blueAccent],
-                      // onTap: () => Get.offNamed(AppRoutes.threeStepLockScreen),
+                      onTap: _launchTelegramChannel, // Link the onTap to the function
                       borderRadius: 15.0,
                     ),
                   ],

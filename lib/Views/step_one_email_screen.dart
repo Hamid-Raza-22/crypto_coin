@@ -94,7 +94,7 @@ class StepOneEmailScreenState extends State<StepOneEmailScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
-        title: 'Crypto Coin',
+        title: 'C Coin',
         imageUrl: logo,
         onBackPressed: () => Get.offNamed('/ThreeStepLockScreen'),
       ),

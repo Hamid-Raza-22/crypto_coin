@@ -33,7 +33,7 @@ class _WalletScreenState extends State<WalletScreen> {
     return const Scaffold(
       backgroundColor: AppColors.bgColor,
       appBar: CustomAppBar(
-        title: 'Crypto Coin',
+        title: 'C Coin',
         imageUrl: 'assets/images/logo.png',
         // onBackPressed: () => Get.offNamed('/ThreeStepLockScreen'),
       ),

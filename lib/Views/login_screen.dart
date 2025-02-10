@@ -121,7 +121,7 @@ class LoginScreenState extends State<LoginScreen> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: CustomAppBar(
-          title: 'Crypto Coin',
+          title: 'C Coin',
           imageUrl: logo,
           onBackPressed: () => Get.offNamed(AppRoutes.signup),
         ),
@@ -178,10 +178,41 @@ class LoginScreenState extends State<LoginScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {
-                      // Navigate to forgot password screen
-                      Get.toNamed('/forgotPassword'); // Update with your forgot password route
-                    },
+                    onPressed: () async {
+                      final String email = _emailController.text.trim();
+                      if (email.isNotEmpty) {
+                        try {
+                          // Send password reset email
+                          await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+
+                          // Show success message
+                          Get.snackbar(
+                            'Success',
+                            'Password reset email sent to $email. Please check your inbox.',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.green,
+                            colorText: Colors.white,
+                          );
+                        } catch (e) {
+                          // Handle errors
+                          Get.snackbar(
+                            'Error',
+                            'Failed to send password reset email: ${e.toString()}',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.red,
+                            colorText: Colors.white,
+                          );
+                        }
+                      } else {
+                        Get.snackbar(
+                          'Error',
+                          'Please enter your email address.',
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.red,
+                          colorText: Colors.white,
+                        );
+                      }
+                      },
                     child: const Text(
                       'Forgot your password?',
                       style: TextStyle(

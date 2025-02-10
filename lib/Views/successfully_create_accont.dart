@@ -24,7 +24,7 @@ class _ConfirmEmailScreenState extends State<SuccessfullyCreateAccount> {
         backgroundColor: Colors.white,
         appBar: CustomAppBar(
           imageUrl: logo,
-          title: 'Crypto Coin',
+          title: 'C Coin',
           onBackPressed: () => Get.offNamed(AppRoutes.createPasswordScreen),
         ),
         body: Column(

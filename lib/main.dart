@@ -21,7 +21,7 @@ Future<void> main() async {
     // await FirebaseAppCheck.instance.setTokenAutoRefreshEnabled(true);
   }
   // EmailOTP.config(
-  //   appName: 'Crypto Coin',
+  //   appName: 'C Coin',
   //   otpType: OTPType.numeric,
   //   emailTheme: EmailTheme.v1,
   // );
