@@ -5,15 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
+import '../../ViewModels/user_provider_logic.dart';
 import '../../ViewModels/wallet_controlers.dart';
 
 const FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
 Future<User?> signInWithGoogle() async {
   final GoogleSignIn googleSignIn = GoogleSignIn();
+  final UserProvider userProvider = Get.put(UserProvider());
 
   // Sign out from the previous account
   await googleSignIn.signOut();
+  userProvider.clearUser(); // Clear user data
 
   // Now initiate the sign-in process
   final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
@@ -29,7 +32,10 @@ Future<User?> signInWithGoogle() async {
     );
     return null;
   }
-
+// Debugging: Print Google Sign-In data
+  print('Google User Name: ${googleUser.displayName}');
+  print('Google User Email: ${googleUser.email}');
+  print('Google User Photo URL: ${googleUser.photoUrl}');
   final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
   final AuthCredential credential = GoogleAuthProvider.credential(
@@ -41,6 +47,13 @@ Future<User?> signInWithGoogle() async {
   final User? user = userCredential.user;
 
   if (user != null) {
+    // Retrieve user details
+    final String userName = googleUser.displayName ?? 'Unknown User';
+    final String userEmail = googleUser.email;
+    final String userPhotoUrl = googleUser.photoUrl ?? 'https://via.placeholder.com/150';
+
+    // Store user data in the provider
+    await userProvider.setUser(userName, userEmail, userPhotoUrl);
     // Clear existing data in secure storage before saving new data
     await secureStorage.deleteAll();
 

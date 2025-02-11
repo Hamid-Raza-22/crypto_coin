@@ -227,7 +227,7 @@ int bandwidth = 0;
 
 
     // const String tronAddress = 'TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw';
-    const String tronAddress = 'TF3bBfUf8RFzFGTVpL3unrmmq93TqxmxWZ';
+    // const String tronAddress = 'TF3bBfUf8RFzFGTVpL3unrmmq93TqxmxWZ';
      String apiUrl =
         'https://apilist.tronscan.org/api/account?address=$publicKey';
 
@@ -870,10 +870,10 @@ class HistoryItem extends StatelessWidget {
 
 class TronApiService {
   static const String baseUrl = "https://api.trongrid.io/v1/accounts";
-  static const String ownerAddress = "TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw";
+  // static const String ownerAddress = "TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw";
 
   static Future<List<Transaction>> fetchTransactions() async {
-    final response = await http.get(Uri.parse('$baseUrl/$ownerAddress/transactions'));
+    final response = await http.get(Uri.parse('$baseUrl/$publicKey/transactions'));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonData = json.decode(response.body);

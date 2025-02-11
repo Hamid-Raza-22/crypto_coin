@@ -18,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   final List<Widget> _pages = [
     HomeScreen(),
-    TeamScreen(),
+    // TeamScreen(),
     ChannelScreen(),
      WalletMainPage(),
     SettingsPage(),
@@ -41,10 +41,10 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Icons.home_outlined),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.swap_horiz_sharp),
-            label: 'Service',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.swap_horiz_sharp),
+          //   label: 'Service',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.group),
             label: 'Team',
@@ -55,7 +55,7 @@ class _MainScreenState extends State<MainScreen> {
             label: 'Wallet',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
+            icon: Icon(Icons.settings),
             label: 'Settings',
           ),
         ],
