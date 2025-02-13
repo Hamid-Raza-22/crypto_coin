@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Components/custom_button.dart';
 import '../Components/custom_editable_menu_option.dart';
 import '../Components/custom_social_button.dart';
@@ -21,7 +22,10 @@ class LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool isLoading = false;
-
+  Future<void> saveLoginState(bool isLoggedIn) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', isLoggedIn);
+  }
   Future<void> _signInUser() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
@@ -48,7 +52,8 @@ class LoginScreenState extends State<LoginScreen> {
           email: email,
           password: password,
         );
-
+        await saveLoginState(true); // Mark user as logged in
+        await getKeysFromPreferences();
         // If successful, navigate to the home screen
         Get.offNamed(AppRoutes.homeScreen); // Replace with your home screen route
         return;
@@ -272,6 +277,8 @@ class LoginScreenState extends State<LoginScreen> {
             User? user = await signInWithGoogle();
             if( user != null){
               //Get.offNamed(AppRoutes.accountActivationScreen);
+              await saveLoginState(true); // Mark user as logged in
+              await getKeysFromPreferences();
               Get.offNamed(AppRoutes.homeScreen);
             }else{
 

@@ -1,7 +1,10 @@
 import 'package:crypto_coin/Views/AppRoutes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../Utilities/global_variables.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../Utilities/global_variables.dart'; // Import shared preferences
+
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,6 +18,34 @@ class SplashScreenState extends State<SplashScreen>
   late AnimationController _controller;
   late Animation<double> _fadeInAnimation;
 
+
+  Future<void> getKeysFromPreferences() async {
+    try {
+      // Step 1: Retrieve the SharedPreferences instance
+      final prefs = await SharedPreferences.getInstance();
+
+      // Step 2: Get the keys from SharedPreferences
+      publicKey = prefs.getString('tronAddressRef');
+      privateKey = prefs.getString('tronPrivateKeyRef');
+
+      if (publicKey == null || privateKey == null) {
+        throw Exception("Keys not found in SharedPreferences.");
+      }
+
+      // Step 3: Assign the keys to variables
+      print("Public Key from Preferences: $publicKey");
+      print("Private Key from Preferences: $privateKey");
+
+      // Step 4: Use the variables (example usage)
+      // For demonstration, let's just print them
+      print("Using Public Key: $publicKey");
+      print("Using Private Key: $privateKey");
+
+      // You can now use `publicKey` and `privateKey` in your app logic
+    } catch (e) {
+      print("Error retrieving keys from SharedPreferences: $e");
+    }
+  }
   @override
   void initState() {
     super.initState();
@@ -32,10 +63,15 @@ class SplashScreenState extends State<SplashScreen>
     // Start the animation
     _controller.forward();
 
-    // Navigate to home page after 3 seconds
-    Future.delayed(const Duration(seconds: 3), () {
-       Get.offNamed(AppRoutes.signup);
-      //Get.offNamed(AppRoutes.homeScreen);
+    // Check login state after 3 seconds
+    Future.delayed(const Duration(seconds: 3), () async {
+      bool isLoggedIn = await _checkLoginState(); // Check if user is logged in
+      if (isLoggedIn) {
+        await getKeysFromPreferences();
+        Get.offNamed(AppRoutes.homeScreen); // Navigate to HomeScreen if logged in
+      } else {
+        Get.offNamed(AppRoutes.signup); // Navigate to Signup screen if not logged in
+      }
     });
   }
 
@@ -43,6 +79,12 @@ class SplashScreenState extends State<SplashScreen>
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  // Function to check login state from shared preferences
+  Future<bool> _checkLoginState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isLoggedIn') ?? false; // Default to false if not set
   }
 
   @override
@@ -59,7 +101,7 @@ class SplashScreenState extends State<SplashScreen>
     final logoTopPadding = screenHeight * 0.2; // Dynamic padding for logo
 
     return Scaffold(
-      backgroundColor: Colors.white, // Set background color to black for modern feel
+      backgroundColor: Colors.white, // Set background color to white
       body: FadeTransition(
         opacity: _fadeInAnimation, // Apply fade-in effect for smooth transition
         child: Center(
@@ -69,10 +111,9 @@ class SplashScreenState extends State<SplashScreen>
               SizedBox(height: logoTopPadding), // Dynamic padding for top alignment
               Image.asset(
                 logo,
-               // height: logoHeight, // Logo size based on screen height
+                height: logoHeight, // Logo size based on screen height
               ),
-              // SizedBox(height: screenHeight * 0.05), // Space between image and text
-               SizedBox(height: 10), // Space between image and text
+              SizedBox(height: 10), // Space between image and text
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
@@ -87,21 +128,10 @@ class SplashScreenState extends State<SplashScreen>
                         height: 1,
                       ),
                     ),
-                    // TextSpan(
-                    //   text: 'SCOOTERS', // Second part in green
-                    //   style: TextStyle(
-                    //     fontFamily: 'Inter',
-                    //     fontSize: mainTextSize, // Matching size for second part
-                    //     fontWeight: FontWeight.bold,
-                    //     color: Color(0xFF00F27E), // Bright green for contrast
-                    //     height: 1.3,
-                    //   ),
-                    // ),
                   ],
                 ),
               ),
               SizedBox(height: spacingBetweenText), // Dynamic space between texts
-
               SizedBox(height: screenHeight * 0.15), // Space at the bottom to keep balance
             ],
           ),
@@ -110,5 +140,3 @@ class SplashScreenState extends State<SplashScreen>
     );
   }
 }
-
-

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../ViewModels/theme_provider.dart';
 import '../ViewModels/user_provider_logic.dart';
 
@@ -21,10 +21,14 @@ class _SettingsPageState extends State<SettingsPage> {
   final themeController = Get.put(ThemeController());
    final UserProvider userProvider = Get.put(UserProvider());
 
-
+  Future<void> saveLoginState(bool isLoggedIn) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', isLoggedIn);
+  }
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 
   void logout() async {
+    saveLoginState(false); // Mark user as logged out
     // Clear user session data from SharedPreferences
     // SharedPreferences prefs = await SharedPreferences.getInstance();
     // await prefs.clear(); // This will clear all stored preferences
@@ -45,7 +49,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-
+   userProvider.setUser();
     print('Name: ${userProvider.name.value}');
     print('Email: ${userProvider.email.value}');
     print('Photo URL: ${userProvider.photoUrl.value}');

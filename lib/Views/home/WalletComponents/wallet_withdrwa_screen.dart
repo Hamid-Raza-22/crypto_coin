@@ -1,10 +1,11 @@
 import 'dart:convert';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypto_coin/Utilities/global_variables.dart';
 import 'package:crypto_coin/Views/home/WalletComponents/wallet_transaction_success.dart';
 import 'package:crypto_coin/Views/home/WalletComponents/wallet_withdraw_confirm_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../../Services/WalletServices/tron_services.dart';
 
@@ -32,9 +33,9 @@ class WithdrawScreen extends StatelessWidget {
   //   }
   // }
 
-
   Future<double> fetchTRXtoUSDTConversionRate() async {
-    const String apiUrl = 'https://min-api.cryptocompare.com/data/pricemulti?fsyms=TRX&tsyms=USDT';
+    const String apiUrl =
+        'https://min-api.cryptocompare.com/data/pricemulti?fsyms=TRX&tsyms=USDT';
 
     try {
       // Make the HTTP GET request to the API
@@ -52,18 +53,20 @@ class WithdrawScreen extends StatelessWidget {
         return trxToUsdtRate;
       } else {
         // Handle API errors
-        throw Exception('Failed to fetch TRX to USDT rate. Status code: ${response.statusCode}');
+        throw Exception(
+            'Failed to fetch TRX to USDT rate. Status code: ${response.statusCode}');
       }
     } catch (e) {
       // Handle exceptions (e.g., network errors)
       throw Exception('Error fetching TRX to USDT rate: $e');
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final TronService tronService = TronService();
 
-  // Fixed transaction fee of $1
+    // Fixed transaction fee of $1
     double transactionFee = 1.0;
     double totalWithdrawalAmount = withdrawalAmount - transactionFee;
 
@@ -78,7 +81,8 @@ class WithdrawScreen extends StatelessWidget {
         ),
         title: const Text(
           'Withdraw',
-          style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600),
+          style: TextStyle(
+              color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
@@ -130,7 +134,8 @@ class WithdrawScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 8),
-                  _buildRowQuantity('Quantity', '${availableBalance.toStringAsFixed(2)} USD'),
+                  _buildRowQuantity(
+                      'Quantity', '${availableBalance.toStringAsFixed(2)} USD'),
                 ],
               ),
             ),
@@ -145,12 +150,14 @@ class WithdrawScreen extends StatelessWidget {
                 children: [
                   _buildRowLabelValue('Address', publicKeyAddress),
                   const Divider(),
-                  _buildRow('Withdrawal Amount', '\$${withdrawalAmount.toStringAsFixed(2)}'),
+                  _buildRow('Withdrawal Amount',
+                      '\$${withdrawalAmount.toStringAsFixed(2)}'),
                   const Divider(),
-                  _buildRow('Transaction Fee', '\$${transactionFee.toStringAsFixed(2)}'), // Fixed fee
+                  _buildRow('Transaction Fee',
+                      '\$${transactionFee.toStringAsFixed(2)}'), // Fixed fee
                   const Divider(),
-                  _buildRow('Total Withdrawal Amount', '\$${totalWithdrawalAmount.toStringAsFixed(2)}'),
-
+                  _buildRow('Total Withdrawal Amount',
+                      '\$${totalWithdrawalAmount.toStringAsFixed(2)}'),
                 ],
               ),
             ),
@@ -162,7 +169,7 @@ class WithdrawScreen extends StatelessWidget {
                 Get.dialog(
                   WillPopScope(
                     onWillPop: () async => false,
-                    child: AlertDialog(
+                    child: const AlertDialog(
                       content: Row(
                         children: [
                           CircularProgressIndicator(),
@@ -183,15 +190,35 @@ class WithdrawScreen extends StatelessWidget {
                   double withdrawalAmountInTrx = withdrawalAmount / trxToUsdtRate;
 
                   // Perform the transaction with the converted TRX amount
+                  // Perform the transaction with the converted TRX amount
                   bool success = await tronService.swapTrxToUsdt(
                     publicKeyAddress,
                     withdrawalAmountInTrx.toInt(), // Pass the TRX amount
                   );
+                  // bool success = transactionResult['success'];
+                  // String transactionId = transactionResult['transactionId'];
+                  // String receiverAddress = transactionResult['receiverAddress'];
 
                   // Close the loading dialog
                   Get.back();
 
                   if (success) {
+                    // Save transaction details to Firebase Firestore
+                    final firebaseUser = FirebaseAuth.instance.currentUser;
+                    if (firebaseUser != null) {
+                      FirebaseFirestore.instance
+                          .collection('Transactions')
+                          .doc(firebaseUser.email) // Use the user's email as the document ID
+                          .collection('Transactions Id') // Sub collection for transactions
+                          .add({
+                        // 'transactionId': transactionId,
+                        'SenderAddress': publicKey,
+                        'amount': withdrawalAmount,
+                        'receiverAddress': publicKeyAddress,
+                        'timestamp': FieldValue.serverTimestamp(), // Add server timestamp
+                      });
+                    }
+
                     // Show success SnackBar
                     Get.snackbar(
                       "Success",
@@ -256,6 +283,7 @@ class WithdrawScreen extends StatelessWidget {
       child: child,
     );
   }
+
   _buildRowLabelValue(String label, String value) {
     return Row(
       //crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,7 +294,7 @@ class WithdrawScreen extends StatelessWidget {
           label,
           style: const TextStyle(fontSize: 16, color: Colors.black54),
         ),
-         //SizedBox(width: 2), // Add some spacing between label and value
+        //SizedBox(width: 2), // Add some spacing between label and value
         Text(
           value,
           style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
@@ -274,6 +302,7 @@ class WithdrawScreen extends StatelessWidget {
       ],
     );
   }
+
   Widget _buildRow(String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -291,9 +320,12 @@ class WithdrawScreen extends StatelessWidget {
   }
 
   Widget _buildRowQuantity(String label, String value) {
-    List<String> valueParts = value.split(' '); // Amount aur currency alag karne ke liye
+    List<String> valueParts =
+        value.split(' '); // Amount aur currency alag karne ke liye
     String amount = valueParts[0]; // Amount part
-    String currency = valueParts.length > 1 ? valueParts.sublist(1).join(' ') : ''; // Currency part
+    String currency = valueParts.length > 1
+        ? valueParts.sublist(1).join(' ')
+        : ''; // Currency part
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

@@ -1,15 +1,36 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:crypto_coin/Utilities/global_variables.dart';
+// import 'package:crypto_coin/Utilities/global_variables.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../ViewModels/user_provider_logic.dart';
 import '../../ViewModels/wallet_controlers.dart';
 
 const FlutterSecureStorage secureStorage = FlutterSecureStorage();
+Future<void> saveKeyReference() async {
+  try {
+    // Step 1: Retrieve the keys from secure storage
+    String? publicKey = await secureStorage.read(key: 'tronAddress');
+    String? privateKey = await secureStorage.read(key: 'tronPrivateKey');
 
+    if (publicKey == null || privateKey == null) {
+      throw Exception("Keys not found in secure storage.");
+    }
+
+    // Step 2: Save a reference to these keys (e.g., in shared preferences or another storage)
+    // For example, using SharedPreferences to save a reference
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('tronAddressRef', publicKey);
+    await prefs.setString('tronPrivateKeyRef', privateKey);
+
+    print("Key references saved successfully.");
+  } catch (e) {
+    print("Error saving key references: $e");
+  }
+}
 Future<User?> signInWithGoogle() async {
   final GoogleSignIn googleSignIn = GoogleSignIn();
   final UserProvider userProvider = Get.put(UserProvider());
@@ -51,9 +72,12 @@ Future<User?> signInWithGoogle() async {
     final String userName = googleUser.displayName ?? 'Unknown User';
     final String userEmail = googleUser.email;
     final String userPhotoUrl = googleUser.photoUrl ?? 'https://via.placeholder.com/150';
-
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('googleName', userName);
+    await prefs.setString('googleEmail', userEmail);
+    await prefs.setString('googlePhoto', userPhotoUrl);
     // Store user data in the provider
-    await userProvider.setUser(userName, userEmail, userPhotoUrl);
+    await userProvider.setUser();
     // Clear existing data in secure storage before saving new data
     await secureStorage.deleteAll();
 
@@ -72,8 +96,7 @@ Future<User?> signInWithGoogle() async {
         await secureStorage.write(key: 'tronAddress', value: tronWallet['address']);
         await secureStorage.write(key: 'tronPrivateKey', value: tronWallet['privateKey']);
 
-        publicKey = await secureStorage.read(key: 'tronAddress');
-        privateKey = await secureStorage.read(key: 'tronPrivateKey');
+        await saveKeyReference(); // Save a reference to the keys
 
         // Initialize the GetX controller
 

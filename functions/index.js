@@ -544,8 +544,8 @@ exports.sendOtp = onRequest(async (request, response) => {
   const mailOptions = {
     from: "info@cryptocoinworld.net",
     to: email,
-    subject: "Crypto Coin OTP Code",
-    text: `Your Crypto Coin OTP code is: ${otp}`,
+    subject: "C Coin OTP Code",
+    text: `Your C Coin OTP code is: ${otp}`,
   };
 
   transporter.sendMail(mailOptions, (error, info) => {

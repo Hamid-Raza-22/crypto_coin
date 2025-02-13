@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 late AnimationController _fadeController;
 late Animation<double> _fadeAnimation;
@@ -33,3 +34,31 @@ const whatsappIcon = "assets/icons/whatsapp.png";
 String? privateKey = "";
 String? publicKey = "";
 double totalAssetsInUSDT = 0.0;
+
+Future<void> getKeysFromPreferences() async {
+  try {
+    // Step 1: Retrieve the SharedPreferences instance
+    final prefs = await SharedPreferences.getInstance();
+
+    // Step 2: Get the keys from SharedPreferences
+    publicKey = prefs.getString('tronAddressRef');
+    privateKey = prefs.getString('tronPrivateKeyRef');
+
+    if (publicKey == null || privateKey == null) {
+      throw Exception("Keys not found in SharedPreferences.");
+    }
+
+    // Step 3: Assign the keys to variables
+    print("Public Key from Preferences: $publicKey");
+    print("Private Key from Preferences: $privateKey");
+
+    // Step 4: Use the variables (example usage)
+    // For demonstration, let's just print them
+    print("Using Public Key: $publicKey");
+    print("Using Private Key: $privateKey");
+
+    // You can now use `publicKey` and `privateKey` in your app logic
+  } catch (e) {
+    print("Error retrieving keys from SharedPreferences: $e");
+  }
+}
