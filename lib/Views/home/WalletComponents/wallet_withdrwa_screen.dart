@@ -209,10 +209,10 @@ class WithdrawScreen extends StatelessWidget {
                       FirebaseFirestore.instance
                           .collection('Transactions')
                           .doc(firebaseUser.email) // Use the user's email as the document ID
-                          .collection('Transactions Id') // Sub collection for transactions
+                          .collection('transactions') // Sub collection for transactions
                           .add({
                         // 'transactionId': transactionId,
-                        'SenderAddress': publicKey,
+                       // 'SenderAddress': publicKey,
                         'amount': withdrawalAmount,
                         'receiverAddress': publicKeyAddress,
                         'timestamp': FieldValue.serverTimestamp(), // Add server timestamp
