@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto_coin/Components/custom_appbar.dart';
 import 'package:crypto_coin/Utilities/global_variables.dart';
 import 'package:crypto_coin/Views/AppRoutes/app_routes.dart';
@@ -8,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../Components/custom_button.dart';
 import '../Components/custom_editable_menu_option.dart';
 import '../Components/custom_social_button.dart';
+import '../Services/WalletServices/tron_services.dart';
 
 class CreatePasswordScreen extends StatefulWidget {
   const CreatePasswordScreen({super.key});
@@ -33,6 +35,7 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
     final password = _passwordController.text.trim();
     final confirmPassword = _confirmPasswordController.text.trim();
 
+    // Validate passwords
     if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Passwords do not match.')),
@@ -40,17 +43,20 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
       return;
     }
 
-
-    if (password.length < 8 || !RegExp(r'[A-Z]').hasMatch(password) ||
-        !RegExp(r'[0-9]').hasMatch(password) || !RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) {
+    if (password.length < 8 ||
+        !RegExp(r'[A-Z]').hasMatch(password) ||
+        !RegExp(r'[0-9]').hasMatch(password) ||
+        !RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Password does not meet complexity requirements.')),
       );
       return;
     }
+
     setState(() {
-      isLoading = true;
+      isLoading = true; // Start loading
     });
+
     try {
       // Firebase Authentication registration
       final authResult = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -58,8 +64,42 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
         password: password,
       );
 
-      // Navigate to success screen
-      Get.offNamed(AppRoutes.successfullyCreateAccount);
+      final User? user = authResult.user;
+
+      // Null safety: Ensure user is not null
+      if (user == null || user.email == null) {
+        throw Exception("User or email is null.");
+      }
+
+      // Firestore instance
+      final walletCollection = FirebaseFirestore.instance.collection('wallets');
+      final walletDoc = await walletCollection.doc(user.email!).get();
+
+      if (walletDoc.exists) {
+        // Null safety: Ensure walletDoc data is not null
+        final walletData = walletDoc.data();
+        if (walletData == null) {
+          throw Exception("Wallet data is null.");
+        }
+        print("Existing Wallet Data: $walletData");
+        // Redirect to dashboard or login
+        Get.offNamed(AppRoutes.login);
+      } else {
+        // New user: Generate wallets
+        TronService tronService = TronService();
+        Map<String, String> tronWallet = await tronService.generateWallet();
+
+        // Save wallets to Firebase
+        await walletCollection.doc(user.email!).set({
+          "email": user.email,
+          "tron": tronWallet,
+        });
+
+        print("Wallets generated and saved successfully!");
+
+        // Redirect to success screen
+        Get.offNamed(AppRoutes.successfullyCreateAccount);
+      }
     } on FirebaseAuthException catch (e) {
       String errorMessage = 'An error occurred. Please try again.';
       if (e.code == 'email-already-in-use') {
@@ -67,7 +107,6 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
       } else if (e.code == 'weak-password') {
         errorMessage = 'The password is too weak.';
       }
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMessage)),
       );
@@ -75,10 +114,10 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('An unexpected error occurred.')),
       );
-    }
-    finally {
+      print('Error: $e');
+    } finally {
       setState(() {
-        isLoading = false;
+        isLoading = false; // Stop loading
       });
     }
   }
@@ -148,7 +187,6 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
                       height: 1.6,
                       color: Colors.black87,
                     ),
-
                   ),
                 ),
                 const SizedBox(height: 5),

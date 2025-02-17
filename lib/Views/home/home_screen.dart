@@ -99,6 +99,7 @@ int bandwidth = 0;
     super.initState();
 
      fetchTRXtoUSDTConversionRate();
+     getKeysFromPreferences();
     // fetchUSDTBalance();
     // transactionsHistory();
     fetchResources().then((_) {

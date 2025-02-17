@@ -8,6 +8,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../Services/FirebaseServices/sign_in_with_google.dart';
 import '../ViewModels/theme_provider.dart';
 import '../ViewModels/user_provider_logic.dart';
 
@@ -25,28 +26,43 @@ class _SettingsPageState extends State<SettingsPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', isLoggedIn);
   }
-  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 
   void logout() async {
-    saveLoginState(false); // Mark user as logged out
-    // Clear user session data from SharedPreferences
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // await prefs.clear(); // This will clear all stored preferences
-    final GoogleSignIn googleSignIn = GoogleSignIn();
+    try {
+      // Mark user as logged out
+      saveLoginState(false);
 
-    // Sign out from the previous account
-    await googleSignIn.signOut();
-    // Clear user session data from Secure Storage
-    await secureStorage.deleteAll(); // This will clear all stored secure data
+      // Clear user session data from SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.clear(); // This will clear all stored preferences
 
-    // If you have any global variables, reset them here
-    // Example: Global.user = null;
+      // Reset the dialog state
+      await prefs.setBool('isDialogShown', false); // Reset dialog state to false
 
-    // Navigate to the login screen
-    Navigator.of(context).pushReplacementNamed('/login');
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      // Sign out from the previous account
+      await googleSignIn.signOut();
+
+      // Clear user session data from Secure Storage
+      await secureStorage.deleteAll(); // This will clear all stored secure data
+
+      final UserProvider userProvider = Get.put(UserProvider());
+      userProvider.clearUser(); // Clear user data
+
+      // Clear private and public keys
+      privateKey = ""; // or privateKey.clear() if it's a List/Map
+      publicKey = "";  // or publicKey.clear() if it's a List/Map
+
+      // Clear any other user-related data you have stored
+      // If you have any global variables, reset them here
+      // Example: Global.user = null;
+
+      // Navigate to the login screen
+      Navigator.of(context).pushReplacementNamed('/login');
+    } catch (e) {
+      print("Error during logout: $e");
+    }
   }
-
-
   @override
   Widget build(BuildContext context) {
    userProvider.setUser();

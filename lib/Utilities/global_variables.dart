@@ -41,8 +41,8 @@ Future<void> getKeysFromPreferences() async {
     final prefs = await SharedPreferences.getInstance();
 
     // Step 2: Get the keys from SharedPreferences
-    publicKey = prefs.getString('tronAddressRef');
-    privateKey = prefs.getString('tronPrivateKeyRef');
+    publicKey = await prefs.getString('tronAddressRef');
+    privateKey = await prefs.getString('tronPrivateKeyRef');
 
     if (publicKey == null || privateKey == null) {
       throw Exception("Keys not found in SharedPreferences.");

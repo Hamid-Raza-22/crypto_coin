@@ -18,8 +18,7 @@ class UserProvider extends GetxController {
 
   }
 
-  // Clear user data on logout
-  void clearUser() {
+clearUser() {
     name.value = '';
     email.value = '';
     photoUrl.value = '';
