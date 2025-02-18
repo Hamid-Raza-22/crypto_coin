@@ -2,6 +2,7 @@
 import 'package:crypto_coin/Utilities/global_variables.dart';
 import 'package:crypto_coin/Views/edit_profile_screen.dart';
 import 'package:crypto_coin/Views/home/channel_screen.dart';
+import 'package:crypto_coin/Views/limit_policy_page.dart';
 import 'package:crypto_coin/Views/privacy_policy_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -70,9 +71,14 @@ class _SettingsPageState extends State<SettingsPage> {
     print('Email: ${userProvider.email.value}');
     print('Photo URL: ${userProvider.photoUrl.value}');
     return Scaffold(
-      backgroundColor: Colors.white,
+      //backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Respects theme
+
+
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        // backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Respects theme
+
         title: const Text('Settings'),
         actions: [
           IconButton(
@@ -91,15 +97,14 @@ class _SettingsPageState extends State<SettingsPage> {
             contentPadding: EdgeInsets.zero,
 
               leading: CircleAvatar(
-                backgroundImage: userProvider.photoUrl.value.isNotEmpty
-                    ? NetworkImage(userProvider.photoUrl.value)
-                    : AssetImage(logo) as ImageProvider,
+                backgroundImage:
+                     AssetImage(userProvider.photoUrl.value),
               ),
-            title: Text(userProvider.name.value,style: const TextStyle(color: Colors.black),),
+            title: Text(userProvider.name.value),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(userProvider.email.value, style: const TextStyle(color: Colors.black),),
+                Text(userProvider.email.value,),
                Text(
                   "ID: $publicKey", // Replace with actual user ID if available
                   style: TextStyle(color: Colors.grey, fontSize: 12),
@@ -118,12 +123,13 @@ class _SettingsPageState extends State<SettingsPage> {
 
           // Privacy Section
           buildSectionTitle('Privacy'),
-          buildListTile(Icons.person, 'Profile', () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => EditProfilePage()),
-            );
-          }), buildListTile(Icons.privacy_tip, 'Privacy', () {
+          // buildListTile(Icons.person, 'Profile', () {
+          //   Navigator.push(
+          //     context,
+          //     MaterialPageRoute(builder: (context) => EditProfilePage()),
+          //   );
+          // }),
+          buildListTile(Icons.privacy_tip, 'Privacy', () {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => PrivacyPolicyPage()),
@@ -135,8 +141,14 @@ class _SettingsPageState extends State<SettingsPage> {
 
           // Finance Section
           // buildSectionTitle('Finance'),
-          buildListTile(Icons.history, 'History', () {}),
-          buildListTile(Icons.production_quantity_limits, 'Limits', () {}),
+         // buildListTile(Icons.history, 'History', () {}),
+          buildListTile(Icons.production_quantity_limits, 'Limits', () {
+    Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => LimitsPolicyPage()),
+    );
+
+          }),
 
           const Divider(),
 
@@ -144,36 +156,37 @@ class _SettingsPageState extends State<SettingsPage> {
           buildSectionTitle('Account'),
           Column(
             children: [
-              Obx(() =>
-                  ListTile(
-                    leading: const Icon(Icons.color_lens),
-                    title: const Text('Theme'),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(themeController.themeMode.value == ThemeMode.dark
-                            ? 'Dark Mode'
-                            : 'Light Mode'),
-                        Switch(
-                          value: themeController.themeMode.value ==
-                              ThemeMode.dark,
-                          onChanged: (value) {
-                            themeController.toggleTheme(); // Toggle Theme
-                          },
-                        ),
-                      ],
-                    ),
-                  )),
+              Obx(() {
+                final themeController = Get.find<ThemeController>();
+                return ListTile(
+                  leading: const Icon(Icons.color_lens),
+                  title: const Text('Theme'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(themeController.themeMode.value == ThemeMode.dark
+                          ? 'Dark Mode'
+                          : 'Light Mode'),
+                      Switch(
+                        value: themeController.themeMode.value == ThemeMode.dark,
+                        onChanged: (value) {
+                          themeController.toggleTheme(); // Toggle Theme
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              }),
             ],
           ),
-          buildListTile(Icons.notifications, 'Notifications', () {}),
+         // buildListTile(Icons.notifications, 'Notifications', () {}),
 
           const Divider(),
 
           // More Section
           buildSectionTitle('More'),
           // buildListTile(Icons.card_giftcard, 'My bonus', () {}),
-          buildListTile(Icons.share, 'Share with friends', () {}),
+         // buildListTile(Icons.share, 'Share with friends', () {}),
           buildListTile(Icons.support, 'Support', () {
             Navigator.push(
               context,

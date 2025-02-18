@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-
 import '../../Components/custom_appbar.dart';
 import '../../Utilities/global_variables.dart';
 
 class TeamScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.white,
-      appBar: CustomAppBar(
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Respects theme
+      appBar: const CustomAppBar(
         title: "C Coin",
         imageUrl: logo,
-        //onBackPressed: ,
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -23,7 +21,6 @@ class TeamScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // SizedBox(height: 20),
                     Text(
                       'Team',
                       style: TextStyle(
@@ -31,11 +28,11 @@ class TeamScreen extends StatelessWidget {
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         height: 1.75,
-                        color: Colors.black,
+                        color: Theme.of(context).textTheme.bodyMedium?.color, // Theme-based color
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 200),
+                    const SizedBox(height: 200),
                     Center(
                       child: Text(
                         'Here we put the channel link for the whatsapp',
@@ -43,13 +40,12 @@ class TeamScreen extends StatelessWidget {
                           fontFamily: 'Readex Pro',
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
-                          color: Colors.black,
+                          color: Theme.of(context).textTheme.bodyMedium?.color, // Theme-based color
                         ),
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    SizedBox(height: 20), // Added space between text and button
-
+                    const SizedBox(height: 20), // Added space between text and button
                   ],
                 ),
               ),
@@ -58,7 +54,5 @@ class TeamScreen extends StatelessWidget {
         ),
       ),
     );
-
   }
 }
-

@@ -11,9 +11,13 @@ class WalletMainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
+      //backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Respects theme
+
+      appBar:  AppBar(
+        // backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Respects theme
+      
         title:
         const Text('Wallet', style: TextStyle(fontWeight: FontWeight.bold)),
         // leading: IconButton(
@@ -21,27 +25,27 @@ class WalletMainPage extends StatelessWidget {
         //   onPressed: () => Navigator.pop(context),
         // ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.qr_code_scanner),
-            onPressed: () {},
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.qr_code_scanner),
+          //   onPressed: () {},
+          // ),
           const SizedBox(width: 16),
         ],
         centerTitle: true,
       ),
       body: Column(
         children: [
-          Obx(() => WalletSegmentedControl(
-            currentIndex: controller.currentIndex.value,
-            onSegmentChanged: controller.changeIndex,
-          )),
+          // Obx(() => WalletSegmentedControl(
+          //   currentIndex: controller.currentIndex.value,
+          //   onSegmentChanged: controller.changeIndex,
+          // )),
           Expanded(
             child: Obx(() {
               switch (controller.currentIndex.value) {
                 case 0:
                   return WalletScreenTwo();
                 case 1:
-                  return WalletPortfolioPage();
+                //  return WalletPortfolioPage();
                 default:
                   return WalletScreenTwo();
               }

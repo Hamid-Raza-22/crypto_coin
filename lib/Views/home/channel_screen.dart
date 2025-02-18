@@ -35,7 +35,9 @@ class ChannelScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      //backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Respects theme
+
       appBar: CustomAppBar(
         title: "C Coin",
         imageUrl: logo,

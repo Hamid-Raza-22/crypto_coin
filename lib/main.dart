@@ -30,28 +30,44 @@ Future<void> main() async {
   runApp(MyApp());
 }
 
-
 class MyApp extends StatelessWidget {
   MyApp({super.key});
-
   final ThemeController themeController = Get.put(ThemeController());
 
   @override
   Widget build(BuildContext context) {
     return Obx(() => GetMaterialApp(
       initialBinding: BindingsBuilder(() {
+        Get.put(ThemeController()); // Initialize ThemeController
         Get.put(UserProvider()); // Initialize UserProvider
       }),
-
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData.light(),
-        // Light Theme
-        darkTheme: ThemeData.dark(),
-        // Dark Theme
-        themeMode: themeController.themeMode.value,
-        initialRoute: AppRoutes.splashScreen,
-        getPages: AppRoutes.routes,
-      ));
-
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.light().copyWith(
+        scaffoldBackgroundColor: Colors.white,
+        // colorScheme: ColorScheme.light(
+        //   primary: Colors.blue, // Primary color
+        //   secondary: Colors.green, // Secondary color
+        //   background: Colors.white, // Background color
+        //   surface: Colors.white, // Surface color (e.g., cards, dialogs)
+        //   onBackground: Colors.black, // Text color on background
+        //   onSurface: Colors.black, // Text color on surface
+        // ),
+        textTheme: const TextTheme(
+          bodyMedium: TextStyle(
+            color: Colors.black, // Custom text color for light mode
+          ),
+        ),
+      ),
+      darkTheme: ThemeData.dark().copyWith(
+        textTheme: const TextTheme(
+          bodyMedium: TextStyle(
+            color: Colors.white, // Custom text color for dark mode
+          ),
+        ),
+      ),
+      themeMode: themeController.themeMode.value, // Use ThemeController's themeMode
+      initialRoute: AppRoutes.splashScreen,
+      getPages: AppRoutes.routes,
+    ));
   }
 }

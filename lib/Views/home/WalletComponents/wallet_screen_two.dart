@@ -10,14 +10,19 @@ import '../../../Components/custom_editable_menu_option.dart';
 import '../../../Utilities/global_variables.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+
+import '../../../ViewModels/user_provider_logic.dart';
 class WalletScreenTwo extends StatelessWidget {
   final WalletController controller = Get.put(WalletController());
+  final UserProvider userProvider = Get.put(UserProvider());
 
    WalletScreenTwo({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      //backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Respects theme
+
       // appBar: _buildAppBar(),
       body: SingleChildScrollView(
          padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -141,8 +146,8 @@ class WalletScreenTwo extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildCardDetail('Card Holder', 'Marcus Aurelius'),
-        _buildCardDetail('Expire', '03/29'),
+        _buildCardDetail('Card Holder', userProvider.email.value),
+       // _buildCardDetail('Expire', '03/29'),
       ],
     );
   }

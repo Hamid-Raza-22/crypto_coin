@@ -4,7 +4,9 @@ class PrivacyPolicyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      //backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Respects theme
+
       appBar: AppBar(
         title: Text('Privacy Policy'),
         backgroundColor: Colors.white,
@@ -69,7 +71,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             SizedBox(height: 20),
             buildSectionHeader('9. Contact Us'),
             buildSectionBody(
-              'If you have any questions or concerns about this Privacy Policy or how we handle your information, please contact us at:\n\nC App Support Team\n- Email: support@capp.com\n- Phone: +[Insert Phone Number]\n\nThank you for trusting C App. Your privacy is our priority.',
+              'If you have any questions or concerns about this Privacy Policy or how we handle your information, please contact us at:\n\nC App Support Team\n- Email: info@cryptocoinworld.net\n\nThank you for trusting C App. Your privacy is our priority.',
             ),
           ],
         ),

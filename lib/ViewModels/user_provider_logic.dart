@@ -2,6 +2,8 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Utilities/global_variables.dart';
+
 class UserProvider extends GetxController {
   // Observable variables to store user data
   var name = ''.obs;
@@ -12,9 +14,9 @@ class UserProvider extends GetxController {
     final prefs = await SharedPreferences.getInstance();
 
 
-    name.value= prefs.getString('googleName') ?? 'Unknown User';
-    email.value  = prefs.getString('googleEmail') ?? '';
-    photoUrl.value = prefs.getString('googlePhoto') ?? 'https://via.placeholder.com/150';
+    name.value= prefs.getString('googleName') ?? 'C Coin User';
+    email.value  = (prefs.getString('googleEmail') ?? prefs.getString("isLoggedInEmail"))??"User Email";
+    photoUrl.value = prefs.getString('googlePhoto')?? logo;
 
   }
 

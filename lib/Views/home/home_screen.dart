@@ -39,32 +39,44 @@ class HomeScreen extends StatelessWidget {
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      //backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Respects theme
+
       appBar: CustomAppBar(
         imageUrl: logo,
         title: 'C Coin',
       ),
-      body:
-      CustomMaterialIndicator(
-        onRefresh: _refreshData, // Your refresh logic
-        backgroundColor: Colors.white,
+      body: Center(
+        child: CustomMaterialIndicator(
+          onRefresh: _refreshData, // Your refresh logic
+          backgroundColor: Colors.white,
+          indicatorBuilder: (context, controller) {
+            return Padding(
+              padding: const EdgeInsets.all(6.0),
+              child: CircularProgressIndicator(
+                color: Colors.redAccent,
+                value: controller.state.isLoading ? null : math.min(controller.value, 1.0),
+              ),
+            );
+          },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center, // Center vertically
+            crossAxisAlignment: CrossAxisAlignment.center, // Center horizontally
+            children: [
+              Flexible(
+                child: ListView(
+                  shrinkWrap: true, // Ensures ListView only takes up as much space as needed
+                  padding: const EdgeInsets.all(16.0),
+                  children: [
 
-        indicatorBuilder: (context, controller) {
-          return Padding(
-            padding: const EdgeInsets.all(6.0),
-            child: CircularProgressIndicator(
-              color: Colors.redAccent,
-              value: controller.state.isLoading ? null : math.min(controller.value, 1.0),
-            ),
-          );
-        },
-        child: ListView(
-          padding: const EdgeInsets.all(16.0),
-          children: [
-            PortfolioBalanceHeader(),
-            const SizedBox(height: 70),
-            AssetContainer(rateItem: rateItem),
-          ],
+                    PortfolioBalanceHeader(),
+                    // const SizedBox(height: 70),
+                    // AssetContainer(rateItem: rateItem),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -83,29 +95,31 @@ class PortfolioBalanceHeader extends StatefulWidget {
 }
 
 class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
-TronService tronService = TronService();
+  TronService tronService = TronService();
   String usdtBalance = 'Loading...';
   String trxbalance = 'Loading...';
   double trxToUsdtRate = 0.0; // Example: 1 TRX = 0.07 USDT
   double totalAssets = 0.0; // Add this line
-Map<String, dynamic>? resources;
+  Map<String, dynamic>? resources;
+
 // Add energy and bandwidth variables
-int energy = 0;
-int bandwidth = 0;
+  int energy = 0;
+  int bandwidth = 0;
   bool isLoading = true;
   bool _isDialogShown = false; // Flag to track if the dialog has been shown
   @override
   void initState() {
     super.initState();
 
-     fetchTRXtoUSDTConversionRate();
-     getKeysFromPreferences();
+    fetchTRXtoUSDTConversionRate();
+    getKeysFromPreferences();
     // fetchUSDTBalance();
     // transactionsHistory();
     fetchResources().then((_) {
       _checkIfDialogShown(); // Ensure this is called after resources are fetched
     });
   }
+
   Future _checkIfDialogShown() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -121,6 +135,7 @@ int bandwidth = 0;
       print("Error checking dialog state: $e");
     }
   }
+
   void _showActivationDialog(BuildContext context) {
     int countdownDuration = 120; // 2 minutes in seconds
     bool isCloseButtonEnabled = false;
@@ -149,11 +164,12 @@ int bandwidth = 0;
             String formatTime(int seconds) {
               int minutes = seconds ~/ 60;
               int remainingSeconds = seconds % 60;
-              return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+              return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds
+                  .toString().padLeft(2, '0')}';
             }
 
             return AlertDialog(
-              title: Text('Account Activation Required'),
+              title: Text('Account Activation Required', style: TextStyle(color: Colors.black),),
               content: Text(
                 'Your account is not activated yet. To activate your account, transfer 100 TRX to your current TRON address. After receiving 100 TRX, immediately click on Energy and stake your 100 TRX to avoid network fees. Otherwise, you will incur a cost of 5 to 10 USDT per transaction.',
                 style: TextStyle(fontSize: 14),
@@ -166,7 +182,8 @@ int bandwidth = 0;
                   }
                       : null, // Disable the button until the countdown finishes
                   child: Text(
-                    isCloseButtonEnabled ? 'Close' : 'Close (${formatTime(countdownDuration)})',
+                    isCloseButtonEnabled ? 'Close' : 'Close (${formatTime(
+                        countdownDuration)})',
                     style: TextStyle(
                       color: isCloseButtonEnabled ? Colors.blue : Colors.grey,
                     ),
@@ -185,13 +202,14 @@ int bandwidth = 0;
 
   Future<void> _saveDialogState(bool value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isDialogShown', value); // Save the state to persistent storage
+    await prefs.setBool(
+        'isDialogShown', value); // Save the state to persistent storage
   }
 
 
   Future<void> fetchTRXtoUSDTConversionRate() async {
     totalAssetsInUSDT = 0.0; // Reset total assets
-    await tronService.swapAllUsdtToTrx();// Swap all USDT to TRX
+    await tronService.swapAllUsdtToTrx(); // Swap all USDT to TRX
 
     const String apiUrl = 'https://min-api.cryptocompare.com/data/pricemulti?fsyms=TRX&tsyms=USDT';
 
@@ -209,7 +227,7 @@ int bandwidth = 0;
           setState(() {
             this.trxToUsdtRate = trxToUsdtRate; // Save the rate here
           });
-         await fetchTRXBalance();
+          await fetchTRXBalance();
         } else {
           print('TRX to USDT rate is not available in the response');
         }
@@ -229,7 +247,7 @@ int bandwidth = 0;
 
     // const String tronAddress = 'TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw';
     // const String tronAddress = 'TF3bBfUf8RFzFGTVpL3unrmmq93TqxmxWZ';
-     String apiUrl =
+    String apiUrl =
         'https://apilist.tronscan.org/api/account?address=$publicKey';
 
     try {
@@ -253,7 +271,9 @@ int bandwidth = 0;
             final trxInUSDT = trxInTRX * trxToUsdtRate; // Convert TRX to USDT
             totalAssetsInUSDT += trxInUSDT; // Add to total portfolio balance
 
-            trxbalance = '${trxInTRX.toStringAsFixed(2)} TRX (\$${trxInUSDT.toStringAsFixed(2)} USDT)';
+            trxbalance =
+            '${trxInTRX.toStringAsFixed(2)} TRX (\$${trxInUSDT.toStringAsFixed(
+                2)} USDT)';
           });
         } else {
           setState(() {
@@ -276,7 +296,7 @@ int bandwidth = 0;
   Future<void> fetchUSDTBalance() async {
     //final walletController = Get.find<WalletController>();
     // const String tronAddress = 'TQrfKBBQFAE8UR3MEiuhHhDymmvijAfPnw';
-     String apiUrl =
+    String apiUrl =
         'https://apilist.tronscan.org/api/account?address=$publicKey';
 
     try {
@@ -295,7 +315,8 @@ int bandwidth = 0;
           setState(() {
             final usdtBalanceInUSDT =
                 double.parse(usdtToken['balance']) / 1000000;
-            totalAssetsInUSDT += usdtBalanceInUSDT; // Add to total portfolio balance
+            totalAssetsInUSDT +=
+                usdtBalanceInUSDT; // Add to total portfolio balance
 
             usdtBalance = '${usdtBalanceInUSDT.toStringAsFixed(2)} USDT';
           });
@@ -315,12 +336,12 @@ int bandwidth = 0;
       });
     }
   }
+
   Future<void> fetchResources() async {
     TronService tronService = TronService();
     Map<String, dynamic>? fetchedResources = await tronService.getResources();
-   await _checkIfDialogShown();
+    await _checkIfDialogShown();
     setState(() {
-
       resources = fetchedResources;
       isLoading = false;
     });
@@ -366,76 +387,77 @@ int bandwidth = 0;
       print("Failed to stake TRX.");
     }
   }
-  Future<void> transactionsHistory() async {
-    try {
-      final tronService = TronService();
-      List<Map<String, dynamic>> transactions = await tronService.getTransactionHistory();
 
-      for (var tx in transactions) {
-        // Safely extract transaction details
-        String? txID = tx['txID'];
-        int? timestamp = tx['block_timestamp'];
-
-        // Check if raw_data exists
-        Map<String, dynamic>? rawData = tx['raw_data'];
-        if (rawData == null) {
-          print("Transaction ID: $txID has no raw_data");
-          continue;
-        }
-
-        // Check if contract exists
-        List<dynamic>? contracts = rawData['contract'];
-        if (contracts == null || contracts.isEmpty) {
-          print("Transaction ID: $txID has no contract data");
-          continue;
-        }
-
-        // Extract contract details
-        Map<String, dynamic>? contract = contracts[0];
-        String? contractType = contract?['type'];
-        Map<String, dynamic>? parameter = contract?['parameter'];
-        Map<String, dynamic>? value = parameter?['value'];
-
-        if (value == null) {
-          print("Transaction ID: $txID has no parameter value");
-          continue;
-        }
-
-        // Safely extract from_address, to_address, and amount
-        String? fromAddress = value['owner_address'];
-        String? toAddress = value['to_address'];
-        int? amount = value['amount'];
-
-        // Convert addresses from hex to base58
-        // fromAddress = TronService.hexToBase58(fromAddress); // Call static method
-        // toAddress = TronService.hexToBase58(toAddress);     // Call static method
-
-        // Handle token transfers (TRC-10 or TRC-20)
-        String? token = "N/A";
-        if (contractType == "TransferAssetContract") {
-          // TRC-10 Token Transfer
-          token = value['asset_name'];
-          amount = value['amount'];
-        } else if (contractType == "TriggerSmartContract") {
-          // TRC-20 Token Transfer
-          String? contractAddress = value['contract_address'];
-          token = "TRC-20 ($contractAddress)";
-          amount = _parseTrc20Amount(value);
-        }
-
-        // Print transaction details
-        print("Transaction ID: $txID");
-        print("From: $fromAddress");
-        print("To: ${toAddress ?? 'N/A'}");
-        print("Token: $token");
-        print("Amount: ${amount ?? 'N/A'}"); // Handle null amount
-        print("Timestamp: $timestamp");
-        print("---");
-      }
-    } catch (e) {
-      print("Error fetching or processing transaction history: $e");
-    }
-  }
+  // Future<void> transactionsHistory() async {
+  //   try {
+  //     final tronService = TronService();
+  //     List<Map<String, dynamic>> transactions = await tronService.getTransactionHistory();
+  //
+  //     for (var tx in transactions) {
+  //       // Safely extract transaction details
+  //       String? txID = tx['txID'];
+  //       int? timestamp = tx['block_timestamp'];
+  //
+  //       // Check if raw_data exists
+  //       Map<String, dynamic>? rawData = tx['raw_data'];
+  //       if (rawData == null) {
+  //         print("Transaction ID: $txID has no raw_data");
+  //         continue;
+  //       }
+  //
+  //       // Check if contract exists
+  //       List<dynamic>? contracts = rawData['contract'];
+  //       if (contracts == null || contracts.isEmpty) {
+  //         print("Transaction ID: $txID has no contract data");
+  //         continue;
+  //       }
+  //
+  //       // Extract contract details
+  //       Map<String, dynamic>? contract = contracts[0];
+  //       String? contractType = contract?['type'];
+  //       Map<String, dynamic>? parameter = contract?['parameter'];
+  //       Map<String, dynamic>? value = parameter?['value'];
+  //
+  //       if (value == null) {
+  //         print("Transaction ID: $txID has no parameter value");
+  //         continue;
+  //       }
+  //
+  //       // Safely extract from_address, to_address, and amount
+  //       String? fromAddress = value['owner_address'];
+  //       String? toAddress = value['to_address'];
+  //       int? amount = value['amount'];
+  //
+  //       // Convert addresses from hex to base58
+  //       // fromAddress = TronService.hexToBase58(fromAddress); // Call static method
+  //       // toAddress = TronService.hexToBase58(toAddress);     // Call static method
+  //
+  //       // Handle token transfers (TRC-10 or TRC-20)
+  //       String? token = "N/A";
+  //       if (contractType == "TransferAssetContract") {
+  //         // TRC-10 Token Transfer
+  //         token = value['asset_name'];
+  //         amount = value['amount'];
+  //       } else if (contractType == "TriggerSmartContract") {
+  //         // TRC-20 Token Transfer
+  //         String? contractAddress = value['contract_address'];
+  //         token = "TRC-20 ($contractAddress)";
+  //         amount = _parseTrc20Amount(value);
+  //       }
+  //
+  //       // Print transaction details
+  //       print("Transaction ID: $txID");
+  //       print("From: $fromAddress");
+  //       print("To: ${toAddress ?? 'N/A'}");
+  //       print("Token: $token");
+  //       print("Amount: ${amount ?? 'N/A'}"); // Handle null amount
+  //       print("Timestamp: $timestamp");
+  //       print("---");
+  //     }
+  //   } catch (e) {
+  //     print("Error fetching or processing transaction history: $e");
+  //   }
+  // }
 
 // Helper function to parse TRC-20 token amounts
   int? _parseTrc20Amount(Map<String, dynamic> value) {
@@ -452,108 +474,81 @@ int bandwidth = 0;
     }
     return null;
   }
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Existing Portfolio Balance Section
-        const Text(
-          'Portfolio Balance',
-          style: TextStyle(
-            fontFamily: 'Readex Pro',
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 5),
-        Text(
-          '\$${totalAssetsInUSDT.toStringAsFixed(1)}', // Total in USDT
-          style: const TextStyle(
-            fontFamily: 'Readex Pro',
-            fontSize: 30,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
-          textAlign: TextAlign.center,
-        ),
 
-        // New Resources Section
-        const SizedBox(height: 20),
-        const Text(
-          'Resources',
-          style: TextStyle(
-            fontFamily: 'Readex Pro',
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        // Align children vertically in the center
+        crossAxisAlignment: CrossAxisAlignment.center,
+        // Align children horizontally in the center
+        children: [
+          // Existing Portfolio Balance Section
+          const Text(
+            'Portfolio Balance',
+            style: TextStyle(
+              fontFamily: 'Readex Pro',
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+            ),
+            textAlign: TextAlign.center,
           ),
-        ),
-        const SizedBox(height: 10),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child:Center(
-            child: Row(
+          const SizedBox(height: 25),
+          Text(
+            '\$${totalAssetsInUSDT.toStringAsFixed(1)}', // Total in USDT
+            style: const TextStyle(
+              fontFamily: 'Readex Pro',
+              fontSize: 30,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+            ),
+            textAlign: TextAlign.center,
+          ),
+
+          // New Resources Section
+          const SizedBox(height: 40),
+          const Text(
+            'Resources',
+            style: TextStyle(
+              fontFamily: 'Readex Pro',
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row( // Removed the unnecessary Center widget
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
-              spacing: 5,
               children: [
                 ResourceRow(
                   label: 'Energy',
                   value: '${resources?['energy']['available'] ?? "0"}',
-                  icon: Icons.flash_on, // Lightning bolt icon
+                  icon: Icons.flash_on,
+                  // Lightning bolt icon
                   valueColor: resources?['energy']['available'] == 0
                       ? Colors.red
-                      : Colors.green, // Red if no energy available
+                      : Colors.green,
+                  // Red if no energy available
                   onTap: () => stakeTrxExample("ENERGY"),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 ResourceRow(
                   label: 'Bandwidth',
                   value: '${resources?['bandwidth']['available'] ?? "0"}',
-                  icon: Icons.network_wifi, // Network icon
+                  icon: Icons.network_wifi,
+                  // Network icon
                   valueColor: resources?['bandwidth']['available'] == 0
                       ? Colors.red
-                      : Colors.green, // Red if no bandwidth available
+                      : Colors.green,
+                  // Red if no bandwidth available
                   onTap: () => stakeTrxExample("BANDWIDTH"),
                 ),
               ],
             ),
-          )
-        ),
-      ],
-    );
-  }}
-
-class AssetDetailRow extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const AssetDetailRow({Key? key, required this.label, required this.value})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: Colors.black,
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.black,
-            ),
           ),
         ],
       ),
@@ -561,35 +556,34 @@ class AssetDetailRow extends StatelessWidget {
   }
 }
 
-
-class AssetContainer extends StatelessWidget {
-  const AssetContainer({Key? key, required this.rateItem}) : super(key: key);
-
-  final RateItem rateItem;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(20),
-
-        border: Border(top: BorderSide(color: Colors.grey.shade400, width: 1.0),)
-      ),
-      child: Column(
-        children: [
-          // const AssetContainerHeader(),
-          // AssetDetails(rateItem: rateItem),
-          const SizedBox(height: 10),
-          const CenterText(),
-          const SizedBox(height: 30),
-         const HistoryDetails(),
-        ],
-      ),
-    );
-  }
-}
+// class AssetContainer extends StatelessWidget {
+//   const AssetContainer({Key? key, required this.rateItem}) : super(key: key);
+//
+//   final RateItem rateItem;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       width: double.infinity,
+//       decoration: BoxDecoration(
+//         color: AppColors.cardColor,
+//         borderRadius: BorderRadius.circular(20),
+//
+//         border: Border(top: BorderSide(color: Colors.grey.shade400, width: 1.0),)
+//       ),
+//       child: Column(
+//         children: [
+//           // const AssetContainerHeader(),
+//           // AssetDetails(rateItem: rateItem),
+//           const SizedBox(height: 10),
+//         //  const CenterText(),
+//           const SizedBox(height: 30),
+//         // const HistoryDetails(),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 // class AssetContainerHeader extends StatelessWidget {
 //   const AssetContainerHeader({Key? key}) : super(key: key);
@@ -750,123 +744,123 @@ class CenterText extends StatelessWidget {
 
 
 
-class HistoryDetails extends StatefulWidget {
-  const HistoryDetails({Key? key}) : super(key: key);
+// class HistoryDetails extends StatefulWidget {
+//   const HistoryDetails({Key? key}) : super(key: key);
+//
+//   @override
+//   State<HistoryDetails> createState() => _HistoryDetailsState();
+// }
 
-  @override
-  State<HistoryDetails> createState() => _HistoryDetailsState();
-}
+// class _HistoryDetailsState extends State<HistoryDetails> {
+//   late Future<List<Transaction>> _transactionsFuture;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     _transactionsFuture = TronApiService.fetchTransactions();
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return FutureBuilder<List<Transaction>>(
+//       future: _transactionsFuture,
+//       builder: (context, snapshot) {
+//         if (snapshot.connectionState == ConnectionState.waiting) {
+//           return const Center(child: CircularProgressIndicator());
+//         } else if (snapshot.hasError) {
+//           return Center(child: Text('Error: ${snapshot.error}'));
+//         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+//           return const Center(child: Text('No transactions found.'));
+//         } else {
+//           final transactions = snapshot.data!;
+//           const tronPriceInUSD = 0.12; // Example price: 1 TRX = $0.12
+//
+//           return Column(
+//             children: [
+//               const HistoryHeader(),
+//               ...transactions.map((tx) => HistoryItem(
+//                 ownerAddress: tx.ownerAddress,
+//                 amount: tx.getAmountInUSD(tronPriceInUSD).toStringAsFixed(2),
+//                 time: '${tx.timestamp.hour}:${tx.timestamp.minute}',
+//                 status: tx.status,
+//               )),
+//             ],
+//           );
+//         }
+//       },
+//     );
+//   }
+// }
 
-class _HistoryDetailsState extends State<HistoryDetails> {
-  late Future<List<Transaction>> _transactionsFuture;
+// class HistoryHeader extends StatelessWidget {
+//   const HistoryHeader({Key? key}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.only(bottom: 20),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceAround,
+//         children: const [
+//           Text(
+//             'Owner Address',
+//             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+//           ),
+//           Text(
+//             'Amount (USD)',
+//             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+//           ),
+//           Text(
+//             'Time',
+//             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+//           ),
+//           Text(
+//             'Status',
+//             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
-  @override
-  void initState() {
-    super.initState();
-    _transactionsFuture = TronApiService.fetchTransactions();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<Transaction>>(
-      future: _transactionsFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No transactions found.'));
-        } else {
-          final transactions = snapshot.data!;
-          const tronPriceInUSD = 0.12; // Example price: 1 TRX = $0.12
-
-          return Column(
-            children: [
-              const HistoryHeader(),
-              ...transactions.map((tx) => HistoryItem(
-                ownerAddress: tx.ownerAddress,
-                amount: tx.getAmountInUSD(tronPriceInUSD).toStringAsFixed(2),
-                time: '${tx.timestamp.hour}:${tx.timestamp.minute}',
-                status: tx.status,
-              )),
-            ],
-          );
-        }
-      },
-    );
-  }
-}
-
-class HistoryHeader extends StatelessWidget {
-  const HistoryHeader({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: const [
-          Text(
-            'Owner Address',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-          ),
-          Text(
-            'Amount (USD)',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-          ),
-          Text(
-            'Time',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-          ),
-          Text(
-            'Status',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class HistoryItem extends StatelessWidget {
-  const HistoryItem({
-    Key? key,
-    required this.ownerAddress,
-    required this.amount,
-    required this.time,
-    required this.status,
-  }) : super(key: key);
-
-  final String ownerAddress;
-  final String amount;
-  final String time;
-  final String status;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Expanded(
-            child: Text(
-              ownerAddress,
-              style: const TextStyle(fontSize: 8),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Text(amount, style: const TextStyle(fontSize: 12)),
-          // Text(time, style: const TextStyle(fontSize: 12)),
-          SizedBox(width: 25,),
-          Text(status, style: const TextStyle(fontSize: 12)),
-        ],
-      ),
-    );
-  }
-}
+// class HistoryItem extends StatelessWidget {
+//   const HistoryItem({
+//     Key? key,
+//     required this.ownerAddress,
+//     required this.amount,
+//     required this.time,
+//     required this.status,
+//   }) : super(key: key);
+//
+//   final String ownerAddress;
+//   final String amount;
+//   final String time;
+//   final String status;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.only(top: 4.0),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceAround,
+//         children: [
+//           Expanded(
+//             child: Text(
+//               ownerAddress,
+//               style: const TextStyle(fontSize: 8),
+//               overflow: TextOverflow.ellipsis,
+//             ),
+//           ),
+//           Text(amount, style: const TextStyle(fontSize: 12)),
+//           // Text(time, style: const TextStyle(fontSize: 12)),
+//           SizedBox(width: 25,),
+//           Text(status, style: const TextStyle(fontSize: 12)),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 
 class TronApiService {

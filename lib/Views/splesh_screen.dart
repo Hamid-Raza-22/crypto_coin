@@ -70,7 +70,7 @@ class SplashScreenState extends State<SplashScreen>
         await getKeysFromPreferences();
         Get.offNamed(AppRoutes.homeScreen); // Navigate to HomeScreen if logged in
       } else {
-        Get.offNamed(AppRoutes.signup); // Navigate to Signup screen if not logged in
+        Get.offNamed(AppRoutes.policyDialog); // Navigate to Signup screen if not logged in
       }
     });
   }
@@ -101,7 +101,9 @@ class SplashScreenState extends State<SplashScreen>
     final logoTopPadding = screenHeight * 0.2; // Dynamic padding for logo
 
     return Scaffold(
-      backgroundColor: Colors.white, // Set background color to white
+      //backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Respects theme
+ // Set background color to white
       body: FadeTransition(
         opacity: _fadeInAnimation, // Apply fade-in effect for smooth transition
         child: Center(

@@ -10,7 +10,9 @@ class WalletDepositScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      //backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Respects theme
+
       appBar: _buildAppBar(context),
       body: SingleChildScrollView(
         child: Padding(
@@ -65,7 +67,7 @@ class WalletDepositScreen extends StatelessWidget {
             ),
               const SizedBox(height: 10),
 
-              _buildQRSection(),
+              _buildQRSection(context),
               const SizedBox(height: 20),
               _buildDepositDetailsCard(context),
               const SizedBox(height: 20),
@@ -83,7 +85,7 @@ class WalletDepositScreen extends StatelessWidget {
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Respects theme
       title: const Text('Deposit USDT'),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
@@ -95,18 +97,21 @@ class WalletDepositScreen extends StatelessWidget {
           onPressed: () {},
           tooltip: 'Help',
         ),
-        IconButton(
-          icon: const Icon(Icons.qr_code_scanner),
-          onPressed: () {},
-          tooltip: 'Scan QR Code',
-        ),
+        // IconButton(
+        //   icon: const Icon(Icons.qr_code_scanner),
+        //   onPressed: () {},
+        //   tooltip: 'Scan QR Code',
+        // ),
       ],
     );
   }
 
-  Widget _buildQRSection() {
+  Widget _buildQRSection(BuildContext context) {
     return Center(
       child: QrImageView(
+        backgroundColor: Theme.of(context).brightness == Brightness.light
+            ? Colors.white // Light mode: white background
+            : Colors.grey[200]!, // Dark mode: light gray background
         data: publicKey!,
         version: QrVersions.auto,
         size: 200.0,
@@ -118,11 +123,10 @@ class WalletDepositScreen extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildDepositDetailsCard(BuildContext context) {
     return Card(
       elevation: 2,
-      color: Colors.white,
+      color: Theme.of(context).scaffoldBackgroundColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),

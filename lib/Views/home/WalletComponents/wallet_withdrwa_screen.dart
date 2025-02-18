@@ -71,7 +71,9 @@ class WithdrawScreen extends StatelessWidget {
     double totalWithdrawalAmount = withdrawalAmount - transactionFee;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      //backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Respects theme
+
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),

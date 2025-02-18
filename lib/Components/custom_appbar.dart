@@ -15,6 +15,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Respects theme
+
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center, // Center the entire row
         crossAxisAlignment: CrossAxisAlignment.center, // Aligns image and text vertically centered
@@ -44,7 +46,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       centerTitle: true,
-      backgroundColor: Colors.white,
+
       elevation: 0,
       leading: onBackPressed != null
           ? IconButton(

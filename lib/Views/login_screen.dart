@@ -156,7 +156,8 @@ _signInUser() async {
 
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
-
+   SharedPreferences prefs = await SharedPreferences.getInstance();
+   await prefs.setString('isLoggedInEmail', email);
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in both email and password.')),

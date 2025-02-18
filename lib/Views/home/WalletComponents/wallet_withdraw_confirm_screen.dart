@@ -98,23 +98,23 @@ class _WithdrawPageState extends State<WithdrawPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Respects theme
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           title: const Text(
             "Withdraw",
-            style: TextStyle(color: Colors.black),
+
           ),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            icon: const Icon(Icons.arrow_back),
             onPressed: () {
               Get.to(() => MainScreen());
             },
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.more_vert, color: Colors.black),
+              icon: const Icon(Icons.more_vert),
               onPressed: () {
                 // Add additional actions here
               },
@@ -281,6 +281,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                     childAspectRatio: 2,
                   ),
                   itemBuilder: (context, index) {
+
                     if (index == 9) {
                       return Container();
                     } else if (index == 10) {
@@ -289,6 +290,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                         onTap: () {
                           _updateAmount("0");
                         },
+
                       );
                     } else if (index == 11) {
                       return KeypadButton(

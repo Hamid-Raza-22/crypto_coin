@@ -85,7 +85,9 @@ class _SignupScreenState extends State<SignupScreen> {
     final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      //backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Respects theme
+
       appBar:  CustomAppBar(
         imageUrl: logo, // Adjust to the actual logo path
         title: 'C Coin',
