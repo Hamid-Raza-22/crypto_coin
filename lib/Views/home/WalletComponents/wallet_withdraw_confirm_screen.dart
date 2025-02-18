@@ -250,10 +250,14 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   ),
                   child: // TextField for user input
                       // TextField for user input
-                      TextField(
-                    controller:  publicAddressController,
+                  TextField(
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
+                        ),
+                        controller:  publicAddressController,
                     decoration: const InputDecoration(
                       hintText: "Enter Tron Address",
+
                       border: InputBorder.none, // Remove all borders (including underline)
                     ),
                   ),
@@ -351,18 +355,20 @@ class KeypadButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
+          color: Colors.grey.shade300,
+          // color: Colors.grey.shade200,
           borderRadius: BorderRadius.circular(8),
         ),
         child: text != null
             ? Text(
                 text!,
                 style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                     TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.titleLarge?.color),
               )
-            : Icon(icon, size: 24, color: Colors.grey),
+            : Icon(icon, size: 24, color:Theme.of(context).textTheme.titleLarge?.color),
       ),
     );
   }

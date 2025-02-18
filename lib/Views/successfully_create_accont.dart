@@ -21,7 +21,7 @@ class _ConfirmEmailScreenState extends State<SuccessfullyCreateAccount> {
         return false; // Prevents the default behavior of closing the app
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor:    Theme.of(context).scaffoldBackgroundColor,
         appBar: CustomAppBar(
           imageUrl: logo,
           title: 'C Coin',
@@ -39,25 +39,25 @@ class _ConfirmEmailScreenState extends State<SuccessfullyCreateAccount> {
                     const SizedBox(height: 30),
                     _buildLockImage(),
                     const SizedBox(height: 20),
-                    const Text(
+                    Text(
                       'Congratulations!',
                       style: TextStyle(
                         fontFamily: 'Readex Pro',
                         fontSize: 30,
                         fontWeight: FontWeight.w600,
                         height: 1.2,
-                        color: Colors.black,
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 5),
-                    const Text(
+                 Text(
                       'You have successfully created a new password, click continue to sign in the application',
                       style: TextStyle(
                         fontFamily: 'Readex Pro',
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                       textAlign: TextAlign.center,
                     ),

@@ -78,7 +78,7 @@ class StepOneEmailScreenState extends State<EmailCodeScreen> {
         return false; // Prevents the default behavior of closing the app
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor:   Theme.of(context).scaffoldBackgroundColor,
         appBar: CustomAppBar(
           title: 'C Coin',
           imageUrl: logo,
@@ -91,24 +91,24 @@ class StepOneEmailScreenState extends State<EmailCodeScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 15),
-                const Text(
+                Text(
                   'Please enter the code',
                   style: TextStyle(
                     fontFamily: 'Readex Pro',
                     fontSize: 30,
                     fontWeight: FontWeight.w600,
                     height: 1.75,
-                    color: Colors.black,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 Text(
                   'We sent email to $email',
-                  style: const TextStyle(
+                  style:  TextStyle(
                     fontFamily: 'Readex Pro',
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black54,
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -149,14 +149,14 @@ class StepOneEmailScreenState extends State<EmailCodeScreen> {
 
                 const SizedBox(height: 40),
                 const SizedBox(height: 80),
-                const Text(
+                Text(
                   '----------- or continue with -----------',
                   style: TextStyle(
                     fontFamily: 'Readex Pro',
                     fontSize: 14,
                     fontWeight: FontWeight.w300,
                     height: 1.6,
-                    color: Colors.black,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -194,7 +194,7 @@ class StepOneEmailScreenState extends State<EmailCodeScreen> {
         ),
         _buildSocialButton(
           iconImage: AssetImage(googleIcon),
-          color: Colors.black,
+            color:Colors.black,
           onTap: () async {
             User? user = await signInWithGoogle();
             if( user !=null){
@@ -206,7 +206,7 @@ class StepOneEmailScreenState extends State<EmailCodeScreen> {
         ),
         _buildSocialButton(
           icon: FontAwesomeIcons.apple,
-          color: Colors.black,
+            color:Colors.black,
           onTap: () => Get.offNamed('/reportIssues'),
         ),
       ],

@@ -306,7 +306,7 @@ _signInUser() async {
         return false; // Prevents the default behavior of closing the app
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor:Theme.of(context).scaffoldBackgroundColor,
         appBar: CustomAppBar(
           title: 'C Coin',
           imageUrl: logo,
@@ -319,14 +319,14 @@ _signInUser() async {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 15),
-                const Text(
+                 Text(
                   'Login to your Account',
                   style: TextStyle(
                     fontFamily: 'Readex Pro',
                     fontSize: 32,
                     fontWeight: FontWeight.w600,
                     height: 1.75,
-                    color: Colors.black,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -433,14 +433,14 @@ _signInUser() async {
                   // onTap: _signInUser,
                 ),
                 const SizedBox(height: 40),
-                const Text(
+                Text(
                   '----------- or continue with -----------',
                   style: TextStyle(
                     fontFamily: 'Readex Pro',
                     fontSize: 14,
                     fontWeight: FontWeight.w300,
                     height: 1.6,
-                    color: Colors.black,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -466,7 +466,7 @@ _signInUser() async {
         ),
         _buildSocialButton(
           iconImage: AssetImage(googleIcon),
-          color: Colors.black,
+            color: Colors.black,
           onTap: () async {
             User? user = await signInWithGoogle();
             if( user != null){
@@ -481,7 +481,7 @@ _signInUser() async {
         ),
         _buildSocialButton(
           icon: FontAwesomeIcons.apple,
-          color: Colors.black,
+            color: Colors.black,
           onTap: () => Get.offNamed('/reportIssues'),
         ),
       ],

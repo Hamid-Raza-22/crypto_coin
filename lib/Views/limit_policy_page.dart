@@ -9,7 +9,7 @@ class LimitsPolicyPage extends StatelessWidget {
 
       appBar: AppBar(
         title: Text('Limits Policy'),
-        backgroundColor: Colors.white,
+        backgroundColor:Theme.of(context).scaffoldBackgroundColor ,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),

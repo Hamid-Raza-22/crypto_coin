@@ -139,7 +139,7 @@ class WalletDepositScreen extends StatelessWidget {
               children: [
                 Text(
                   'Tron (TRC20)',
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 // IconButton(
                 //   icon: const Icon(Icons.swap_horiz),
@@ -157,7 +157,7 @@ class WalletDepositScreen extends StatelessWidget {
                 Flexible(
                   child: Text(
                     publicKey!,
-                    style: Theme.of(context).textTheme.titleMedium,
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
                 IconButton(

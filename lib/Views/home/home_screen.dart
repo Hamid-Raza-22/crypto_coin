@@ -169,7 +169,7 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
             }
 
             return AlertDialog(
-              title: Text('Account Activation Required', style: TextStyle(color: Colors.black),),
+              title: Text('Account Activation Required', style: TextStyle(  color: Theme.of(context).textTheme.bodyMedium?.color),),
               content: Text(
                 'Your account is not activated yet. To activate your account, transfer 100 TRX to your current TRON address. After receiving 100 TRX, immediately click on Energy and stake your 100 TRX to avoid network fees. Otherwise, you will incur a cost of 5 to 10 USDT per transaction.',
                 style: TextStyle(fontSize: 14),
@@ -484,37 +484,37 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
         // Align children horizontally in the center
         children: [
           // Existing Portfolio Balance Section
-          const Text(
+           Text(
             'Portfolio Balance',
             style: TextStyle(
               fontFamily: 'Readex Pro',
               fontSize: 24,
               fontWeight: FontWeight.w600,
-              color: Colors.black,
+              color: Theme.of(context).textTheme.bodyMedium?.color,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 25),
           Text(
             '\$${totalAssetsInUSDT.toStringAsFixed(1)}', // Total in USDT
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Readex Pro',
               fontSize: 30,
               fontWeight: FontWeight.w600,
-              color: Colors.black,
+              color: Theme.of(context).textTheme.bodyMedium?.color,
             ),
             textAlign: TextAlign.center,
           ),
 
           // New Resources Section
           const SizedBox(height: 40),
-          const Text(
+           Text(
             'Resources',
             style: TextStyle(
               fontFamily: 'Readex Pro',
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: Theme.of(context).textTheme.bodyMedium?.color,
             ),
           ),
           const SizedBox(height: 20),

@@ -33,7 +33,7 @@ class _ThreeStepLockScreenState extends State<ThreeStepLockScreen> {
         return false; // Prevents the default behavior of closing the app
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor:    Theme.of(context).scaffoldBackgroundColor,
         appBar: CustomAppBar(
           imageUrl: logo,
           title: 'C Coin',
@@ -49,20 +49,20 @@ class _ThreeStepLockScreenState extends State<ThreeStepLockScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 20),
-                    const Text(
+                     Text(
                       'Get started in 3 easy steps',
                       style: TextStyle(
                         fontFamily: 'Readex Pro',
                         fontSize: 30,
                         fontWeight: FontWeight.w600,
                         height: 1.2,
-                        color: Colors.black,
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
                     _buildLockImage(),
-                    const Center(
+                     Center(
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -79,7 +79,7 @@ class _ThreeStepLockScreenState extends State<ThreeStepLockScreen> {
                               fontFamily: 'Readex Pro',
                               fontSize: 21,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black,
+                                color: Theme.of(context).textTheme.bodyMedium?.color,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -87,7 +87,7 @@ class _ThreeStepLockScreenState extends State<ThreeStepLockScreen> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    const Center(
+                    Center(
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -103,7 +103,7 @@ class _ThreeStepLockScreenState extends State<ThreeStepLockScreen> {
                               fontFamily: 'Readex Pro',
                               fontSize: 21,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black,
+                                color: Theme.of(context).textTheme.bodyMedium?.color,
                             ),
                             textAlign: TextAlign.center,
                           ),

@@ -60,6 +60,9 @@ class MyApp extends StatelessWidget {
       ),
       darkTheme: ThemeData.dark().copyWith(
         textTheme: const TextTheme(
+          titleLarge: TextStyle(
+            color: Colors.black
+          ),
           bodyMedium: TextStyle(
             color: Colors.white, // Custom text color for dark mode
           ),

@@ -105,14 +105,14 @@ class _SignupScreenState extends State<SignupScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 20),
-                  const Text(
+                   Text(
                     'Hello! Start your crypto investment today',
                     style: TextStyle(
                       fontFamily: 'Readex Pro',
                       fontSize: 32,
                       fontWeight: FontWeight.w600,
                       height: 1.75,
-                      color: Colors.black,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -154,14 +154,14 @@ class _SignupScreenState extends State<SignupScreen> {
                     borderRadius: 15.0,
                   ),
                   const SizedBox(height: 55),
-                  const Center(
+                  Center(
                     child: Text(
                       'Already have an account?',
                       style: TextStyle(
                         fontFamily: 'Readex Pro',
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                          color: Theme.of(context).textTheme.bodyMedium?.color
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -215,8 +215,9 @@ class _SignupScreenState extends State<SignupScreen> {
       iconColor: Colors.black,
       spacing: 10,
       textAlign: TextAlign.left,
-      textStyle: const TextStyle(
-        color: Colors.black,
+      textStyle:  TextStyle(
+        color:Theme.of(context).scaffoldBackgroundColor ,
+
         fontSize: 14,
         fontWeight: FontWeight.bold,
       ),

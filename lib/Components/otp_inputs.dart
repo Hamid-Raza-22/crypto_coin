@@ -47,25 +47,26 @@ class _CustomEditableOTPInputState extends State<CustomEditableOTPInput> {
         return SizedBox(
           width: 50,
           child: TextField(
+            autofocus: true,
             controller: _controllers[index],
             focusNode: _focusNodes[index],
             maxLength: 1,
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Theme.of(context).textTheme.bodyMedium?.color, // Explicitly set text color
+            ),
             onChanged: (value) {
               if (value.length == 1 && index < widget.length - 1) {
                 FocusScope.of(context).requestFocus(_focusNodes[index + 1]);
               }
-
               if (value.isEmpty && index > 0) {
                 FocusScope.of(context).requestFocus(_focusNodes[index - 1]);
               }
-
               // Update the combined OTP in the main controller
               if (widget.controller != null) {
                 widget.controller!.text = _controllers.map((e) => e.text).join();
               }
-
               // Call onCompleted when all fields are filled
               if (_controllers.every((controller) => controller.text.isNotEmpty)) {
                 String otp = _controllers.map((e) => e.text).join();

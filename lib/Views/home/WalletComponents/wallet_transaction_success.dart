@@ -32,7 +32,7 @@ class _ConfirmEmailScreenState extends State<WalletTransactionSuccess> {
         return false; // Prevents the default behavior of closing the app
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor:  Theme.of(context).scaffoldBackgroundColor,
         appBar: CustomAppBar(
           imageUrl: logo,
           title: 'C Coin',
@@ -50,25 +50,25 @@ class _ConfirmEmailScreenState extends State<WalletTransactionSuccess> {
                     const SizedBox(height: 30),
                     _buildLockImage(),
                     const SizedBox(height: 20),
-                    const Text(
+                     Text(
                       'Transaction Successful',
                       style: TextStyle(
                         fontFamily: 'Readex Pro',
                         fontSize: 25,
                         fontWeight: FontWeight.w600,
                         height: 1.2,
-                        color: Colors.black,
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 5),
-                    const Text(
+                     Text(
                       'You have successfully initiated the transaction. Amount will reflect in wallet within 1 hour',
                       style: TextStyle(
                         fontFamily: 'Readex Pro',
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                       textAlign: TextAlign.center,
                     ),

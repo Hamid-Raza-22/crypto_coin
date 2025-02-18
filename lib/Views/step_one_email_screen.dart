@@ -106,14 +106,14 @@ class StepOneEmailScreenState extends State<StepOneEmailScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 15),
-            const Text(
+             Text(
               'What’s your email?',
               style: TextStyle(
                 fontFamily: 'Readex Pro',
                 fontSize: 32,
                 fontWeight: FontWeight.w600,
                 height: 1.75,
-                color: Colors.black,
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
               ),
               textAlign: TextAlign.center,
             ),
@@ -150,26 +150,26 @@ class StepOneEmailScreenState extends State<StepOneEmailScreen> {
               onTap: _isLoading ? null : _verifyEmail,
             ),
             const SizedBox(height: 40),
-            const Text(
+            Text(
               'By registering you accept our Terms & Conditions and Privacy Policy. Your data will be securely encrypted with TLS',
               style: TextStyle(
                 fontFamily: 'Readex Pro',
                 fontSize: 11,
                 fontWeight: FontWeight.w300,
                 height: 1.6,
-                color: Colors.black,
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 80),
-            const Text(
+           Text(
               '----------- or continue with -----------',
               style: TextStyle(
                 fontFamily: 'Readex Pro',
                 fontSize: 14,
                 fontWeight: FontWeight.w300,
                 height: 1.6,
-                color: Colors.black,
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
               ),
               textAlign: TextAlign.center,
             ),
@@ -195,7 +195,7 @@ class StepOneEmailScreenState extends State<StepOneEmailScreen> {
         ),
         _buildSocialButton(
           iconImage: AssetImage(googleIcon),
-          color: Colors.black,
+            color: Colors.black,
           onTap: () async {
             User? user = await signInWithGoogle();
             if( user !=null){
@@ -207,7 +207,7 @@ class StepOneEmailScreenState extends State<StepOneEmailScreen> {
         ),
         _buildSocialButton(
           icon: FontAwesomeIcons.apple,
-          color: Colors.black,
+            color: Colors.black,
           onTap: () => Get.offNamed('/reportIssues'),
         ),
       ],

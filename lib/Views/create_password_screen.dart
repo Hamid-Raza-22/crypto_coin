@@ -143,25 +143,25 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 15),
-                const Text(
+                 Text(
                   'Create a password',
                   style: TextStyle(
                     fontFamily: 'Readex Pro',
                     fontSize: 32,
                     fontWeight: FontWeight.w600,
                     height: 0.5,
-                    color: Colors.black,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                 Text(
                   'The password must be 8 characters, including 1 uppercase letter, 1 number, and 1 special character.',
                   style: TextStyle(
                     fontFamily: 'Readex Pro',
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -233,14 +233,14 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),
-                const Text(
+                 Text(
                   '----------- or continue with -----------',
                   style: TextStyle(
                     fontFamily: 'Readex Pro',
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                     height: 1.6,
-                    color: Colors.black,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -266,12 +266,12 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
         ),
         _buildSocialButton(
           iconImage: AssetImage(googleIcon),
-          color: Colors.black,
+            color: Colors.black,
           onTap: () => Get.offNamed('/reportIssues'),
         ),
         _buildSocialButton(
           icon: FontAwesomeIcons.apple,
-          color: Colors.black,
+            color:Colors.black,
           onTap: () => Get.offNamed('/reportIssues'),
         ),
       ],
