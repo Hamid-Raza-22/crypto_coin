@@ -12,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../Services/FirebaseServices/sign_in_with_google.dart';
 import '../ViewModels/theme_provider.dart';
 import '../ViewModels/user_provider_logic.dart';
-
+import 'package:share_plus/share_plus.dart';
 class SettingsPage extends StatefulWidget {
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -186,7 +186,10 @@ class _SettingsPageState extends State<SettingsPage> {
           // More Section
           buildSectionTitle('More'),
           // buildListTile(Icons.card_giftcard, 'My bonus', () {}),
-         // buildListTile(Icons.share, 'Share with friends', () {}),
+         buildListTile(Icons.share, 'Share with friends', () {
+           Share.share('Check out this awesome C Coin app! https://adminportal.cryptocoinworld.net/CCoinv0.1.6.apk');
+         }),
+
           buildListTile(Icons.support, 'Support', () {
             Navigator.push(
               context,
