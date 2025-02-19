@@ -11,6 +11,10 @@ import '../Components/custom_editable_menu_option.dart';
 import '../Components/custom_social_button.dart';
 import '../Services/FirebaseServices/send_otp_email.dart';
 import '../Services/FirebaseServices/sign_in_with_google.dart';
+import '../Services/FirebaseServices/sign_up_with_google.dart';
+import '../Services/FirebaseServices/sign_up_with_google.dart';
+import '../Services/FirebaseServices/sign_up_with_google.dart';
+import '../Services/FirebaseServices/sign_up_with_google.dart';
 
 class StepOneEmailScreen extends StatefulWidget {
   const StepOneEmailScreen({super.key});
@@ -196,20 +200,21 @@ class StepOneEmailScreenState extends State<StepOneEmailScreen> {
         _buildSocialButton(
           iconImage: AssetImage(googleIcon),
             color: Colors.black,
-          onTap: () async {
-            User? user = await signInWithGoogle();
-            if( user !=null){
-              Get.offNamed(AppRoutes.homeScreen);
-            }else{
-
-            }
-          } ,
+          onTap: signUpWithGoogle
+          // onTap: () async {
+          //   User? user = await signInWithGoogle();
+          //   if( user !=null){
+          //     Get.offNamed(AppRoutes.homeScreen);
+          //   }else{
+          //
+          //   }
+          // } ,
         ),
-        _buildSocialButton(
-          icon: FontAwesomeIcons.apple,
-            color: Colors.black,
-          onTap: () => Get.offNamed('/reportIssues'),
-        ),
+        // _buildSocialButton(
+        //   icon: FontAwesomeIcons.apple,
+        //     color: Colors.black,
+        //   onTap: () => Get.offNamed('/reportIssues'),
+        // ),
       ],
     );
   }

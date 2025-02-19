@@ -245,7 +245,7 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 50),
-                _buildSocialButtons(context),
+               // _buildSocialButtons(context),
                 const SizedBox(height: 40),
               ],
             ),
@@ -255,28 +255,28 @@ class CreatePasswordScreenState extends State<CreatePasswordScreen> {
     );
   }
 
-  Widget _buildSocialButtons(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        _buildSocialButton(
-          icon: FontAwesomeIcons.facebookF,
-          color: Colors.blue,
-          onTap: () => Get.offNamed('/reportIssues'),
-        ),
-        _buildSocialButton(
-          iconImage: AssetImage(googleIcon),
-            color: Colors.black,
-          onTap: () => Get.offNamed('/reportIssues'),
-        ),
-        _buildSocialButton(
-          icon: FontAwesomeIcons.apple,
-            color:Colors.black,
-          onTap: () => Get.offNamed('/reportIssues'),
-        ),
-      ],
-    );
-  }
+  // Widget _buildSocialButtons(BuildContext context) {
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.spaceAround,
+  //     children: [
+  //       _buildSocialButton(
+  //         icon: FontAwesomeIcons.facebookF,
+  //         color: Colors.blue,
+  //         onTap: () => Get.offNamed('/reportIssues'),
+  //       ),
+  //       _buildSocialButton(
+  //         iconImage: AssetImage(googleIcon),
+  //           color: Colors.black,
+  //         onTap: () => Get.offNamed('/reportIssues'),
+  //       ),
+  //       // _buildSocialButton(
+  //       //   icon: FontAwesomeIcons.apple,
+  //       //     color:Colors.black,
+  //       //   onTap: () => Get.offNamed('/reportIssues'),
+  //       // ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildSocialButton({
     IconData? icon,

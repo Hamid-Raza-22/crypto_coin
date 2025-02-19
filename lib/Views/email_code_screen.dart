@@ -1,5 +1,6 @@
 import 'package:crypto_coin/Components/custom_appbar.dart';
 import 'package:crypto_coin/Components/otp_inputs.dart';
+import 'package:crypto_coin/Services/FirebaseServices/sign_up_with_google.dart';
 import 'package:crypto_coin/Utilities/global_variables.dart';
 import 'package:crypto_coin/Views/AppRoutes/app_routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -195,20 +196,21 @@ class StepOneEmailScreenState extends State<EmailCodeScreen> {
         _buildSocialButton(
           iconImage: AssetImage(googleIcon),
             color:Colors.black,
-          onTap: () async {
-            User? user = await signInWithGoogle();
-            if( user !=null){
-              Get.offNamed(AppRoutes.homeScreen);
-            }else{
-
-            }
-          } ,
+          onTap: signUpWithGoogle
+          // onTap: () async {
+          //   User? user = await signInWithGoogle();
+          //   if( user !=null){
+          //     Get.offNamed(AppRoutes.homeScreen);
+          //   }else{
+          //
+          //   }
+          // } ,
         ),
-        _buildSocialButton(
-          icon: FontAwesomeIcons.apple,
-            color:Colors.black,
-          onTap: () => Get.offNamed('/reportIssues'),
-        ),
+        // _buildSocialButton(
+        //   icon: FontAwesomeIcons.apple,
+        //     color:Colors.black,
+        //   onTap: () => Get.offNamed('/reportIssues'),
+        // ),
       ],
     );
   }

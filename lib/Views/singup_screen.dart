@@ -131,13 +131,13 @@ class _SignupScreenState extends State<SignupScreen> {
                     iconImage: const AssetImage(googleIcon),
                      onTap: signUpWithGoogle,
                   ),
-                  const SizedBox(height: 10),
-                  _buildSocialButton(
-                    context: context,
-                    text: 'Continue with Apple',
-                    icon: FontAwesomeIcons.apple,
-                    onTap: _signUpWithApple,
-                  ),
+                  const SizedBox(height: 20),
+                  // _buildSocialButton(
+                  //   context: context,
+                  //   text: 'Continue with Apple',
+                  //   icon: FontAwesomeIcons.apple,
+                  //   onTap: _signUpWithApple,
+                  // ),
                   const SizedBox(height: 10),
                   CustomButton(
                     width: screenSize.width * _buttonWidthFactor,
@@ -216,7 +216,7 @@ class _SignupScreenState extends State<SignupScreen> {
       spacing: 10,
       textAlign: TextAlign.left,
       textStyle:  TextStyle(
-        color:Theme.of(context).scaffoldBackgroundColor ,
+        color: Theme.of(context).textTheme.bodyMedium?.color,
 
         fontSize: 14,
         fontWeight: FontWeight.bold,

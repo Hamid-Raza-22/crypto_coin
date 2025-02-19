@@ -479,11 +479,11 @@ _signInUser() async {
             }
           } ,
         ),
-        _buildSocialButton(
-          icon: FontAwesomeIcons.apple,
-            color: Colors.black,
-          onTap: () => Get.offNamed('/reportIssues'),
-        ),
+        // _buildSocialButton(
+        //   icon: FontAwesomeIcons.apple,
+        //     color: Colors.black,
+        //   onTap: () => Get.offNamed('/reportIssues'),
+        // ),
       ],
     );
   }
