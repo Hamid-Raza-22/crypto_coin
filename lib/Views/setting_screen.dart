@@ -13,6 +13,10 @@ import '../Services/FirebaseServices/sign_in_with_google.dart';
 import '../ViewModels/theme_provider.dart';
 import '../ViewModels/user_provider_logic.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'dart:io';
+
+
 class SettingsPage extends StatefulWidget {
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -62,6 +66,27 @@ class _SettingsPageState extends State<SettingsPage> {
       Navigator.of(context).pushReplacementNamed('/login');
     } catch (e) {
       print("Error during logout: $e");
+    }
+  }
+  Future<void> _launchTelegramChannel() async {
+    const String telegramLink = "https://t.me/+1lAv9emLNsM3NWE9";
+
+    try {
+      // Check if the URL can be launched
+      if (await canLaunch(telegramLink)) {
+        await launch(telegramLink);
+      } else {
+        // Fallback to opening in a browser
+        throw 'Could not launch $telegramLink';
+      }
+    } catch (e) {
+      // Show an error message or fallback behavior
+      print("Error launching URL: $e");
+
+      // Fallback to opening in a browser
+      if (Platform.isAndroid || Platform.isIOS) {
+        await launch(telegramLink, forceSafariVC: false);
+      }
     }
   }
   @override
@@ -180,6 +205,15 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
          // buildListTile(Icons.notifications, 'Notifications', () {}),
+          const Divider(),
+
+          // More Section
+          buildSectionTitle('Support'),
+
+          buildListTile(Icons.support, 'Support', () {
+            _launchTelegramChannel();
+          }),
+
 
           const Divider(),
 
@@ -187,7 +221,7 @@ class _SettingsPageState extends State<SettingsPage> {
           buildSectionTitle('More'),
           // buildListTile(Icons.card_giftcard, 'My bonus', () {}),
          buildListTile(Icons.share, 'Share with friends', () {
-           Share.share('Check out this awesome C Coin app! https://adminportal.cryptocoinworld.net/CCoinv0.1.6.apk');
+           Share.share('Check out this awesome C Coin app! https://adminportal.cryptocoinworld.net/CCoinv0.1.7.apk');
          }),
 
           buildListTile(Icons.support, 'Support', () {
@@ -245,4 +279,5 @@ class _SettingsPageState extends State<SettingsPage> {
       onTap: onTap,
     );
   }
+
 }
