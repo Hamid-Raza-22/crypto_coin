@@ -1,16 +1,15 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:convert/convert.dart';
- import 'package:base58check/base58check.dart';
-
+import 'package:base58check/base58check.dart';
 
 class WalletService {
-  /// Generate Ethereum Wallet
-  Map<String, String> generateEthereumWallet() {
+  /// Generate BEP20 Wallet (Binance Smart Chain)
+  /// BEP20 uses the same address format as Ethereum but on the Binance Smart Chain.
+  Map<String, String> generateBep20Wallet() {
     final rng = Random.secure();
     EthPrivateKey privateKey = EthPrivateKey.createRandom(rng);
 
@@ -23,8 +22,7 @@ class WalletService {
     };
   }
 
-  /// Generate Tron Wallet
-  /// Generate Tron Wallet
+  /// Generate Tron Wallet (TRC20)
   Map<String, String> generateTronWallet() {
     final rng = Random.secure();
 
@@ -61,13 +59,11 @@ class WalletService {
     return hex.encode(bytes);
   }
 
-
-
   /// Save Wallet Data to Firebase
-  Future<void> _saveToFirebase(String email, Map<String, dynamic> walletData) async {
+  Future<void> saveWalletToFirebase(String email, String walletType, Map<String, dynamic> walletData) async {
     final userDoc = FirebaseFirestore.instance.collection('wallets').doc(email);
-    await userDoc.set(walletData, SetOptions(merge: true));
+    await userDoc.set({
+      walletType: walletData
+    }, SetOptions(merge: true));
   }
 }
-
-
