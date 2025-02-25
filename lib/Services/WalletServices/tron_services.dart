@@ -315,27 +315,35 @@ class TronService {
   // 10. Get Energy and Bandwidth Resources
   Future<Map<String, dynamic>?> getResources() async {
     try {
-      // Call the backend API to fetch resource details
       final response = await http.get(
         Uri.parse('$baseUrl/getResources?address=$publicKey'),
       );
 
-      // Check if the request was successful
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        print("API Response: $data"); // Log the full API response
 
-        // Parse and return the resource details
         if (data['success'] == true) {
+          // Extract energy and bandwidth details
+          final energyAvailable = data['resources']['energy']['available'];
+          final energyLimit = data['resources']['energy']['limit'];
+          final bandwidthAvailable = data['resources']['bandwidth']['available'];
+          final bandwidthLimit = data['resources']['bandwidth']['limit'];
+
+          // Log extracted values
+          print("Energy - Available: $energyAvailable, Limit: $energyLimit");
+          print("Bandwidth - Available: $bandwidthAvailable, Limit: $bandwidthLimit");
+
           return {
             'energy': {
-              'limit': data['resources']['energy']['limit'],
+              'limit': energyLimit,
               'used': data['resources']['energy']['used'],
-              'available': data['resources']['energy']['available'],
+              'available': energyAvailable,
             },
             'bandwidth': {
-              'limit': data['resources']['bandwidth']['limit'],
+              'limit': bandwidthLimit,
               'used': data['resources']['bandwidth']['used'],
-              'available': data['resources']['bandwidth']['available'],
+              'available': bandwidthAvailable,
             },
           };
         } else {
@@ -350,5 +358,4 @@ class TronService {
       print("Error fetching resources: $e");
       return null;
     }
-  }
-}
+  }}

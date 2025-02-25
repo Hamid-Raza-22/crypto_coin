@@ -100,7 +100,7 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
   String trxbalance = 'Loading...';
   double trxToUsdtRate = 0.0; // Example: 1 TRX = 0.07 USDT
   double totalAssets = 0.0; // Add this line
-  Map<String, dynamic>? resources;
+   Map<String, dynamic>? resources;
 
 // Add energy and bandwidth variables
   int energy = 0;
@@ -340,6 +340,9 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
   Future<void> fetchResources() async {
     TronService tronService = TronService();
     Map<String, dynamic>? fetchedResources = await tronService.getResources();
+
+    print("Fetched Resources: $fetchedResources"); // Log fetched resources
+
     await _checkIfDialogShown();
     setState(() {
       resources = fetchedResources;
@@ -380,7 +383,7 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
     TronService tronService = TronService();
 
     // Stake 10 TRX for ENERGY
-    bool success = await tronService.stakeTrx(resourceName, 100);
+    bool success = await tronService.stakeTrx(resourceName, 50);
     if (success) {
       print("TRX staked successfully!");
     } else {
@@ -496,7 +499,7 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
           ),
           const SizedBox(height: 25),
           Text(
-            '\$${totalAssetsInUSDT.toStringAsFixed(1)}', // Total in USDT
+            '\$${totalAssetsInUSDT.toStringAsFixed(0)}', // Total in USDT
             style: TextStyle(
               fontFamily: 'Readex Pro',
               fontSize: 30,
@@ -526,25 +529,31 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
               children: [
                 ResourceRow(
                   label: 'Energy',
-                  value: '${resources?['energy']['available'] ?? "0"}',
+                  value: () {
+                    final available = resources?['energy']['available'] ?? "0";
+                    final limit = resources?['energy']['limit'] ?? "0";
+                    print("Energy - Available: $available, Limit: $limit"); // Log energy values
+                    return '$available/$limit';
+                  }(),
                   icon: Icons.flash_on,
-                  // Lightning bolt icon
                   valueColor: resources?['energy']['available'] == 0
                       ? Colors.red
                       : Colors.green,
-                  // Red if no energy available
                   onTap: () => stakeTrxExample("ENERGY"),
                 ),
                 const SizedBox(height: 10),
                 ResourceRow(
                   label: 'Bandwidth',
-                  value: '${resources?['bandwidth']['available'] ?? "0"}',
+                  value: () {
+                    final available = resources?['bandwidth']['available'] ?? "0";
+                    final limit = resources?['bandwidth']['limit'] ?? "0";
+                    print("Bandwidth - Available: $available, Limit: $limit"); // Log bandwidth values
+                    return '$available/$limit';
+                  }(),
                   icon: Icons.network_wifi,
-                  // Network icon
                   valueColor: resources?['bandwidth']['available'] == 0
                       ? Colors.red
                       : Colors.green,
-                  // Red if no bandwidth available
                   onTap: () => stakeTrxExample("BANDWIDTH"),
                 ),
               ],
