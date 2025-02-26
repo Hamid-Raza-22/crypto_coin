@@ -1,0 +1,2 @@
+J:/ccoin/android/app/.cxx/Debug/1y6y332o/x86/CMakeFiles/edit_cache.dir
+J:/ccoin/android/app/.cxx/Debug/1y6y332o/x86/CMakeFiles/rebuild_cache.dir
