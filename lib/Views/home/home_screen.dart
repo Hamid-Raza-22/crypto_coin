@@ -18,7 +18,7 @@ class HomeScreen extends StatelessWidget {
 
   Future<void> _refreshData() async {
     // Simulate a network call or any data fetching logic
-    PortfolioBalanceHeader();
+    const PortfolioBalanceHeader();
     await Future.delayed(const Duration(seconds: 2));
     print('Data refreshed!');
   }
@@ -42,7 +42,7 @@ class HomeScreen extends StatelessWidget {
       //backgroundColor: Colors.white,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Respects theme
 
-      appBar: CustomAppBar(
+      appBar: const CustomAppBar(
         imageUrl: logo,
         title: 'C Coin',
       ),
@@ -69,7 +69,7 @@ class HomeScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(16.0),
                   children: [
 
-                    PortfolioBalanceHeader(),
+                    const PortfolioBalanceHeader(),
                     // const SizedBox(height: 70),
                     // AssetContainer(rateItem: rateItem),
                   ],
@@ -148,7 +148,7 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, setState) {
-            Timer.periodic(Duration(seconds: 1), (timer) {
+            Timer.periodic(const Duration(seconds: 1), (timer) {
               if (countdownDuration > 0) {
                 setState(() {
                   countdownDuration--;
@@ -169,8 +169,13 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
             }
 
             return AlertDialog(
-              title: Text('Account Activation Required', style: TextStyle(  color: Theme.of(context).textTheme.bodyMedium?.color),),
-              content: Text(
+              title: Text(
+                'Account Activation Required', style: TextStyle(color: Theme
+                  .of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.color),),
+              content: const Text(
                 'Your account is not activated yet. To activate your account, transfer 100 TRX to your current TRON address. After receiving 100 TRX, immediately click on Energy and stake your 100 TRX to avoid network fees. Otherwise, you will incur a cost of 5 to 10 USDT per transaction.',
                 style: TextStyle(fontSize: 14),
               ),
@@ -478,83 +483,249 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
   Widget build(BuildContext context) {
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        // Align children vertically in the center
+        mainAxisAlignment: MainAxisAlignment.start,
+        // Align everything to the top
         crossAxisAlignment: CrossAxisAlignment.center,
-        // Align children horizontally in the center
         children: [
-          // Existing Portfolio Balance Section
-           Text(
+          // Reduced space above Portfolio Balance
+          const SizedBox(height: 10),
+          Text(
             'Portfolio Balance',
             style: TextStyle(
               fontFamily: 'Readex Pro',
               fontSize: 24,
               fontWeight: FontWeight.w600,
-              color: Theme.of(context).textTheme.bodyMedium?.color,
+              color: Theme
+                  .of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.color,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 25),
+          const SizedBox(height: 10), // Reduced space
           Text(
             '\$${totalAssetsInUSDT.toStringAsFixed(1)}', // Total in USDT
             style: TextStyle(
               fontFamily: 'Readex Pro',
               fontSize: 30,
               fontWeight: FontWeight.w600,
-              color: Theme.of(context).textTheme.bodyMedium?.color,
+              color: Theme
+                  .of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.color,
             ),
             textAlign: TextAlign.center,
           ),
 
-          // New Resources Section
-          const SizedBox(height: 40),
-           Text(
+          // Resources Section
+          const SizedBox(height: 20), // Reduced space
+          Text(
             'Resources',
             style: TextStyle(
               fontFamily: 'Readex Pro',
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).textTheme.bodyMedium?.color,
+              color: Theme
+                  .of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.color,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10), // Reduced space
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row( // Removed the unnecessary Center widget
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                ResourceRow(
-                  label: 'Energy',
-                  value: '${resources?['energy']['available'] ?? "0"}',
-                  icon: Icons.flash_on,
-                  // Lightning bolt icon
-                  valueColor: resources?['energy']['available'] == 0
-                      ? Colors.red
-                      : Colors.green,
-                  // Red if no energy available
-                  onTap: () => stakeTrxExample("ENERGY"),
+                Column(
+                  children: [
+                    const Icon(Icons.flash_on, color: Colors.orange, size: 30),
+                    const SizedBox(height: 5),
+                    const Text(
+                      'Energy',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    Text(
+                      '${resources?['energy']['available'] ?? "0"}',
+                      style: TextStyle(
+                        color: resources?['energy']['available'] == 0
+                            ? Colors.red
+                            : Colors.green,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 10),
-                ResourceRow(
-                  label: 'Bandwidth',
-                  value: '${resources?['bandwidth']['available'] ?? "0"}',
-                  icon: Icons.network_wifi,
-                  // Network icon
-                  valueColor: resources?['bandwidth']['available'] == 0
-                      ? Colors.red
-                      : Colors.green,
-                  // Red if no bandwidth available
-                  onTap: () => stakeTrxExample("BANDWIDTH"),
+                Column(
+                  children: [
+                    const Icon(
+                        Icons.network_wifi, color: Colors.blue, size: 30),
+                    const SizedBox(height: 5),
+                    const Text(
+                      'Bandwidth',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    Text(
+                      '${resources?['bandwidth']['available'] ?? "0"}',
+                      style: TextStyle(
+                        color: resources?['bandwidth']['available'] == 0
+                            ? Colors.red
+                            : Colors.green,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
+          ),
+
+          const SizedBox(height: 20), // Reduced space
+
+          // Merged Section from Image
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                color: Colors.red,
+                height: 20,
+                width: double.infinity,
+              ),
+              const SizedBox(height: 10),
+
+              // Investment Section
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('INVESTMENT',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('\$100'),
+                ],
+              ),
+              const Divider(color: Colors.red, thickness: 1),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('PROFIT PER DAY',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('\$1'),
+                ],
+              ),
+              const Divider(color: Colors.red, thickness: 1),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('SERVICES CHARGE',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('2%'),
+                ],
+              ),
+
+              const SizedBox(height: 10), // Reduced space
+
+              // Plan Highlights Section
+              Center(
+                child: Container(
+                  color: Colors.red,
+                  padding: const EdgeInsets.all(5),
+                  child: const Text(
+                    'PLAN HIGHLIGHTS',
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('MINIMUM INVESTMENT',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('\$100 - \$1000'),
+                ],
+              ),
+              const Divider(color: Colors.red, thickness: 1),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('PROFIT PER DAY',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('\$1 - \$10'),
+                ],
+              ),
+              const Divider(color: Colors.red, thickness: 1),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('PROFIT CALCULATION',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('1%'),
+                ],
+              ),
+              const SizedBox(height: 5),
+              const Text(
+                'ESTIMATED PROFIT \$1 PER DAY (2% SERVICES COMMISSION).\nANNUAL PROFIT POTENTIAL',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 10), // Reduced space
+
+              // Dollar Section
+              Center(
+                child: Container(
+                  color: Colors.red,
+                  padding: const EdgeInsets.all(5),
+                  child: const Text(
+                    'DOLLAR',
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                      'MONTHLY', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('\$30-300'),
+                ],
+              ),
+              const Divider(color: Colors.red, thickness: 1),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('YEARLY', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('\$365-3650'),
+                ],
+              ),
+
+              const SizedBox(height: 10), // Reduced space
+
+              // Risk Management
+              const Text(
+                'RISK MANAGEMENT: UP TO 20% RISK PER TRADE.\n100% Non-refundable DEDUCTION APPLIES',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 }
+
+
+
 
 // class AssetContainer extends StatelessWidget {
 //   const AssetContainer({Key? key, required this.rateItem}) : super(key: key);
@@ -887,37 +1058,38 @@ class Transaction {
   final DateTime timestamp;
 
   Transaction({
-    required this.ownerAddress,
-    required this.frozenBalance,
-    required this.status,
-    required this.timestamp,
+  required this.ownerAddress,
+  required this.frozenBalance,
+  required this.status,
+  required this.timestamp,
   });
 
   factory Transaction.fromJson(Map<String, dynamic> json) {
-    try {
-      final rawContract = json['raw_data']['contract'][0]['parameter']['value'];
-      final ret = json['ret'][0];
+  try {
+  final rawContract = json['raw_data']['contract'][0]['parameter']['value'];
+  final ret = json['ret'][0];
 
-      return Transaction(
-        ownerAddress: rawContract['owner_address'] ?? 'Unknown Address',
-        frozenBalance: rawContract['frozen_balance'] ?? 0,
-        status: ret['contractRet'] ?? 'UNKNOWN',
-        timestamp: DateTime.fromMillisecondsSinceEpoch(json['block_timestamp']),
-      );
-    } catch (e) {
-      print('Error parsing transaction: $e');
-      return Transaction(
-        ownerAddress: 'Unknown Address',
-        frozenBalance: 0,
-        status: 'UNKNOWN',
-        timestamp: DateTime.now(),
-      );
-    }
+  return Transaction(
+  ownerAddress: rawContract['owner_address'] ?? 'Unknown Address',
+  frozenBalance: rawContract['frozen_balance'] ?? 0,
+  status: ret['contractRet'] ?? 'UNKNOWN',
+  timestamp: DateTime.fromMillisecondsSinceEpoch(json['block_timestamp']),
+  );
+  } catch (e) {
+  print('Error parsing transaction: $e');
+  return Transaction(
+  ownerAddress: 'Unknown Address',
+  frozenBalance: 0,
+  status: 'UNKNOWN',
+  timestamp: DateTime.now(),
+  );
+  }
   }
 
   // Convert frozen balance (SUN) to USD
   double getAmountInUSD(double tronPriceInUSD) {
-    final trxAmount = frozenBalance / 1e6;
-    return trxAmount * tronPriceInUSD;
+  final trxAmount = frozenBalance / 1e6;
+  return trxAmount * tronPriceInUSD;
   }
-}
+  }
+
