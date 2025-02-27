@@ -53,7 +53,6 @@ dependencies:
   firebase_app_check: ^0.3.1+7
 #  flutter_email_sender: ^6.0.3
 #  email_otp: ^3.0.2
-  onesignal_flutter: ^5.2.9
   firebase_messaging: ^15.1.6
   http: ^1.2.2
   fl_chart: ^0.70.0
