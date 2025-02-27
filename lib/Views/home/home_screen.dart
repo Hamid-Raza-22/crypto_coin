@@ -567,142 +567,138 @@ class _PortfolioBalanceHeaderState extends State<PortfolioBalanceHeader> {
               ],
             ),
           ),
+      //     const SizedBox(height: 20), // Reduced space
+      // // Merged Section from Image
+      // Column(
+      //   crossAxisAlignment: CrossAxisAlignment.start,
+      //   children: [
+      //     Container(
+      //       color: Colors.red,
+      //       height: 20,
+      //       width: double.infinity,
+      //     ),
+      //     const SizedBox(height: 10),
+      //
+      //     // Investment Section
+      //     const Row(
+      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //       children: [
+      //         Text('INVESTMENT',
+      //             style: TextStyle(fontWeight: FontWeight.bold)),
+      //         Text('\$100'),
+      //       ],
+      //     ),
+      //     const Divider(color: Colors.red, thickness: 1),
+      //     const Row(
+      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //       children: [
+      //         Text('PROFIT PER DAY',
+      //             style: TextStyle(fontWeight: FontWeight.bold)),
+      //         Text('\$1'),
+      //       ],
+      //     ),
+      //     const Divider(color: Colors.red, thickness: 1),
+      //     const Row(
+      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //       children: [
+      //         Text('SERVICES CHARGE',
+      //             style: TextStyle(fontWeight: FontWeight.bold)),
+      //         Text('2%'),
+      //       ],
+      //     ),
+      //
+      //     const SizedBox(height: 10), // Reduced space
+      //
+      //     // Plan Highlights Section
+      //     Center(
+      //       child: Container(
+      //         color: Colors.red,
+      //         padding: const EdgeInsets.all(5),
+      //         child: const Text(
+      //           'PLAN HIGHLIGHTS',
+      //           style: TextStyle(
+      //               color: Colors.white, fontWeight: FontWeight.bold),
+      //         ),
+      //       ),
+      //     ),
+      //     const SizedBox(height: 10),
+      //     const Row(
+      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //       children: [
+      //         Text('MINIMUM INVESTMENT',
+      //             style: TextStyle(fontWeight: FontWeight.bold)),
+      //         Text('\$100 - \$1000'),
+      //       ],
+      //     ),
+      //     const Divider(color: Colors.red, thickness: 1),
+      //     const Row(
+      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //       children: [
+      //         Text('PROFIT PER DAY',
+      //             style: TextStyle(fontWeight: FontWeight.bold)),
+      //         Text('\$1 - \$10'),
+      //       ],
+      //     ),
+      //     const Divider(color: Colors.red, thickness: 1),
+      //     const Row(
+      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //       children: [
+      //         Text('PROFIT CALCULATION',
+      //             style: TextStyle(fontWeight: FontWeight.bold)),
+      //         Text('1%'),
+      //       ],
+      //     ),
+      //     const SizedBox(height: 5),
+      //     const Text(
+      //       'ESTIMATED PROFIT \$1 PER DAY (2% SERVICES COMMISSION).\nANNUAL PROFIT POTENTIAL',
+      //       style: TextStyle(fontWeight: FontWeight.bold),
+      //     ),
+      //
+      //     const SizedBox(height: 10), // Reduced space
+      //
+      //     // Dollar Section
+      //     Center(
+      //       child: Container(
+      //         color: Colors.red,
+      //         padding: const EdgeInsets.all(5),
+      //         child: const Text(
+      //           'DOLLAR',
+      //           style: TextStyle(
+      //               color: Colors.white, fontWeight: FontWeight.bold),
+      //         ),
+      //       ),
+      //     ),
+      //     const SizedBox(height: 10),
+      //     const Row(
+      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //       children: [
+      //         Text(
+      //             'MONTHLY', style: TextStyle(fontWeight: FontWeight.bold)),
+      //         Text('\$30-300'),
+      //       ],
+      //     ),
+      //     const Divider(color: Colors.red, thickness: 1),
+      //     const Row(
+      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //       children: [
+      //         Text('YEARLY', style: TextStyle(fontWeight: FontWeight.bold)),
+      //         Text('\$365-3650'),
+      //       ],
+      //     ),
+      //
+      //     const SizedBox(height: 10), // Reduced space
+      //
+      //     // Risk Management
+      //     const Text(
+      //       'RISK MANAGEMENT: UP TO 20% RISK PER TRADE.\n100% Non-refundable DEDUCTION APPLIES',
+      //       style: TextStyle(
+      //           fontWeight: FontWeight.bold, color: Colors.black),
+      //     ),
+      //   ],
+      // )
         ],
       ),
-      const SizedBox(height: 20), // Reduced space
-
-      // Merged Section from Image
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            color: Colors.red,
-            height: 20,
-            width: double.infinity,
-          ),
-          const SizedBox(height: 10),
-
-          // Investment Section
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('INVESTMENT',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('\$100'),
-            ],
-          ),
-          const Divider(color: Colors.red, thickness: 1),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('PROFIT PER DAY',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('\$1'),
-            ],
-          ),
-          const Divider(color: Colors.red, thickness: 1),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('SERVICES CHARGE',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('2%'),
-            ],
-          ),
-
-          const SizedBox(height: 10), // Reduced space
-
-          // Plan Highlights Section
-          Center(
-            child: Container(
-              color: Colors.red,
-              padding: const EdgeInsets.all(5),
-              child: const Text(
-                'PLAN HIGHLIGHTS',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('MINIMUM INVESTMENT',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('\$100 - \$1000'),
-            ],
-          ),
-          const Divider(color: Colors.red, thickness: 1),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('PROFIT PER DAY',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('\$1 - \$10'),
-            ],
-          ),
-          const Divider(color: Colors.red, thickness: 1),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('PROFIT CALCULATION',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('1%'),
-            ],
-          ),
-          const SizedBox(height: 5),
-          const Text(
-            'ESTIMATED PROFIT \$1 PER DAY (2% SERVICES COMMISSION).\nANNUAL PROFIT POTENTIAL',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-
-          const SizedBox(height: 10), // Reduced space
-
-          // Dollar Section
-          Center(
-            child: Container(
-              color: Colors.red,
-              padding: const EdgeInsets.all(5),
-              child: const Text(
-                'DOLLAR',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                  'MONTHLY', style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('\$30-300'),
-            ],
-          ),
-          const Divider(color: Colors.red, thickness: 1),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('YEARLY', style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('\$365-3650'),
-            ],
-          ),
-
-          const SizedBox(height: 10), // Reduced space
-
-          // Risk Management
-          const Text(
-            'RISK MANAGEMENT: UP TO 20% RISK PER TRADE.\n100% Non-refundable DEDUCTION APPLIES',
-            style: TextStyle(
-                fontWeight: FontWeight.bold, color: Colors.black),
-          ),
-        ],
-      ),
-      ],
-    ),
     );
-
   }
 }
 

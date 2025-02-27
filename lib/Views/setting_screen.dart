@@ -221,15 +221,15 @@ class _SettingsPageState extends State<SettingsPage> {
           buildSectionTitle('More'),
           // buildListTile(Icons.card_giftcard, 'My bonus', () {}),
          buildListTile(Icons.share, 'Share with friends', () {
-           Share.share('Check out this awesome C Coin app! https://adminportal.cryptocoinworld.net/CCoinv0.1.7.apk');
+           Share.share('Check out this awesome C Coin app! https://adminportal.cryptocoinworld.net/CCoinv0.1.8.apk');
          }),
-
-          buildListTile(Icons.support, 'Support', () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ChannelScreen()),
-            );
-          }),
+          //
+          // buildListTile(Icons.support, 'Support', () {
+          //   Navigator.push(
+          //     context,
+          //     MaterialPageRoute(builder: (context) => ChannelScreen()),
+          //   );
+          // }),
 
           const Divider(),
 

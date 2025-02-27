@@ -133,14 +133,14 @@ class WalletDepositScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildLabelText('Network', context),
+            // _buildLabelText('Network', context),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Tron (TRC20)',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
+                // Text(
+                //   'Tron (TRC20)',
+                //   style: Theme.of(context).textTheme.bodyMedium,
+                // ),
                 // IconButton(
                 //   icon: const Icon(Icons.swap_horiz),
                 //   onPressed: () {},
@@ -150,7 +150,7 @@ class WalletDepositScreen extends StatelessWidget {
             ),
           //  _buildLabelText('* Contract Information ***jLjt', context),
             const SizedBox(height: 10),
-            _buildLabelText('Deposit Address', context),
+            _buildLabelText('Deposit Tron Address', context),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -165,6 +165,29 @@ class WalletDepositScreen extends StatelessWidget {
                   onPressed: () {
                     // Text to be copied
                     final textToCopy = publicKey!;
+                    // Copy text to clipboard
+                    Clipboard.setData(ClipboardData(text: textToCopy));
+                  },
+                  tooltip: 'Copy Address',
+                ),
+              ],
+            ),const SizedBox(height: 10),
+            _buildLabelText('Deposit BNB Address', context),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                    //publicKey!,
+                    "0xcbdcf3920551939927ef12674ac8bda8631d7556",
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.copy),
+                  onPressed: () {
+                    // Text to be copied
+                    final textToCopy = "0xcbdcf3920551939927ef12674ac8bda8631d7556";
                     // Copy text to clipboard
                     Clipboard.setData(ClipboardData(text: textToCopy));
                   },

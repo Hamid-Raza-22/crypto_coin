@@ -6,12 +6,12 @@ import 'package:get/get.dart';
 
 import '../../../Utilities/global_variables.dart';
 
-class WithdrawPage extends StatefulWidget {
+class InvestmentsDepositScreen extends StatefulWidget {
   @override
   _WithdrawPageState createState() => _WithdrawPageState();
 }
 
-class _WithdrawPageState extends State<WithdrawPage> {
+class _WithdrawPageState extends State<InvestmentsDepositScreen> {
   TextEditingController _amountController = TextEditingController();
   double availableBalance = totalAssetsInUSDT;
   String selectedBank = 'Enter Public Address'; // Default bank
@@ -36,10 +36,10 @@ class _WithdrawPageState extends State<WithdrawPage> {
   void _confirmWithdraw() {
     withdrawalAmount = double.tryParse(_amountController.text) ?? 0.0; // Reuse the class-level variable
 
-    if (withdrawalAmount < 20) {
+    if (withdrawalAmount < 100) {
       Get.snackbar(
         'Invalid Amount',
-        'Please enter an amount greater than or equal to 20.',
+        'Please enter an amount greater than or equal to 100.',
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.orangeAccent,
         colorText: Colors.white,
@@ -73,13 +73,13 @@ class _WithdrawPageState extends State<WithdrawPage> {
     double totalWithdrawalAmount = withdrawalAmount + transactionFee;
 
     if (totalWithdrawalAmount <= availableBalance) {
-      Get.to(
-            () => WithdrawScreen(
-          withdrawalAmount: withdrawalAmount,
-          availableBalance: availableBalance - totalWithdrawalAmount,
-          publicKeyAddress: publicAddressController.text,
-        ),
-      );
+      // Get.to(
+      //       () => WithdrawScreen(
+      //     withdrawalAmount: withdrawalAmount,
+      //     availableBalance: availableBalance - totalWithdrawalAmount,
+      //     publicKeyAddress: publicAddressController.text,
+      //   ),
+      // );
     } else {
       Get.snackbar(
         'Insufficient Balance',
@@ -103,7 +103,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
           elevation: 0,
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           title: const Text(
-            "Withdraw",
+            "Deposit",
 
           ),
           leading: IconButton(
@@ -127,52 +127,52 @@ class _WithdrawPageState extends State<WithdrawPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Toggle Between Deposit and Withdraw
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const WalletDepositScreen()),
-                          );
-                          // Add deposit functionality
-                        },
-                        style: TextButton.styleFrom(
-                          backgroundColor: Colors.grey[200],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text(
-                          "Deposit",
-                          style: TextStyle(color: Colors.black),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          // Add withdraw functionality
-                        },
-                        style: TextButton.styleFrom(
-                          backgroundColor: Colors.blueAccent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text(
-                          "Withdraw",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                // Toggle Between Deposit and Deposit
+                // Row(
+                //   children: [
+                //     Expanded(
+                //       child: TextButton(
+                //         onPressed: () {
+                //           Navigator.push(
+                //             context,
+                //             MaterialPageRoute(
+                //                 builder: (context) =>
+                //                 const WalletDepositScreen()),
+                //           );
+                //           // Add deposit functionality
+                //         },
+                //         style: TextButton.styleFrom(
+                //           backgroundColor: Colors.grey[200],
+                //           shape: RoundedRectangleBorder(
+                //             borderRadius: BorderRadius.circular(8),
+                //           ),
+                //         ),
+                //         child: const Text(
+                //           "Deposit",
+                //           style: TextStyle(color: Colors.black),
+                //         ),
+                //       ),
+                //     ),
+                //     const SizedBox(width: 10),
+                //     Expanded(
+                //       child: TextButton(
+                //         onPressed: () {
+                //           // Add withdraw functionality
+                //         },
+                //         style: TextButton.styleFrom(
+                //           backgroundColor: Colors.blueAccent,
+                //           shape: RoundedRectangleBorder(
+                //             borderRadius: BorderRadius.circular(8),
+                //           ),
+                //         ),
+                //         child: const Text(
+                //           "Deposit",
+                //           style: TextStyle(color: Colors.white),
+                //         ),
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 const SizedBox(height: 5),
 
                 // You Pay Section
@@ -180,7 +180,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   child: Column(
                     children: [
                       const Text(
-                        "Amount must be greater than 20",
+                        "Amount must be greater than 100",
                         style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                       TextField(
@@ -192,7 +192,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                         ),
                         decoration: InputDecoration(
                           border: InputBorder.none,
-                          hintText: "\$20",
+                          hintText: "\$100",
                           hintStyle: TextStyle(
                             fontSize: 32, // Chhota font size
                             fontWeight: FontWeight.normal, // Normal font weight
@@ -234,27 +234,28 @@ class _WithdrawPageState extends State<WithdrawPage> {
                 ),
                 const SizedBox(height: 10),
 
-                // Withdraw To Section
+                // Deposit To Section
                 const Text(
-                  "Withdraw to Trc20",
+                 // "Deposit to Trc20",
+                  "Deposit",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
 
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                  const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey.shade300),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: // TextField for user input
-                      // TextField for user input
+                  // TextField for user input
                   TextField(
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium?.color,
-                        ),
-                        controller:  publicAddressController,
+                    style: TextStyle(
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                    ),
+                    controller:  publicAddressController,
                     decoration: const InputDecoration(
                       hintText: "Enter Tron Address",
 
@@ -264,45 +265,9 @@ class _WithdrawPageState extends State<WithdrawPage> {
                 ),
 
                 const SizedBox(height:5),
-                // Withdraw To Section
+                // Deposit To Section
                 const Text(
                   "Tron: TKSRbKd1K8v62F*****Md19joP1oxCPTjP",
-                  style: TextStyle(fontSize: 12),
-                ),const SizedBox(height: 10),
-
-                // Withdraw To Section
-                const Text(
-                  "Withdraw to BNB",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: // TextField for user input
-                      // TextField for user input
-                  TextField(
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium?.color,
-                        ),
-                       // controller:  publicAddressController,
-                    decoration: const InputDecoration(
-                      hintText: "Enter BNB Address",
-
-                      border: InputBorder.none, // Remove all borders (including underline)
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height:5),
-                // Withdraw To Section
-                const Text(
-                  "BNB: 0xcbdcf3920551939927e****74ac8bda8631d7556",
                   style: TextStyle(fontSize: 12),
                 ),
 
@@ -351,22 +316,22 @@ class _WithdrawPageState extends State<WithdrawPage> {
                 ),
                 const SizedBox(height: 20),
 
-                // Withdraw Button
+                // Deposit Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _confirmWithdraw,
                     //onPressed: main,
-                   // onPressed: main,
+                    // onPressed: main,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: Colors.red,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     child: const Text(
-                      "WITHDRAW",
+                      "DEPOSIT",
                       style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
@@ -400,10 +365,10 @@ class KeypadButton extends StatelessWidget {
         ),
         child: text != null
             ? Text(
-                text!,
-                style:
-                     TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.titleLarge?.color),
-              )
+          text!,
+          style:
+          TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.titleLarge?.color),
+        )
             : Icon(icon, size: 24, color:Theme.of(context).textTheme.titleLarge?.color),
       ),
     );

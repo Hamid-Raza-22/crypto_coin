@@ -54,6 +54,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: onBackPressed,
       )
           : null, // Only show the back button if onBackPressed is provided
+
     );
   }
 
